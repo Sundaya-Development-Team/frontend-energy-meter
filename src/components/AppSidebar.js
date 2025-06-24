@@ -43,9 +43,20 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
-          <CImage thumbnail src="/src/assets/images/white.png" width={200} height={200} />
+          <CImage
+            className="sidebar-brand-full"
+            thumbnail
+            src="/src/assets/images/white.png"
+            width={200}
+            height={200}
+          />
+          <CImage
+            className="sidebar-brand-narrow"
+            thumbnail
+            src="/src/assets/images/white_logo.PNG"
+          />
           {/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}
-          <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
+          {/* <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} /> */}
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"

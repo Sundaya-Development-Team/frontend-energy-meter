@@ -7,6 +7,16 @@ const Typography = React.lazy(() => import('./views/theme/typography/Typography'
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
 const PraQC = React.lazy(() => import('./views/semiproduction/praQC'))
+const QCUnits = React.lazy(() => import('./views/semiproduction/QCUnits'))
+const ReportQCUnit = React.lazy(() => import('./views/semiproduction/ReportQCUnit'))
+
+//Production
+const BatchingProduction = React.lazy(() => import('./views/production/BatchingProduction'))
+const ScanBeforeAssemble = React.lazy(
+  () => import('./views/production/assemble/ScanBeforeAssemble'),
+)
+const QCAssemble = React.lazy(() => import('./views/production/assemble/QCAsemble'))
+const ScanAfterAssemble = React.lazy(() => import('./views/production/assemble/ScanAfterAssemble'))
 
 // Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
@@ -100,9 +110,34 @@ const routes = [
   { path: '/notifications/badges', name: 'Badges', element: Badges },
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
-  { path: '/semiproduction', name: 'Semi Production', element: IncomingUnit, exact: true },
+  { path: '/production', name: 'Production', element: IncomingUnit, exact: true },
+  { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
+  {
+    path: '/production/assemble',
+    name: 'Assemble Production',
+    element: ScanBeforeAssemble,
+    exact: true,
+  },
+  {
+    path: '/production/assemble/before',
+    name: 'Scan Before Assemble',
+    element: ScanBeforeAssemble,
+  },
+  {
+    path: '/production/assemble/qc',
+    name: 'Quality Control Assemble',
+    element: QCAssemble,
+  },
+  {
+    path: '/production/assemble/after',
+    name: 'Scan After Assemble',
+    element: ScanAfterAssemble,
+  },
+  { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
   { path: '/semiproduction/praqc', name: 'Pra-QC Semi Product', element: PraQC },
   { path: '/semiproduction/incoming', name: 'Incoming Semi Product', element: IncomingUnit },
+  { path: '/semiproduction/qcunits', name: 'QC Semi Product', element: QCUnits },
+  { path: '/semiproduction/reportqcunit', name: 'Report QC Semi Product', element: ReportQCUnit },
   { path: '/widgets', name: 'Widgets', element: Widgets },
 ]
 

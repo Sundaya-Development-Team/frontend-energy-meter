@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CButton,
   CCard,
@@ -14,6 +14,29 @@ import {
 } from '@coreui/react'
 
 const IncomingUnit = () => {
+  const [formData, setFormData] = useState({ sapcode: '', barcode: '', batch: '' })
+  const handleChange = (e) => {
+    const { name, value, type, files } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'file' ? files[0] : value, // Handle file input
+    }))
+  }
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log('Form Data:', formData)
+
+    if (!formData.sapcode || !formData.barcode || !formData.batch) {
+      alert('Please fill out all fields!')
+      return
+    }
+
+    alert(`
+      SAP Code: ${formData.sapcode}
+      Barcode: ${formData.barcode}
+      Incoming Batch: ${formData.batch}
+    `)
+  }
   return (
     <CRow>
       <CCol xs={12}>
@@ -22,14 +45,21 @@ const IncomingUnit = () => {
             <strong>Scan Incoming Semi Product</strong>
           </CCardHeader>
           <CCardBody>
-            <CForm>
+            <CForm onSubmit={handleSubmit}>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="FormSAPCodeInput" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="sapcode" className="col-sm-2 col-form-label">
                   SAP Code
                 </CFormLabel>
                 <CCol sm={10}>
-                  <CFormSelect aria-label="Default select example">
-                    <option>Open this select menu</option>
+                  <CFormSelect
+                    id="sapcode"
+                    name="sapcode"
+                    aria-label="Select SAP Code"
+                    value={formData.sapcode}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select SAP Code</option>
                     <option value="1">One</option>
                     <option value="2">Two</option>
                     <option value="3">Three</option>
@@ -37,19 +67,35 @@ const IncomingUnit = () => {
                 </CCol>
               </CRow>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="barcode" className="col-sm-2 col-form-label">
                   Barcode
                 </CFormLabel>
                 <CCol sm={10}>
-                  <CFormInput type="text" id="FormBarcodeInput" placeholder="Scan Barcode" />
+                  <CFormInput
+                    type="text"
+                    id="barcode"
+                    name="barcode"
+                    placeholder="Scan Barcode"
+                    value={formData.barcode}
+                    onChange={handleChange}
+                    required
+                  />
                 </CCol>
               </CRow>
               <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBatchIncomingInput" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="batch" className="col-sm-2 col-form-label">
                   Incoming Batch
                 </CFormLabel>
                 <CCol sm={10}>
-                  <CFormInput type="number" id="FormBatchIncomingInput" />
+                  <CFormInput
+                    type="number"
+                    id="batch"
+                    name="batch"
+                    placeholder="Input Batch"
+                    value={formData.batch}
+                    onChange={handleChange}
+                    required
+                  />
                 </CCol>
               </CRow>
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">

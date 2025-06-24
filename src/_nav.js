@@ -48,20 +48,49 @@ const _nav = [
     icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'QC Units',
+    to: '/semiproduction/qcunits',
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Report QC Units',
+    to: '/semiproduction/reportqcunit',
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'Production',
   },
   {
     component: CNavItem,
-    name: 'Pages 1',
-    to: '/production/page1',
+    name: 'Batch Production',
+    to: '/production/batch',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
   {
-    component: CNavItem,
-    name: 'Pages 2',
-    to: '/production/page2',
+    component: CNavGroup,
+    name: 'Assemble',
+    to: '/production/assemble',
     icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/assemble/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Quality Control',
+        to: '/production/assemble/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan After',
+        to: '/production/assemble/after',
+      },
+    ],
   },
   {
     component: CNavTitle,
