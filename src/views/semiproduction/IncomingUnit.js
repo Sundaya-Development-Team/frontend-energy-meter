@@ -23,14 +23,8 @@ const IncomingUnit = () => {
     }))
   }
   const handleSubmit = (e) => {
-    e.preventDefault()
+    // e.preventDefault()
     console.log('Form Data:', formData)
-
-    if (!formData.sapcode || !formData.barcode || !formData.batch) {
-      alert('Please fill out all fields!')
-      return
-    }
-
     alert(`
       SAP Code: ${formData.sapcode}
       Barcode: ${formData.barcode}
@@ -46,6 +40,7 @@ const IncomingUnit = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
+            {/* SAP Code */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="sapcode" className="col-sm-2 col-form-label">
                   SAP Code
@@ -66,6 +61,8 @@ const IncomingUnit = () => {
                   </CFormSelect>
                 </CCol>
               </CRow>
+
+              {/* Barcode */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="barcode" className="col-sm-2 col-form-label">
                   Barcode
@@ -82,6 +79,8 @@ const IncomingUnit = () => {
                   />
                 </CCol>
               </CRow>
+
+              {/* Incoming Batch */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="batch" className="col-sm-2 col-form-label">
                   Incoming Batch
@@ -98,6 +97,8 @@ const IncomingUnit = () => {
                   />
                 </CCol>
               </CRow>
+
+              {/* Submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit">
                   Submit

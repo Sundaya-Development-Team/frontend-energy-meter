@@ -12,10 +12,9 @@ import {
   CRow,
 } from '@coreui/react'
 
-const BatchingProduction = () => {
+const IncomingUnits = () => {
   const [formData, setFormData] = useState({
-    productionBatch: '',
-    totalUnit: '',
+    barcode: '',
   })
 
   const handleChange = (e) => {
@@ -28,8 +27,9 @@ const BatchingProduction = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Batching Production Submitted:', formData)
-    alert(`Production Batch: ${formData.productionBatch}\nTotal Unit: ${formData.totalUnit}`)
+    console.log('Scan After Assemble:', formData)
+    alert(`Barcode: ${formData.barcode}`)
+    // Tambahkan logic kirim ke backend jika perlu
   }
 
   return (
@@ -37,45 +37,25 @@ const BatchingProduction = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Batch Product</strong>
+            <strong>Incoming To Inventory</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              {/* Production Batch */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
-                  Production Batch
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="number"
-                    id="FormBatchProductionInput"
-                    name="productionBatch"
-                    value={formData.productionBatch}
-                    onChange={handleChange}
-                    required
-                  />
-                </CCol>
-              </CRow>
-
-              {/* Total Unit */}
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormTotalUnitInput" className="col-sm-2 col-form-label">
-                  Total Unit
+                <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
+                  Barcode
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="text"
-                    id="FormTotalUnitInput"
-                    name="totalUnit"
-                    value={formData.totalUnit}
+                    id="FormBarcodeInput"
+                    name="barcode"
+                    value={formData.barcode}
                     onChange={handleChange}
                     required
                   />
                 </CCol>
               </CRow>
-
-              {/* Submit Button */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit">
                   Submit
@@ -89,4 +69,4 @@ const BatchingProduction = () => {
   )
 }
 
-export default BatchingProduction
+export default IncomingUnits

@@ -6,17 +6,58 @@ const Typography = React.lazy(() => import('./views/theme/typography/Typography'
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
-const PraQC = React.lazy(() => import('./views/semiproduction/praQC'))
+const PraQC = React.lazy(() => import('./views/semiproduction/PraQC'))
 const QCUnits = React.lazy(() => import('./views/semiproduction/QCUnits'))
 const ReportQCUnit = React.lazy(() => import('./views/semiproduction/ReportQCUnit'))
 
 //Production
 const BatchingProduction = React.lazy(() => import('./views/production/BatchingProduction'))
+
+// Assemble
 const ScanBeforeAssemble = React.lazy(
   () => import('./views/production/assemble/ScanBeforeAssemble'),
 )
-const QCAssemble = React.lazy(() => import('./views/production/assemble/QCAsemble'))
+const QCAssemble = React.lazy(() => import('./views/production/assemble/QCAssemble'))
 const ScanAfterAssemble = React.lazy(() => import('./views/production/assemble/ScanAfterAssemble'))
+
+// On
+const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
+const ScanAfterOn = React.lazy(() => import('./views/production/ontest/ScanAfterOn'))
+
+// Hipot
+const ScanBeforeHipot = React.lazy(() => import('./views/production/hipottest/ScanBeforeHipot'))
+const ScanAfterHipot = React.lazy(() => import('./views/production/hipottest/ScanAfterHipot'))
+
+// Calibration
+const ScanBeforeCalibration = React.lazy(
+  () => import('./views/production/calibrationtest/ScanBeforeCalibration'),
+)
+const ScanAfterCalibration = React.lazy(
+  () => import('./views/production/calibrationtest/ScanAfterCalibration'),
+)
+
+// Aging
+const ScanBeforeAging = React.lazy(() => import('./views/production/agingtest/ScanBeforeAging'))
+const ScanAfterAging = React.lazy(() => import('./views/production/agingtest/ScanAfterAging'))
+
+// Clear Zero
+const ScanBeforeClearZero = React.lazy(
+  () => import('./views/production/clearzero/ScanBeforeClearZero'),
+)
+const ScanAfterZeroClear = React.lazy(
+  () => import('./views/production/clearzero/ScanAfterClearZero'),
+)
+
+// Closing Cover
+const ScanBeforeClosingCover = React.lazy(
+  () => import('./views/production/closingcover/ScanBeforeClosingCover'),
+)
+const ScanAfterClosingCover = React.lazy(
+  () => import('./views/production/closingcover/ScanAfterClosingCover'),
+)
+
+// Inventory
+const IncomingUnits = React.lazy(() => import('./views/inventory/IncomingUnits'))
 
 // Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
@@ -105,6 +146,7 @@ const routes = [
   { path: '/icons/coreui-icons', name: 'CoreUI Icons', element: CoreUIIcons },
   { path: '/icons/flags', name: 'Flags', element: Flags },
   { path: '/icons/brands', name: 'Brands', element: Brands },
+  { path: '/inventory', name: 'Inventory', element: IncomingUnits },
   { path: '/notifications', name: 'Notifications', element: Alerts, exact: true },
   { path: '/notifications/alerts', name: 'Alerts', element: Alerts },
   { path: '/notifications/badges', name: 'Badges', element: Badges },
@@ -119,6 +161,11 @@ const routes = [
     exact: true,
   },
   {
+    path: '/production/assemble/after',
+    name: 'Scan After Assemble',
+    element: ScanAfterAssemble,
+  },
+  {
     path: '/production/assemble/before',
     name: 'Scan Before Assemble',
     element: ScanBeforeAssemble,
@@ -129,9 +176,100 @@ const routes = [
     element: QCAssemble,
   },
   {
-    path: '/production/assemble/after',
-    name: 'Scan After Assemble',
-    element: ScanAfterAssemble,
+    path: '/production/aging',
+    name: 'Aging Test',
+    element: ScanBeforeAging,
+    exact: true,
+  },
+  {
+    path: '/production/aging/after',
+    name: 'Scan After Aging Test',
+    element: ScanAfterAging,
+  },
+  {
+    path: '/production/aging/before',
+    name: 'Scan Before Aging Test',
+    element: ScanBeforeAging,
+  },
+  {
+    path: '/production/calibration',
+    name: 'Calibration Testing',
+    element: ScanBeforeCalibration,
+    exact: true,
+  },
+  {
+    path: '/production/calibration/after',
+    name: 'Scan After Calibration Testing',
+    element: ScanAfterCalibration,
+  },
+  {
+    path: '/production/calibration/before',
+    name: 'Scan Before Calibration Testing',
+    element: ScanBeforeCalibration,
+  },
+  {
+    path: '/production/clearzero',
+    name: 'Clear Zero',
+    element: ScanBeforeClearZero,
+    exact: true,
+  },
+  {
+    path: '/production/clearzero/after',
+    name: 'Scan After Clear Zero',
+    element: ScanAfterZeroClear,
+  },
+  {
+    path: '/production/clearzero/before',
+    name: 'Scan Before Clear Zero',
+    element: ScanBeforeClearZero,
+  },
+  {
+    path: '/production/closingcover',
+    name: 'Closing Cover',
+    element: ScanBeforeClosingCover,
+    exact: true,
+  },
+  {
+    path: '/production/closingcover/after',
+    name: 'Scan After Closing Cover',
+    element: ScanAfterClosingCover,
+  },
+  {
+    path: '/production/closingcover/before',
+    name: 'Scan Before Closing Cover',
+    element: ScanBeforeClosingCover,
+  },
+  {
+    path: '/production/hipot',
+    name: 'Hipot Testing',
+    element: ScanBeforeHipot,
+    exact: true,
+  },
+  {
+    path: '/production/hipot/after',
+    name: 'Scan After Hipot Testing',
+    element: ScanAfterHipot,
+  },
+  {
+    path: '/production/hipot/before',
+    name: 'Scan Before Hipot Testing',
+    element: ScanBeforeHipot,
+  },
+  {
+    path: '/production/on',
+    name: 'On Test',
+    element: ScanBeforeOn,
+    exact: true,
+  },
+  {
+    path: '/production/on/after',
+    name: 'Scan After On',
+    element: ScanAfterOn,
+  },
+  {
+    path: '/production/on/before',
+    name: 'Scan Before On',
+    element: ScanBeforeOn,
   },
   { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
   { path: '/semiproduction/praqc', name: 'Pra-QC Semi Product', element: PraQC },

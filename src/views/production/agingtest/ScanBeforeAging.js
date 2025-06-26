@@ -12,10 +12,10 @@ import {
   CRow,
 } from '@coreui/react'
 
-const BatchingProduction = () => {
+const ScanBeforeAging = () => {
   const [formData, setFormData] = useState({
-    productionBatch: '',
-    totalUnit: '',
+    barcode: '',
+    productionBatch: '10', // bisa diisi otomatis berdasarkan barcode jika ada logicnya
   })
 
   const handleChange = (e) => {
@@ -28,8 +28,8 @@ const BatchingProduction = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Batching Production Submitted:', formData)
-    alert(`Production Batch: ${formData.productionBatch}\nTotal Unit: ${formData.totalUnit}`)
+    console.log('Scan Submitted:', formData)
+    alert(`Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}`)
   }
 
   return (
@@ -37,45 +37,41 @@ const BatchingProduction = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Batch Product</strong>
+            <strong>Scan Before Aging Test</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              {/* Production Batch */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
+                  Barcode
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="text"
+                    id="FormBarcodeInput"
+                    name="barcode"
+                    value={formData.barcode}
+                    onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
                   Production Batch
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
-                    type="number"
+                    type="text"
                     id="FormBatchProductionInput"
                     name="productionBatch"
                     value={formData.productionBatch}
-                    onChange={handleChange}
-                    required
+                    readOnly
                   />
                 </CCol>
               </CRow>
 
-              {/* Total Unit */}
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormTotalUnitInput" className="col-sm-2 col-form-label">
-                  Total Unit
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="text"
-                    id="FormTotalUnitInput"
-                    name="totalUnit"
-                    value={formData.totalUnit}
-                    onChange={handleChange}
-                    required
-                  />
-                </CCol>
-              </CRow>
-
-              {/* Submit Button */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit">
                   Submit
@@ -89,4 +85,4 @@ const BatchingProduction = () => {
   )
 }
 
-export default BatchingProduction
+export default ScanBeforeAging

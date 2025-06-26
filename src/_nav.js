@@ -93,6 +93,154 @@ const _nav = [
     ],
   },
   {
+    component: CNavGroup,
+    name: 'On Test',
+    to: '/production/on',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/on/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Quality Control',
+        to: '/production/on/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan After',
+        to: '/production/on/after',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Hipot Test',
+    to: '/production/hipot',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/hipot/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Quality Control',
+        to: '/production/hipot/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan After',
+        to: '/production/hipot/after',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Calibration Test',
+    to: '/production/calibration',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/calibration/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Quality Control',
+        to: '/production/calibration/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan After',
+        to: '/production/calibration/after',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Aging Test',
+    to: '/production/aging',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/aging/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Quality Control',
+        to: '/production/aging/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan After',
+        to: '/production/aging/after',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Clear Zero',
+    to: '/production/clearzero',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/clearzero/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Quality Control',
+        to: '/production/clearzero/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan After',
+        to: '/production/clearzero/after',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Closing Cover',
+    to: '/production/closingcover',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/closingcover/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Quality Control',
+        to: '/production/closingcover/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan After',
+        to: '/production/closingcover/after',
+      },
+    ],
+  },
+  {
+    component: CNavTitle,
+    name: 'Inventory',
+  },
+  {
+    component: CNavItem,
+    name: 'Inventory',
+    to: '/inventory',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'Theme',
   },
