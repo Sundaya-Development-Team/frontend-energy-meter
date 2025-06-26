@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -15,8 +15,10 @@ import {
   CInputGroupText,
   CRow,
 } from '@coreui/react'
+import { backendQualityService } from '../../api/axios'
 
 const QCUnits = () => {
+  const [questionData, setQuestionData] = useState([])
   const [formData, setFormData] = useState({
     sapCode: 'SAP123456',
     sampleQty: 10,
@@ -79,6 +81,19 @@ const QCUnits = () => {
     },
   ]
 
+  const getQuestions = async () => {
+    console.log('Getting questions data')
+    try {
+      const resQuestion = await backendQualityService.get('/v1/api/quality-service/questions')
+      const data = resQuestion.data
+      setQuestionData(data.data)
+
+      // setQuestionData(data)
+    } catch (error) {
+      console.log('Error fetching question data', error)
+    }
+  }
+
   const listQuestions2 = [
     {
       id: 1,
@@ -133,6 +148,12 @@ const QCUnits = () => {
     },
   ]
 
+  useEffect(() => {
+    console.log('Component rendered')
+    getQuestions()
+    // console.log("formData berubah:", formData);
+  }, [])
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -184,42 +205,46 @@ const QCUnits = () => {
               </CRow>
 
               {/* Dynamic Questions */}
-              {listQuestions1.map((section) => (
-                <div key={section.id}>
-                  <CFormLabel className="col-form-label mt-3">
-                    <strong>{section.title}</strong>
-                  </CFormLabel>
-                  {section.questions.map((q) => (
-                    <CRow className="mb-3" key={q.id}>
-                      <CCol sm={12}>
-                        <div className="border rounded p-3">
-                          <CFormLabel className="col-form-label">{q.question}</CFormLabel>
-                          <div className="d-flex justify-content-end gap-3">
-                            <CFormCheck
-                              inline
-                              type="radio"
-                              name={`question-${q.id}`}
-                              value="true"
-                              label="Ya"
-                              checked={formData.answers[q.id] === true}
-                              onChange={handleChange}
-                            />
-                            <CFormCheck
-                              inline
-                              type="radio"
-                              name={`question-${q.id}`}
-                              value="false"
-                              label="Tidak"
-                              checked={formData.answers[q.id] === false}
-                              onChange={handleChange}
-                            />
+              {questionData.length === 0 ? (
+                <p className="text-muted">Pertanyaan belum tersedia...</p>
+              ) : (
+                questionData.map((section) => (
+                  <div key={section.id}>
+                    <CFormLabel className="col-form-label mt-3">
+                      <strong>{section.title}</strong>
+                    </CFormLabel>
+                    {section.questions.map((q) => (
+                      <CRow className="mb-3" key={q.id}>
+                        <CCol sm={12}>
+                          <div className="border rounded p-3">
+                            <CFormLabel className="col-form-label">{q.question}</CFormLabel>
+                            <div className="d-flex justify-content-end gap-3">
+                              <CFormCheck
+                                inline
+                                type="radio"
+                                name={`question-${q.id}`}
+                                value="true"
+                                label="Ya"
+                                checked={formData.answers[q.id] === true}
+                                onChange={handleChange}
+                              />
+                              <CFormCheck
+                                inline
+                                type="radio"
+                                name={`question-${q.id}`}
+                                value="false"
+                                label="Tidak"
+                                checked={formData.answers[q.id] === false}
+                                onChange={handleChange}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </CCol>
-                    </CRow>
-                  ))}
-                </div>
-              ))}
+                        </CCol>
+                      </CRow>
+                    ))}
+                  </div>
+                ))
+              )}
 
               {/* Submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">

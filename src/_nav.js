@@ -247,7 +247,23 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Admins',
+  },
+  {
+    component: CNavItem,
+    name: 'Admin',
+    to: '/admin',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
     name: 'Theme',
+  },
+  {
+    component: CNavItem,
+    name: 'Admin',
+    to: '/admin',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
