@@ -65,7 +65,7 @@ const BatchingProduction = () => {
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
-                    type="text"
+                    type="number"
                     id="FormTotalUnitInput"
                     name="totalUnit"
                     value={formData.totalUnit}

@@ -15,7 +15,8 @@ import {
 const ScanBeforeClosingCover = () => {
   const [formData, setFormData] = useState({
     barcode: '',
-    productionBatch: '10', // bisa diisi otomatis berdasarkan barcode jika ada logicnya
+    productionBatch: '10',
+    agingBatch: '',
   })
 
   const handleChange = (e) => {
@@ -29,7 +30,9 @@ const ScanBeforeClosingCover = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Scan Submitted:', formData)
-    alert(`Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}`)
+    alert(
+      `Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}\nAging Batch: ${formData.agingBatch}`,
+    )
   }
 
   return (
@@ -41,6 +44,7 @@ const ScanBeforeClosingCover = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
+              {/* Barcode */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
                   Barcode
@@ -57,6 +61,7 @@ const ScanBeforeClosingCover = () => {
                 </CCol>
               </CRow>
 
+              {/* Production Batch */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
                   Production Batch
@@ -72,6 +77,24 @@ const ScanBeforeClosingCover = () => {
                 </CCol>
               </CRow>
 
+              {/* Aging Batch */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="FormBatchAgingInput" className="col-sm-2 col-form-label">
+                  Aging Batch
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="number"
+                    id="FormBatchAgingInput"
+                    name="agingBatch"
+                    value={formData.agingBatch}
+                    onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+
+              {/* Submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit">
                   Submit

@@ -37,6 +37,7 @@ const ScanAfterCalibration = React.lazy(
 )
 
 // Aging
+const BatchingAging = React.lazy(() => import('./views/production/agingtest/BatchingAging'))
 const ScanBeforeAging = React.lazy(() => import('./views/production/agingtest/ScanBeforeAging'))
 const ScanAfterAging = React.lazy(() => import('./views/production/agingtest/ScanAfterAging'))
 
@@ -185,6 +186,11 @@ const routes = [
     path: '/production/aging/after',
     name: 'Scan After Aging Test',
     element: ScanAfterAging,
+  },
+  {
+    path: '/production/aging/batching',
+    name: 'Batching Aging Test',
+    element: BatchingAging,
   },
   {
     path: '/production/aging/before',

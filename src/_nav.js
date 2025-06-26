@@ -169,6 +169,11 @@ const _nav = [
     items: [
       {
         component: CNavItem,
+        name: 'Batching',
+        to: '/production/aging/batching',
+      },
+      {
+        component: CNavItem,
         name: 'Scan Before',
         to: '/production/aging/before',
       },

@@ -12,11 +12,12 @@ import {
   CRow,
 } from '@coreui/react'
 
-const ScanAfterAging = () => {
+const BatchingAging = () => {
   const [formData, setFormData] = useState({
-    barcode: '',
     productionBatch: '10',
     agingBatch: '',
+    totalQuantity: '',
+    sampleQuantity: '',
   })
 
   const handleChange = (e) => {
@@ -27,11 +28,13 @@ const ScanAfterAging = () => {
     }))
   }
 
+  const sampleQty = formData.totalQuantity ? Math.ceil(Number(formData.totalQuantity) * 0.1) : ''
+
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Scan After Assemble:', formData)
     alert(
-      `Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}\nAging Batch: ${formData.agingBatch}`,
+      `Production Batch: ${formData.productionBatch}\nAging Batch: ${formData.agingBatch}\nTotal Quantity: ${formData.totalQuantity}\nSample Quantity: ${sampleQty}`,
     )
     // Tambahkan logic kirim ke backend jika perlu
   }
@@ -41,27 +44,10 @@ const ScanAfterAging = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Scan After Aging Test</strong>
+            <strong>Batching Aging Test</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              {/* Barcode */}
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
-                  Barcode
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="text"
-                    id="FormBarcodeInput"
-                    name="barcode"
-                    value={formData.barcode}
-                    onChange={handleChange}
-                    required
-                  />
-                </CCol>
-              </CRow>
-
               {/* Production Batch */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
@@ -69,7 +55,7 @@ const ScanAfterAging = () => {
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
-                    type="text"
+                    type="number"
                     id="FormBatchProductionInput"
                     name="productionBatch"
                     value={formData.productionBatch}
@@ -95,6 +81,39 @@ const ScanAfterAging = () => {
                 </CCol>
               </CRow>
 
+              {/* Total Quantity */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="totalQuantity" className="col-sm-2 col-form-label">
+                  Total Quantity
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="number"
+                    id="totalQuantity"
+                    name="totalQuantity"
+                    value={formData.totalQuantity}
+                    onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+
+              {/* Sample Quantity */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="sampleQty" className="col-sm-2 col-form-label">
+                  Sample Quantity
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="number"
+                    id="sampleQty"
+                    name="sampleQty"
+                    value={sampleQty}
+                    readOnly
+                  />
+                </CCol>
+              </CRow>
+
               {/* Submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit">
@@ -109,4 +128,4 @@ const ScanAfterAging = () => {
   )
 }
 
-export default ScanAfterAging
+export default BatchingAging

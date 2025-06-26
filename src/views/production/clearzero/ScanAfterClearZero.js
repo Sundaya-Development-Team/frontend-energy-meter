@@ -15,7 +15,8 @@ import {
 const ScanAfterZeroClear = () => {
   const [formData, setFormData] = useState({
     barcode: '',
-    productionBatch: '10', // bisa diisi otomatis jika diperlukan
+    productionBatch: '10',
+    agingBatch: '',
   })
 
   const handleChange = (e) => {
@@ -29,7 +30,9 @@ const ScanAfterZeroClear = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Scan After Assemble:', formData)
-    alert(`Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}`)
+    alert(
+      `Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}\nAging Batch: ${formData.agingBatch}`,
+    )
     // Tambahkan logic kirim ke backend jika perlu
   }
 
@@ -42,6 +45,7 @@ const ScanAfterZeroClear = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
+              {/* Barcode */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
                   Barcode
@@ -58,6 +62,7 @@ const ScanAfterZeroClear = () => {
                 </CCol>
               </CRow>
 
+              {/* Production */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
                   Production Batch
@@ -73,6 +78,24 @@ const ScanAfterZeroClear = () => {
                 </CCol>
               </CRow>
 
+              {/* Aging Batch */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="FormBatchAgingInput" className="col-sm-2 col-form-label">
+                  Aging Batch
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="number"
+                    id="FormBatchAgingInput"
+                    name="agingBatch"
+                    value={formData.agingBatch}
+                    onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+
+              {/* Submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit">
                   Submit
@@ -87,4 +110,3 @@ const ScanAfterZeroClear = () => {
 }
 
 export default ScanAfterZeroClear
-

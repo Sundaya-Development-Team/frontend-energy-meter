@@ -16,6 +16,7 @@ const ScanAfterClosingCover = () => {
   const [formData, setFormData] = useState({
     barcode: '',
     productionBatch: '10', // bisa diisi otomatis jika diperlukan
+    agingBatch: '',
   })
 
   const handleChange = (e) => {
@@ -29,7 +30,9 @@ const ScanAfterClosingCover = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Scan After Assemble:', formData)
-    alert(`Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}`)
+    alert(
+      `Barcode: ${formData.barcode}\nProduction Batch: ${formData.productionBatch}\nAging Batch: ${formData.agingBatch}`,
+    )
     // Tambahkan logic kirim ke backend jika perlu
   }
 
@@ -42,6 +45,7 @@ const ScanAfterClosingCover = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
+              {/* Barcode */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
                   Barcode
@@ -58,6 +62,7 @@ const ScanAfterClosingCover = () => {
                 </CCol>
               </CRow>
 
+              {/* Production Batch */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
                   Production Batch
@@ -73,6 +78,24 @@ const ScanAfterClosingCover = () => {
                 </CCol>
               </CRow>
 
+              {/* Aging Batch */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="FormBatchAgingInput" className="col-sm-2 col-form-label">
+                  Aging Batch
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="number"
+                    id="FormBatchAgingInput"
+                    name="agingBatch"
+                    value={formData.agingBatch}
+                    onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+
+              {/* submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit">
                   Submit
@@ -87,4 +110,3 @@ const ScanAfterClosingCover = () => {
 }
 
 export default ScanAfterClosingCover
-
