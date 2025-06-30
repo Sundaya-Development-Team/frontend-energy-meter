@@ -85,7 +85,25 @@ const AddProduct = () => {
       window.location.reload()
       // await getAllProduct()
     } catch (error) {
-      console.error(error)
+      console.error('Error delete Product', error)
+    }
+  }
+
+  const editProduct = async (rowData) => {
+    try {
+      const { id, sap_code, name, uom, product_type, category, is_active } = rowData
+      alert(
+        `Edit product:\n` +
+          `id: ${id}\n` +
+          `sap: ${sap_code}\n` +
+          `name: ${name}\n` +
+          `uom_id: ${uom?.id}\n` +
+          `type: ${product_type}\n` +
+          `category_id: ${category?.id}\n` +
+          `active: ${is_active}`,
+      )
+    } catch (error) {
+      console.error('Error edit Product', error)
     }
   }
 
@@ -239,8 +257,8 @@ const AddProduct = () => {
       deleteProduct(id)
     })
     $table.on('click', '.btn-edit', (e) => {
-      const id = $(e.currentTarget).data('id')
-      alert(`Edit product id: ${id} (belum di‑implementasi)`)
+      const rowData = dtInstance.current.row($(e.currentTarget).closest('tr')).data()
+      editProduct(rowData)
     })
 
     return () => {
