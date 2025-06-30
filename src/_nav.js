@@ -251,19 +251,25 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Admin',
-    to: '/admin',
+    name: 'Dynamic Question',
+    to: '/admin/dynamicquestion',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Add Product',
+    to: '/admin/product/addproduct',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'View Product',
+    to: '/admin/product/viewproduct',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
     name: 'Theme',
-  },
-  {
-    component: CNavItem,
-    name: 'Admin',
-    to: '/admin',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,

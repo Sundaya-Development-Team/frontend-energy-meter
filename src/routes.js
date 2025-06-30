@@ -5,7 +5,8 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
 // Admin
-
+const AddProduct = React.lazy(() => import('./views/admins/product/AddProduct'))
+const ViewProduct = React.lazy(() => import('./views/admins/product/ViewProduct'))
 const DynamicQuestionForm = React.lazy(() => import('./views/admins/DynamicQuestionForm'))
 
 // Semi Production
@@ -113,7 +114,11 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/admin', name: 'Dashboard', element: DynamicQuestionForm },
+  { path: '/admin', name: 'Admin', element: DynamicQuestionForm, exact: true },
+  { path: '/admin/product', name: 'Admin Product', element: DynamicQuestionForm, exact: true },
+  { path: '/admin/product/addproduct', name: 'Add Product', element: AddProduct },
+  { path: '/admin/product/viewproduct', name: 'View Product', element: ViewProduct },
+  { path: '/admin/dynamicquestion', name: 'Dynamic Question', element: DynamicQuestionForm },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
