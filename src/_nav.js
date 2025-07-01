@@ -257,14 +257,14 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Add Product',
-    to: '/admin/product/addproduct',
+    name: 'Product',
+    to: '/admin/product',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
-    name: 'View Product',
-    to: '/admin/product/viewproduct',
+    name: 'Partner',
+    to: '/admin/partner',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
   {
