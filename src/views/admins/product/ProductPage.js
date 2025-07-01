@@ -228,7 +228,12 @@ const ProductPage = () => {
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Product List</strong>
-              <CButton color="success" size="sm" onClick={() => handleOpenModal('add')}>
+              <CButton
+                className="fw-bold text-white"
+                color="success"
+                size="sm"
+                onClick={() => handleOpenModal('add')}
+              >
                 + Add Product
               </CButton>
             </CCardHeader>
