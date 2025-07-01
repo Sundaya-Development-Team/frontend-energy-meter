@@ -25,7 +25,7 @@ import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.html5.js'
 import 'datatables.net-buttons/js/buttons.print.js'
 import JSZip from 'jszip'
-import { backendPartner, backendProduct } from '../../../api/axios'
+import { backendPartner } from '../../../api/axios'
 
 window.JSZip = JSZip
 
@@ -39,8 +39,10 @@ const PartnerPage = () => {
   const [typeData, setTypeData] = useState([])
 
   /* form di modal */
+  const [visibleBulk, setVisibleBulk] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState('add') // 'add' | 'edit'
+  const [excelFile, setExcelFile] = useState(null)
   const [formData, setFormData] = useState({
     id: '',
     name: '',
@@ -58,6 +60,104 @@ const PartnerPage = () => {
   const refreshTable = async () => {
     const { data } = await backendPartner.get('/partners/all').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
+  }
+
+  const handleOpenModelBulk = (mode) => {
+    mode === 'bulk' && setVisibleBulk(true)
+  }
+
+  const handleOpenModal = (mode, rowData = null) => {
+    setModalMode(mode)
+    if (mode === 'edit' && rowData) {
+      setFormData({
+        id: rowData.id,
+        name: rowData.name ?? '',
+        sap_pcode: rowData.sap_pcode ?? '',
+        type: rowData.type ?? '',
+        address: rowData.address ?? '',
+        phone: rowData.phone ?? '',
+        fax: rowData.fax ?? '',
+        email: rowData.email ?? '',
+        contact_person: rowData.contact_person ?? '',
+        is_active: rowData.is_active ?? '',
+      })
+    } else {
+      setFormData(emptyForm)
+    }
+    setModalVisible(true)
+  }
+
+  /* onChange semua input */
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    if (name === 'is_active') {
+      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
+    }
+    setFormData((p) => ({ ...p, [name]: value }))
+  }
+  /* ---------- modal helpers ---------- */
+  const emptyForm = {
+    id: '',
+    name: '',
+    sap_pcode: '',
+    type: '',
+    address: '',
+    phone: '',
+    fax: '',
+    email: '',
+    contact_person: '',
+    is_active: '',
+  }
+
+  /* ---------- Simpan (Add / Update) ---------- */
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+      const payload = {
+        name: formData.name,
+        sap_pcode: formData.sap_pcode,
+        type: formData.type,
+        address: formData.address,
+        phone: formData.phone,
+        fax: formData.fax,
+        email: formData.email,
+        contact_person: formData.contact_person,
+        is_active: formData.is_active,
+      }
+      if (modalMode === 'add') {
+        await backendPartner.post('/partners/add', payload)
+      } else {
+        await backendPartner.put(`/partners/update/${formData.id}`, payload)
+      }
+      setModalVisible(false)
+      await refreshTable()
+    } catch (err) {
+      alert(err.response?.data?.message || err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUploadExcel = async (e) => {
+    e.preventDefault()
+    if (!excelFile) return
+
+    const formData = new FormData()
+    formData.append('file', excelFile)
+
+    try {
+      setLoading(true)
+      await backendPartner.post('/partners/upload-excel', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setVisibleBulk(false)
+      setExcelFile(null)
+      await refreshTable()
+    } catch (err) {
+      alert(err.response?.data?.message || err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   /* ---------- fetch master ---------- */
@@ -146,79 +246,6 @@ const PartnerPage = () => {
     }
   }, [tableData])
 
-  /* ---------- modal helpers ---------- */
-  const emptyForm = {
-    id: '',
-    name: '',
-    sap_pcode: '',
-    type: '',
-    address: '',
-    phone: '',
-    fax: '',
-    email: '',
-    contact_person: '',
-    is_active: '',
-  }
-
-  const handleOpenModal = (mode, rowData = null) => {
-    setModalMode(mode)
-    if (mode === 'edit' && rowData) {
-      setFormData({
-        id: rowData.id,
-        name: rowData.name ?? '',
-        sap_pcode: rowData.sap_pcode ?? '',
-        type: rowData.type ?? '',
-        address: rowData.address ?? '',
-        phone: rowData.phone ?? '',
-        fax: rowData.fax ?? '',
-        email: rowData.email ?? '',
-        contact_person: rowData.contact_person ?? '',
-        is_active: rowData.is_active ?? '',
-      })
-    } else {
-      setFormData(emptyForm)
-    }
-    setModalVisible(true)
-  }
-
-  /* onChange semua input */
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    if (name === 'is_active') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
-    }
-    setFormData((p) => ({ ...p, [name]: value }))
-  }
-
-  /* ---------- Simpan (Add / Update) ---------- */
-  const handleSave = async () => {
-    try {
-      setLoading(true)
-      const payload = {
-        name: formData.name,
-        sap_pcode: formData.sap_pcode,
-        type: formData.type,
-        address: formData.address,
-        phone: formData.phone,
-        fax: formData.fax,
-        email: formData.email,
-        contact_person: formData.contact_person,
-        is_active: formData.is_active,
-      }
-      if (modalMode === 'add') {
-        await backendPartner.post('/partners/add', payload)
-      } else {
-        await backendPartner.put(`/partners/update/${formData.id}`, payload)
-      }
-      setModalVisible(false)
-      await refreshTable()
-    } catch (err) {
-      alert(err.response?.data?.message || err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   /* ---------- render ---------- */
   return (
     <>
@@ -227,7 +254,20 @@ const PartnerPage = () => {
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Partner List</strong>
-              <CButton color="success" size="sm" onClick={() => handleOpenModal('add')}>
+              <CButton
+                className="fw-bold text-white"
+                color="success"
+                size="sm"
+                onClick={() => handleOpenModelBulk('bulk')}
+              >
+                + Add Partner Bulk
+              </CButton>
+              <CButton
+                className="fw-bold text-white"
+                color="success"
+                size="sm"
+                onClick={() => handleOpenModal('add')}
+              >
                 + Add Partner
               </CButton>
             </CCardHeader>
@@ -379,6 +419,35 @@ const PartnerPage = () => {
             {loading ? 'Loading...' : 'Save'}
           </CButton>
         </CModalFooter>
+      </CModal>
+
+      {/* MODAl BULK */}
+      <CModal visible={visibleBulk} onClose={() => setVisibleBulk(false)}>
+        <CForm onSubmit={handleUploadExcel}>
+          <CModalHeader>
+            <CModalTitle>Bulk Upload Partners (Excel)</CModalTitle>
+          </CModalHeader>
+
+          <CModalBody>
+            <CFormLabel htmlFor="excel">Select Excel file (.xlsx / .xls)</CFormLabel>
+            <CFormInput
+              type="file"
+              id="excel"
+              accept=".xlsx,.xls"
+              onChange={(e) => setExcelFile(e.target.files[0])}
+              required
+            />
+          </CModalBody>
+
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setVisibleBulk(false)}>
+              Cancel
+            </CButton>
+            <CButton color="primary" type="submit" disabled={loading}>
+              Upload
+            </CButton>
+          </CModalFooter>
+        </CForm>
       </CModal>
     </>
   )
