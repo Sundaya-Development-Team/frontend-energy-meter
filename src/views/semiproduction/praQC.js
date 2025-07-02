@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
@@ -14,46 +14,102 @@ import {
   CFormTextarea,
   CRow,
 } from '@coreui/react'
+import { backendIncoming, backendPartner, backendProduct } from '../../api/axios'
 
 const PraQC = () => {
+  const [loading, setLoading] = useState(false)
+  const [sapData, setSapData] = useState([])
+  const [partnerData, setPartnerData] = useState([])
   const [formData, setFormData] = useState({
-    aoNumber: '',
-    totalQuantity: '',
-    sapCode: '',
-    batch: '',
-    incomingQty: '',
-    supplier: '',
-    note: '',
+    ref_code: '',
+    notes: '',
+    sap_code: '',
+    partner_code: '',
+    ref_quantity: '',
+    incoming_batch: '',
+    incoming_quantity: '',
+    remaining_quantity: '100',
+    sample_quantity: '100',
+    inspect_quantity: '',
     image: null,
-    inspectionResult: '',
   })
 
+  /* ---------- Handle ---------- */
   const handleChange = (e) => {
     const { name, value, type, files } = e.target
+    if (name === 'inspect_quantity') {
+      return setFormData((p) => ({
+        ...p,
+        inspect_quantity: value === 'true',
+      }))
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'file' ? files[0] : value,
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     // e.preventDefault()
-    console.log('Form data:', formData)
-    alert(`
-      AO Number: ${formData.aoNumber}
-      Total Quantity: ${formData.totalQuantity}
-      SAP Code: ${formData.sapCode}
-      Batch: ${formData.batch}
-      Incoming Quantity: ${formData.incomingQty}
-      Note: ${formData.note}
-      Image: ${formData.image}
-      Inspection Result: ${formData.inspectionResult}
-    `)
+    try {
+      setLoading(true)
+      // console.log('Form data:', formData)
+      // alert(`
+      //   ref_code: ${formData.ref_code}
+      //   notes: ${formData.notes}
+      //   SAP Code: ${formData.sap_code}
+      //   partner_code: ${formData.partner_code}
+      //   ref_quantity: ${formData.ref_quantity}
+      //   incoming_batch: ${formData.incoming_batch}
+      //   incoming_quantity: ${formData.incoming_quantity}
+      //   remaining_quantity: ${formData.remaining_quantity}
+      //   sample_quantity: ${formData.sample_quantity}
+      //   inspect_quantity: ${formData.inspect_quantity}
+      //   Image: ${formData.image?.name}
+      // `)
+      const payload = {
+        ref_code: formData.ref_code,
+        notes: formData.notes,
+        details: [
+          {
+            sap_code: formData.sap_code,
+            partner_code: formData.partner_code,
+            ref_quantity: Number(formData.ref_quantity),
+            incoming_batch: Number(formData.incoming_batch),
+            incoming_quantity: Number(formData.incoming_quantity),
+            remaining_quantity: Number(formData.remaining_quantity),
+            sample_quantity: Number(formData.sample_quantity),
+            inspect_quantity: formData.inspect_quantity,
+            img: formData.image?.name,
+          },
+        ],
+      }
+      // console.log(payload)
+      const res = await backendIncoming.post('/api/v1/products-receiving/add', payload)
+      alert(`${res.data?.message}`)
+    } catch (error) {
+      alert(err.response?.data?.message || err.message)
+    } finally {
+      setLoading(false)
+    }
   }
+
+  /* ---------- fetch master ---------- */
+  useEffect(() => {
+    ;(async () => {
+      const [sapRes, partnerRes] = await Promise.all([
+        backendProduct.get('/products/all'),
+        backendPartner.get('/partners/all'),
+      ])
+      setSapData(sapRes.data.data)
+      setPartnerData(partnerRes.data.data)
+    })()
+  }, [])
 
   return (
     <CRow>
-      <CCol xs={12}>
+      <CCol xs={12} md={6}>
         <CCard className="mb-4">
           <CCardHeader>
             <strong>Incoming Semi Product (Pra-QC)</strong>
@@ -67,16 +123,16 @@ const PraQC = () => {
 
               {/* PO / AO No */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="aoNumber" className="col-sm-2 col-form-label">
-                  PO / AO No
+                <CFormLabel htmlFor="ref_code" className="col-sm-2 col-form-label">
+                  Reference Code
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="text"
-                    id="aoNumber"
-                    name="aoNumber"
+                    id="ref_code"
+                    name="ref_code"
                     placeholder="AOxxx"
-                    value={formData.aoNumber}
+                    value={formData.ref_code}
                     onChange={handleChange}
                     required
                   />
@@ -85,15 +141,15 @@ const PraQC = () => {
 
               {/* Total Quantity */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="totalQuantity" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="ref_quantity" className="col-sm-2 col-form-label">
                   Total Quantity
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="number"
-                    id="totalQuantity"
-                    name="totalQuantity"
-                    value={formData.totalQuantity}
+                    id="ref_quantity"
+                    name="ref_quantity"
+                    value={formData.ref_quantity}
                     onChange={handleChange}
                     required
                   />
@@ -107,36 +163,38 @@ const PraQC = () => {
 
               {/* SAP Code */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="sapCode" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="sap_code" className="col-sm-2 col-form-label">
                   SAP Code
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormSelect
-                    id="sapCode"
-                    name="sapCode"
-                    value={formData.sapCode}
+                    id="sap_code"
+                    name="sap_code"
+                    value={formData.sap_code}
                     onChange={handleChange}
                     required
                   >
                     <option value="">Select SAP Code</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    {sapData.map((u) => (
+                      <option key={u.id} value={u.sap_code}>
+                        {u.sap_code}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
               </CRow>
 
               {/* Incoming Batch */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="batch" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="incoming_batch" className="col-sm-2 col-form-label">
                   Incoming Batch
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="number"
-                    id="batch"
-                    name="batch"
-                    value={formData.batch}
+                    id="incoming_batch"
+                    name="incoming_batch"
+                    value={formData.incoming_batch}
                     onChange={handleChange}
                     required
                   />
@@ -145,15 +203,15 @@ const PraQC = () => {
 
               {/* Incoming Quantity */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="incomingQty" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="incoming_quantity" className="col-sm-2 col-form-label">
                   Incoming Quantity
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="number"
-                    id="incomingQty"
-                    name="incomingQty"
-                    value={formData.incomingQty}
+                    id="incoming_quantity"
+                    name="incoming_quantity"
+                    value={formData.incoming_quantity}
                     onChange={handleChange}
                     required
                   />
@@ -162,19 +220,15 @@ const PraQC = () => {
 
               {/* Remaining Quantity */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="remainingQty" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="remaining_quantity" className="col-sm-2 col-form-label">
                   Remaining Quantity
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="number"
-                    id="remainingQty"
-                    name="remainingQty"
-                    value={
-                      formData.totalQuantity && formData.incomingQty
-                        ? formData.totalQuantity - formData.incomingQty
-                        : ''
-                    }
+                    id="remaining_quantity"
+                    name="remaining_quantity"
+                    value={formData.remaining_quantity}
                     readOnly
                   />
                 </CCol>
@@ -182,52 +236,54 @@ const PraQC = () => {
 
               {/* Sample Quantity */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="sampleQty" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="sample_quantity" className="col-sm-2 col-form-label">
                   Sample Quantity
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="number"
-                    id="sampleQty"
-                    name="sampleQty"
-                    value={formData.incomingQty ? Math.ceil(formData.incomingQty * 0.1) : ''}
+                    id="sample_quantity"
+                    name="sample_quantity"
+                    value={formData.sample_quantity}
                     readOnly
                   />
                 </CCol>
               </CRow>
 
-              {/* Supplier */}
+              {/* Partner */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="supplier" className="col-sm-2 col-form-label">
-                  Supplier
+                <CFormLabel htmlFor="partner_code" className="col-sm-2 col-form-label">
+                  Partner
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormSelect
-                    id="supplier"
-                    name="supplier"
-                    value={formData.supplier}
+                    id="partner_code"
+                    name="partner_code"
+                    value={formData.partner_code}
                     onChange={handleChange}
                     required
                   >
-                    <option value="">Select Supplier</option>
-                    <option value="Supplier A">Supplier A</option>
-                    <option value="Supplier B">Supplier B</option>
-                    <option value="Supplier C">Supplier C</option>
+                    <option value="">Select Partner</option>
+                    {partnerData.map((u) => (
+                      <option key={u.id} value={u.partner_code}>
+                        {u.name}
+                      </option>
+                    ))}
                   </CFormSelect>
                 </CCol>
               </CRow>
 
               {/* Note */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="note" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="notes" className="col-sm-2 col-form-label">
                   Note
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormTextarea
-                    id="note"
-                    name="note"
+                    id="notes"
+                    name="notes"
                     rows={3}
-                    value={formData.note}
+                    value={formData.notes}
                     onChange={handleChange}
                     required
                   />
@@ -245,49 +301,60 @@ const PraQC = () => {
               </CRow>
 
               {/* Early Inspection */}
-              <CFormLabel className="col-form-label">
+              <CFormLabel className="col-form-label mt-3">
                 <strong>Early Inspection</strong>
               </CFormLabel>
-
               {/* Quantity Check */}
               <CRow className="mb-3">
-                <CFormLabel className="col-sm-2 col-form-label">
-                  Jumlah Kuantitas sudah sesuai
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormCheck
-                    inline
-                    type="radio"
-                    name="inspectionResult"
-                    id="inspectionYes"
-                    value="yes"
-                    label="Ya"
-                    checked={formData.inspectionResult === 'yes'}
-                    onChange={handleChange}
-                    required
-                  />
-                  <CFormCheck
-                    inline
-                    type="radio"
-                    name="inspectionResult"
-                    id="inspectionNo"
-                    value="no"
-                    label="Tidak"
-                    checked={formData.inspectionResult === 'no'}
-                    onChange={handleChange}
-                    required
-                  />
+                <CCol sm={12}>
+                  <div className="border rounded p-3">
+                    <CFormLabel className="col-form-label">
+                      Jumlah Kuantitas sudah sesuai
+                    </CFormLabel>
+                    <div className="d-flex justify-content-end gap-3">
+                      <CFormCheck
+                        inline
+                        type="radio"
+                        name="inspect_quantity"
+                        id="inspectionYes"
+                        value="true"
+                        label="Ya"
+                        checked={formData.inspect_quantity === true}
+                        onChange={handleChange}
+                        required
+                      />
+                      <CFormCheck
+                        inline
+                        type="radio"
+                        name="inspect_quantity"
+                        id="inspectionNo"
+                        value="false"
+                        label="Tidak"
+                        checked={formData.inspect_quantity === false}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
                 </CCol>
               </CRow>
 
               {/* Submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">
-                  Submit
+                <CButton color="primary" type="submit" disabled={loading}>
+                  {loading ? 'Loading...' : 'Save'}
                 </CButton>
               </div>
             </CForm>
           </CCardBody>
+        </CCard>
+      </CCol>
+      <CCol xs={12} md={6}>
+        <CCard className="mb-4">
+          <CCardHeader>
+            <strong>Scan Barcode</strong>
+          </CCardHeader>
+          <CCardBody>ini body card</CCardBody>
         </CCard>
       </CCol>
     </CRow>

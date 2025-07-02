@@ -444,7 +444,7 @@ const PartnerPage = () => {
               Cancel
             </CButton>
             <CButton color="primary" type="submit" disabled={loading}>
-              Upload
+              {loading ? 'Loading...' : 'Upload'}
             </CButton>
           </CModalFooter>
         </CForm>

@@ -59,6 +59,73 @@ const ProductPage = () => {
     setTableData(data) // trigger rerender DataTable
   }
 
+  /* ---------- modal helpers ---------- */
+  const emptyForm = {
+    id: '',
+    sapCode: '',
+    productName: '',
+    uom: '',
+    productType: '',
+    productCategory: '',
+    aktifView: '',
+    image: '',
+  }
+
+  const handleOpenModal = (mode, rowData = null) => {
+    setModalMode(mode)
+    if (mode === 'edit' && rowData) {
+      setFormData({
+        id: rowData.id,
+        sapCode: rowData.sap_code ?? '',
+        productName: rowData.name ?? '',
+        uom: rowData.uom?.id ?? '',
+        productType: rowData.product_type ?? '',
+        productCategory: rowData.category?.id ?? '',
+        aktifView: rowData.is_active ?? '',
+        image: rowData.img ?? '',
+      })
+    } else {
+      setFormData(emptyForm)
+    }
+    setModalVisible(true)
+  }
+
+  /* onChange semua input */
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    if (name === 'aktifView') {
+      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
+    }
+    setFormData((p) => ({ ...p, [name]: value }))
+  }
+
+  /* ---------- Simpan (Add / Update) ---------- */
+  const handleSave = async () => {
+    try {
+      setLoading(true)
+      const payload = {
+        sap_code: formData.sapCode,
+        name: formData.productName,
+        uom_id: Number(formData.uom),
+        category_id: Number(formData.productCategory),
+        is_active: formData.aktifView,
+        product_type: formData.productType,
+        img: formData.image,
+      }
+      if (modalMode === 'add') {
+        await backendProduct.post('/products/add', payload)
+      } else {
+        await backendProduct.put(`/products/update/${formData.id}`, payload)
+      }
+      setModalVisible(false)
+      await refreshTable()
+    } catch (err) {
+      alert(err.response?.data?.message || err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   /* ---------- fetch master ---------- */
   useEffect(() => {
     ;(async () => {
@@ -152,74 +219,6 @@ const ProductPage = () => {
       dtInstance.current.clear().rows.add(tableData).draw(false)
     }
   }, [tableData])
-
-  /* ---------- modal helpers ---------- */
-  const emptyForm = {
-    id: '',
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '',
-  }
-
-  const handleOpenModal = (mode, rowData = null) => {
-    setModalMode(mode)
-    if (mode === 'edit' && rowData) {
-      setFormData({
-        id: rowData.id,
-        sapCode: rowData.sap_code ?? '',
-        productName: rowData.name ?? '',
-        uom: rowData.uom?.id ?? '',
-        productType: rowData.product_type ?? '',
-        productCategory: rowData.category?.id ?? '',
-        aktifView: rowData.is_active ?? '',
-        image: rowData.img ?? '',
-      })
-    } else {
-      setFormData(emptyForm)
-    }
-    setModalVisible(true)
-  }
-
-  /* onChange semua input */
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    if (name === 'aktifView') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
-    }
-    setFormData((p) => ({ ...p, [name]: value }))
-  }
-
-  /* ---------- Simpan (Add / Update) ---------- */
-  const handleSave = async () => {
-    try {
-      setLoading(true)
-      const payload = {
-        sap_code: formData.sapCode,
-        name: formData.productName,
-        uom_id: Number(formData.uom),
-        category_id: Number(formData.productCategory),
-        is_active: formData.aktifView,
-        product_type: formData.productType,
-        img: formData.image,
-      }
-      if (modalMode === 'add') {
-        await backendProduct.post('/products/add', payload)
-      } else {
-        await backendProduct.put(`/products/update/${formData.id}`, payload)
-      }
-      setModalVisible(false)
-      await refreshTable()
-    } catch (err) {
-      alert(err.response?.data?.message || err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   /* ---------- render ---------- */
   return (
     <>
