@@ -257,6 +257,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Incoming',
+    to: '/admin/incoming',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Product',
     to: '/admin/product',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,

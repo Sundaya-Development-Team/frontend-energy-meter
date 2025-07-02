@@ -5,6 +5,7 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
 // Admin
+const Incoming = React.lazy(() => import('./views/admins/incoming/IncomingPage'))
 const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
 const DynamicQuestionForm = React.lazy(() => import('./views/admins/DynamicQuestionForm'))
 const Partner = React.lazy(() => import('./views/admins/partner/PartnerPage'))
@@ -115,6 +116,7 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/admin', name: 'Admin', element: DynamicQuestionForm, exact: true },
+  { path: '/admin/incoming', name: 'Admin Incoming', element: Incoming },
   { path: '/admin/product', name: 'Admin Product', element: Product },
   { path: '/admin/dynamicquestion', name: 'Dynamic Question', element: DynamicQuestionForm },
   { path: '/admin/partner', name: 'Admin Partner', element: Partner },
