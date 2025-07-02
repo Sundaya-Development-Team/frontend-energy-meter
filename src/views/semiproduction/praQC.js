@@ -354,7 +354,32 @@ const PraQC = () => {
           <CCardHeader>
             <strong>Scan Barcode</strong>
           </CCardHeader>
-          <CCardBody>ini body card</CCardBody>
+          <CCardBody>
+            <CForm>
+              {/* <CForm onSubmit={handleSubmit}> */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="barcode" className="col-sm-2 col-form-label">
+                  Barcode
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="text"
+                    id="barcode"
+                    name="barcode"
+                    // value={formData.barcode}
+                    // onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+
+              {/* <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                <CButton color="primary" type="submit">
+                  Submit
+                </CButton>
+              </div> */}
+            </CForm>
+          </CCardBody>
         </CCard>
       </CCol>
     </CRow>
