@@ -99,8 +99,8 @@ const PraQC = () => {
   useEffect(() => {
     ;(async () => {
       const [sapRes, partnerRes] = await Promise.all([
-        backendProduct.get('/products/all'),
-        backendPartner.get('/partners/all'),
+        backendProduct.get('/api/v1/products/all'),
+        backendPartner.get('/api/v1/partners/all'),
       ])
       setSapData(sapRes.data.data)
       setPartnerData(partnerRes.data.data)
@@ -109,6 +109,7 @@ const PraQC = () => {
 
   return (
     <CRow>
+      {/* Incoming Form */}
       <CCol xs={12} md={6}>
         <CCard className="mb-4">
           <CCardHeader>
@@ -349,6 +350,7 @@ const PraQC = () => {
           </CCardBody>
         </CCard>
       </CCol>
+      {/* barcode form */}
       <CCol xs={12} md={6}>
         <CCard className="mb-4">
           <CCardHeader>

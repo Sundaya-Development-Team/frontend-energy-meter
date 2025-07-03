@@ -21,7 +21,7 @@ import {
   CPaginationItem,
   CRow,
 } from '@coreui/react'
-import { backendIncoming } from '../../../api/axios'
+import { backendIncoming, backendPartner, backendProduct } from '../../../api/axios'
 
 const formatDate = (iso) =>
   new Date(iso).toLocaleString('id-ID', {
@@ -41,9 +41,12 @@ const cardBodyStyle = {
 }
 
 const IncomingPage = () => {
+  const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(false)
   const [headerLoading, setHeaderLoading] = useState(false)
   const [detailLoading, setdetailLoading] = useState(false)
+  const [sapData, setSapData] = useState([])
+  const [partnerData, setPartnerData] = useState([])
   const [idHeader, setIdHeader] = useState(null)
   const [idDetail, setIdDetail] = useState(null)
   const [modalHeaderVisible, setModalHeaderVisible] = useState(false)
@@ -68,14 +71,14 @@ const IncomingPage = () => {
     remaining_quantity: '',
     sample_quantity: '',
     inspect_quantity: '',
-    img: '',
+    image: '',
   })
 
-  const fetchData = async (page = 1) => {
+  const fetchData = async (page = 1, ref_code = '') => {
     try {
       setLoading(true)
       const { data } = await backendIncoming.get(`/api/v1/products-receiving/all`, {
-        params: { limit: 12, page },
+        params: { limit: 12, page, ref_code },
       })
       setIncomingData(data)
     } catch (error) {
@@ -118,6 +121,11 @@ const IncomingPage = () => {
         inspect_quantity: value === 'true',
       }))
     }
+
+    setFormDetailData((prev) => ({
+      ...prev,
+      [name]: type === 'file' ? files[0] : value,
+    }))
   }
 
   const handleOpenModel = (mode, rowData) => {
@@ -131,11 +139,18 @@ const IncomingPage = () => {
     }
     if (mode === 'detail') {
       setModalDetailVisible(true)
-    //   setIdHeader(rowData.id)
-    //   setFormHeaderData({
-    //     ref_code: rowData.ref_code ?? '',
-    //     notes: rowData.notes ?? '',
-    //   })
+      setIdDetail(rowData.id)
+      setFormDetailData({
+        sap_code: rowData.sap_code,
+        partner_code: rowData.partner_code ?? '',
+        ref_quantity: rowData.ref_quantity ?? '',
+        incoming_batch: rowData.incoming_batch ?? '',
+        incoming_quantity: rowData.incoming_quantity ?? '',
+        remaining_quantity: rowData.remaining_quantity ?? '',
+        sample_quantity: rowData.sample_quantity ?? '',
+        inspect_quantity: rowData.inspect_quantity ?? '',
+        image: rowData.img ?? '',
+      })
     }
   }
 
@@ -146,7 +161,7 @@ const IncomingPage = () => {
         ref_code: formHeaderData.ref_code,
         notes: formHeaderData.notes,
       }
-      console.log(payload)
+      //   console.log(payload)
 
       await backendIncoming.put(`/api/v1/products-receiving/update-header/${idHeader}`, payload)
       setModalHeaderVisible(false)
@@ -158,13 +173,60 @@ const IncomingPage = () => {
     }
   }
 
+  const handleDetailHeader = async () => {
+    try {
+      setdetailLoading(true)
+      const payload = {
+        sap_code: formDetailData.sap_code,
+        partner_code: formDetailData.partner_code,
+        ref_quantity: Number(formDetailData.ref_quantity),
+        incoming_batch: Number(formDetailData.incoming_batch),
+        incoming_quantity: Number(formDetailData.incoming_quantity),
+        remaining_quantity: Number(formDetailData.remaining_quantity),
+        sample_quantity: Number(formDetailData.sample_quantity),
+        inspect_quantity: formDetailData.inspect_quantity,
+        img: formDetailData.image?.name,
+      }
+      console.log(payload)
+
+      await backendIncoming.put(`/api/v1/products-receiving/update-detail/${idDetail}`, payload)
+      setModalDetailVisible(false)
+      await fetchData()
+    } catch (err) {
+      alert(err.response?.data?.message || err.message)
+    } finally {
+      setdetailLoading(false)
+    }
+  }
+
   /* ---------- fetch master ---------- */
   useEffect(() => {
+    ;(async () => {
+      const [sapRes, partnerRes] = await Promise.all([
+        backendProduct.get('/api/v1/products/all'),
+        backendPartner.get('/api/v1/partners/all'),
+      ])
+      setSapData(sapRes.data.data)
+      setPartnerData(partnerRes.data.data)
+    })()
     fetchData()
   }, [])
 
   return (
     <>
+      {/* -------------input search------------- */}
+      <CRow className="mb-3">
+        <CCol md={4}>
+          <CFormInput
+            placeholder="Cari Reference Code"
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value)
+              fetchData(1, e.target.value) // search saat mengetik
+            }}
+          />
+        </CCol>
+      </CRow>
       {/* --------- Card----------- */}
       <CRow>
         {loading && <div className="text-center py-5 fw-semibold">Loading …</div>}
@@ -257,7 +319,7 @@ const IncomingPage = () => {
           <CPagination className="justify-content-center">
             <CPaginationItem
               disabled={incomingData.page === 1}
-              onClick={() => fetchData(incomingData.page - 1)}
+              onClick={() => fetchData(incomingData.page - 1, searchTerm)}
             >
               &laquo;
             </CPaginationItem>
@@ -266,7 +328,7 @@ const IncomingPage = () => {
               <CPaginationItem
                 key={i + 1}
                 active={incomingData.page === i + 1}
-                onClick={() => fetchData(i + 1)}
+                onClick={() => fetchData(i + 1, searchTerm)}
               >
                 {i + 1}
               </CPaginationItem>
@@ -274,7 +336,7 @@ const IncomingPage = () => {
 
             <CPaginationItem
               disabled={incomingData.page === incomingData.totalPages}
-              onClick={() => fetchData(incomingData.page + 1)}
+              onClick={() => fetchData(incomingData.page + 1, searchTerm)}
             >
               &raquo;
             </CPaginationItem>
@@ -304,7 +366,7 @@ const IncomingPage = () => {
             <CRow className="mb-3">
               <CFormLabel className="col-sm-3 col-form-label">Notes</CFormLabel>
               <CCol sm={9}>
-                <CFormInput
+                <CFormTextarea
                   name="notes"
                   value={formHeaderData.notes}
                   onChange={handleHeaderChange}
@@ -335,7 +397,188 @@ const IncomingPage = () => {
         <CModalHeader>
           <CModalTitle>Edit Detail</CModalTitle>
         </CModalHeader>
-        <CModalBody>ini body</CModalBody>
+        <CModalBody>
+          {/* Total Quantity */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="ref_quantity" className="col-sm-2 col-form-label">
+              Total Quantity
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormInput
+                type="number"
+                id="ref_quantity"
+                name="ref_quantity"
+                value={formDetailData.ref_quantity}
+                onChange={handleDetailChange}
+                required
+              />
+            </CCol>
+          </CRow>
+
+          {/* Incoming Material */}
+          <CFormLabel className="col-form-label">
+            <strong>Incoming Material</strong>
+          </CFormLabel>
+
+          {/* SAP Code */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="sap_code" className="col-sm-2 col-form-label">
+              SAP Code
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormSelect
+                id="sap_code"
+                name="sap_code"
+                value={formDetailData.sap_code}
+                onChange={handleDetailChange}
+                required
+              >
+                <option value="">Select SAP Code</option>
+                {sapData.map((u) => (
+                  <option key={u.id} value={u.sap_code}>
+                    {u.sap_code}
+                  </option>
+                ))}
+              </CFormSelect>
+            </CCol>
+          </CRow>
+
+          {/* Incoming Batch */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="incoming_batch" className="col-sm-2 col-form-label">
+              Incoming Batch
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormInput
+                type="number"
+                id="incoming_batch"
+                name="incoming_batch"
+                value={formDetailData.incoming_batch}
+                onChange={handleDetailChange}
+                required
+              />
+            </CCol>
+          </CRow>
+
+          {/* Incoming Quantity */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="incoming_quantity" className="col-sm-2 col-form-label">
+              Incoming Quantity
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormInput
+                type="number"
+                id="incoming_quantity"
+                name="incoming_quantity"
+                value={formDetailData.incoming_quantity}
+                onChange={handleDetailChange}
+                required
+              />
+            </CCol>
+          </CRow>
+
+          {/* Remaining Quantity */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="remaining_quantity" className="col-sm-2 col-form-label">
+              Remaining Quantity
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormInput
+                type="number"
+                id="remaining_quantity"
+                name="remaining_quantity"
+                value={formDetailData.remaining_quantity}
+                readOnly
+              />
+            </CCol>
+          </CRow>
+
+          {/* Sample Quantity */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="sample_quantity" className="col-sm-2 col-form-label">
+              Sample Quantity
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormInput
+                type="number"
+                id="sample_quantity"
+                name="sample_quantity"
+                value={formDetailData.sample_quantity}
+                readOnly
+              />
+            </CCol>
+          </CRow>
+
+          {/* Partner */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="partner_code" className="col-sm-2 col-form-label">
+              Partner
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormSelect
+                id="partner_code"
+                name="partner_code"
+                value={formDetailData.partner_code}
+                onChange={handleDetailChange}
+                required
+              >
+                <option value="">Select Partner</option>
+                {partnerData.map((u) => (
+                  <option key={u.id} value={u.partner_code}>
+                    {u.name}
+                  </option>
+                ))}
+              </CFormSelect>
+            </CCol>
+          </CRow>
+
+          {/* Image */}
+          <CRow className="mb-3">
+            <CFormLabel htmlFor="image" className="col-sm-2 col-form-label">
+              Image
+            </CFormLabel>
+            <CCol sm={10}>
+              <CFormInput type="file" id="image" name="image" onChange={handleDetailChange} />
+            </CCol>
+          </CRow>
+
+          {/* Early Inspection */}
+          <CFormLabel className="col-form-label mt-3">
+            <strong>Early Inspection</strong>
+          </CFormLabel>
+          {/* Quantity Check */}
+          <CRow className="mb-3">
+            <CCol sm={12}>
+              <div className="border rounded p-3">
+                <CFormLabel className="col-form-label">Jumlah Kuantitas sudah sesuai</CFormLabel>
+                <div className="d-flex justify-content-end gap-3">
+                  <CFormCheck
+                    inline
+                    type="radio"
+                    name="inspect_quantity"
+                    id="inspectionYes"
+                    value="true"
+                    label="Ya"
+                    checked={formDetailData.inspect_quantity === true}
+                    onChange={handleDetailChange}
+                    required
+                  />
+                  <CFormCheck
+                    inline
+                    type="radio"
+                    name="inspect_quantity"
+                    id="inspectionNo"
+                    value="false"
+                    label="Tidak"
+                    checked={formDetailData.inspect_quantity === false}
+                    onChange={handleDetailChange}
+                    required
+                  />
+                </div>
+              </div>
+            </CCol>
+          </CRow>
+        </CModalBody>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setModalDetailVisible(false)}>
             Cancel
@@ -343,11 +586,11 @@ const IncomingPage = () => {
           <CButton
             color="primary"
             onClick={() => {
-              handleEditHeader()
+              handleDetailHeader()
             }}
             disabled={headerLoading}
           >
-            {loading ? 'Loading...' : 'Save'}
+            {detailLoading ? 'Loading...' : 'Save'}
           </CButton>
         </CModalFooter>
       </CModal>
