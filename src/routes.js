@@ -64,7 +64,12 @@ const ScanAfterClosingCover = React.lazy(
 )
 
 // Inventory
-const IncomingUnits = React.lazy(() => import('./views/inventory/IncomingUnits'))
+const IncomingUnits = React.lazy(() => import('./views/production/inventory/IncomingUnits'))
+
+// Delivery
+const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
+const ScanBeforePacking = React.lazy(() => import('./views/delivery/ScanBeforePacking'))
+const ScanDelivery = React.lazy(() => import('./views/delivery/ScanDelivery'))
 
 // Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
@@ -121,6 +126,10 @@ const routes = [
   { path: '/admin/dynamicquestion', name: 'Dynamic Question', element: DynamicQuestionForm },
   { path: '/admin/partner', name: 'Admin Partner', element: Partner },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/delivery', name: 'Delivery', element: ScanBeforePacking, exact: true },
+  { path: '/delivery/packing/after', name: 'Delivery Packing After', element: ScanAfterPacking },
+  { path: '/delivery/packing/before', name: 'Delivery Packing Before', element: ScanBeforePacking },
+  { path: '/delivery/scan', name: 'Scan Delivery', element: ScanDelivery },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },

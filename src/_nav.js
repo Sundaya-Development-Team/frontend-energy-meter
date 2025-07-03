@@ -247,6 +247,34 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Delivery',
+  },
+  {
+    component: CNavGroup,
+    name: 'Packing',
+    to: '/delivery/packing',
+    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Scan Packing 1',
+        to: '/delivery/packing/before',
+      },
+      {
+        component: CNavItem,
+        name: 'Scan Packing 2',
+        to: '/delivery/packing/after',
+      },
+    ],
+  },
+  {
+    component: CNavItem,
+    name: 'Scan',
+    to: '/delivery/scan',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
     name: 'Admins',
   },
   {
