@@ -58,7 +58,7 @@ const PartnerPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendPartner.get('/partners/all').then((r) => r.data)
+    const { data } = await backendPartner.get('/api/v1/partners/all').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -125,9 +125,9 @@ const PartnerPage = () => {
         is_active: formData.is_active,
       }
       if (modalMode === 'add') {
-        await backendPartner.post('/partners/add', payload)
+        await backendPartner.post('/api/v1/partners/add', payload)
       } else {
-        await backendPartner.put(`/partners/update/${formData.id}`, payload)
+        await backendPartner.put(`/api/v1/partners/update/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -147,7 +147,7 @@ const PartnerPage = () => {
 
     try {
       setLoading(true)
-      await backendPartner.post('/partners/upload-excel', formData, {
+      await backendPartner.post('/api/v1/partners/upload-excel', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       setVisibleBulk(false)
@@ -163,7 +163,7 @@ const PartnerPage = () => {
   /* ---------- fetch master ---------- */
   useEffect(() => {
     ;(async () => {
-      const [typeRes] = await Promise.all([backendPartner.get('/partners/types')])
+      const [typeRes] = await Promise.all([backendPartner.get('/api/v1/partners/types')])
       setTypeData(typeRes.data.data)
       await refreshTable()
     })()
@@ -231,8 +231,8 @@ const PartnerPage = () => {
       const $tbl = $(tableRef.current)
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
-        if (window.confirm('Delete this product?')) {
-          await backendPartner.delete(`/partners/delete/${id}`)
+        if (window.confirm('Delete this Partner?')) {
+          await backendPartner.delete(`/api/v1/partners/delete/${id}`)
           await refreshTable()
         }
       })

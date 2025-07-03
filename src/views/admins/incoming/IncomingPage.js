@@ -86,7 +86,7 @@ const IncomingPage = () => {
   }
 
   const deleteHeader = async (id) => {
-    if (!window.confirm('Hapus Header ini?')) return
+    if (!window.confirm('Delete this Header')) return
     try {
       await backendIncoming.delete(`/api/v1/products-receiving/delete-header/${id}`)
       fetchData(incomingData.page)
@@ -96,7 +96,7 @@ const IncomingPage = () => {
   }
 
   const deleteDetails = async (id) => {
-    if (!window.confirm('Hapus Detail ini?')) return
+    if (!window.confirm('Delete this Detail?')) return
     try {
       await backendIncoming.delete(`/api/v1/products-receiving/delete-detail/${id}`)
       fetchData(incomingData.page)
