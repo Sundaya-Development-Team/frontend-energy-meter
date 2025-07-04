@@ -1,20 +1,28 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
 import {
-  cilBarChart,
+  cilBarcode,
   cilBell,
   cilCalculator,
   cilChartLine,
   cilChartPie,
+  cilCheckAlt,
+  cilCog,
   cilCursor,
   cilDescription,
   cilDrop,
   cilExternalLink,
+  cilFactory,
+  cilGroup,
   cilNotes,
   cilPencil,
   cilPuzzle,
+  cilShareBoxed,
   cilSpeedometer,
+  cilSpreadsheet,
   cilStar,
+  cilStorage,
+  cilTag,
   cilTask,
   cilTruck,
 } from '@coreui/icons'
@@ -45,7 +53,7 @@ const _nav = [
     component: CNavItem,
     name: 'Pra - QC',
     to: '/semiproduction/praqc',
-    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCheckAlt} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
@@ -57,7 +65,7 @@ const _nav = [
     component: CNavItem,
     name: 'Report QC Units',
     to: '/semiproduction/reportqcunit',
-    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
@@ -67,13 +75,13 @@ const _nav = [
     component: CNavItem,
     name: 'Batch Production',
     to: '/production/batch',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,
     name: 'Assemble',
     to: '/production/assemble',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -96,7 +104,7 @@ const _nav = [
     component: CNavGroup,
     name: 'On Test',
     to: '/production/on',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -119,7 +127,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Hipot Test',
     to: '/production/hipot',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -142,7 +150,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Calibration Test',
     to: '/production/calibration',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -165,7 +173,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Aging Test',
     to: '/production/aging',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -193,7 +201,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Clear Zero',
     to: '/production/clearzero',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -216,7 +224,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Closing Cover',
     to: '/production/closingcover',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -243,7 +251,7 @@ const _nav = [
     component: CNavItem,
     name: 'Inventory',
     to: '/inventory',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
@@ -253,7 +261,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Packing',
     to: '/delivery/packing',
-    icon: <CIcon icon={cilBarChart} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilShareBoxed} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -271,7 +279,7 @@ const _nav = [
     component: CNavItem,
     name: 'Scan',
     to: '/delivery/scan',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
@@ -287,19 +295,19 @@ const _nav = [
     component: CNavItem,
     name: 'Incoming',
     to: '/admin/incoming',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
-    name: 'Product',
+    name: 'SAP Product',
     to: '/admin/product',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Partner',
     to: '/admin/partner',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
   {
     component: CNavTitle,
