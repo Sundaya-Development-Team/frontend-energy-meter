@@ -59,7 +59,7 @@ const IncomingPage = () => {
     totalPages: 1,
   })
   const [formHeaderData, setFormHeaderData] = useState({
-    ref_code: '',
+    reference_po: '',
     notes: '',
   })
   const [formDetailData, setFormDetailData] = useState({
@@ -74,11 +74,11 @@ const IncomingPage = () => {
     image: '',
   })
 
-  const fetchData = async (page = 1, ref_code = '') => {
+  const fetchData = async (page = 1, reference_po = '') => {
     try {
       setLoading(true)
-      const { data } = await backendIncoming.get(`/api/v1/products-receiving/all`, {
-        params: { limit: 12, page, ref_code },
+      const { data } = await backendIncoming.get(`/api/v1/receiving-products/all`, {
+        params: { limit: 12, page, reference_po },
       })
       setIncomingData(data)
     } catch (error) {
@@ -91,7 +91,7 @@ const IncomingPage = () => {
   const deleteHeader = async (id) => {
     if (!window.confirm('Delete this Header')) return
     try {
-      await backendIncoming.delete(`/api/v1/products-receiving/delete-header/${id}`)
+      await backendIncoming.delete(`/api/v1/receiving-products/delete-header/${id}`)
       fetchData(incomingData.page)
     } catch (error) {
       console.log('error : ~ IncomingPage : deleteHeader', error)
@@ -101,7 +101,7 @@ const IncomingPage = () => {
   const deleteDetails = async (id) => {
     if (!window.confirm('Delete this Detail?')) return
     try {
-      await backendIncoming.delete(`/api/v1/products-receiving/delete-detail/${id}`)
+      await backendIncoming.delete(`/api/v1/receiving-products/delete-detail/${id}`)
       fetchData(incomingData.page)
     } catch (error) {
       console.log('error : ~ IncomingPage : deleteDetails', error)
@@ -133,7 +133,7 @@ const IncomingPage = () => {
       setModalHeaderVisible(true)
       setIdHeader(rowData.id)
       setFormHeaderData({
-        ref_code: rowData.ref_code ?? '',
+        reference_po: rowData.reference_po ?? '',
         notes: rowData.notes ?? '',
       })
     }
@@ -158,12 +158,12 @@ const IncomingPage = () => {
     try {
       setHeaderLoading(true)
       const payload = {
-        ref_code: formHeaderData.ref_code,
+        reference_po: formHeaderData.reference_po,
         notes: formHeaderData.notes,
       }
       //   console.log(payload)
 
-      await backendIncoming.put(`/api/v1/products-receiving/update-header/${idHeader}`, payload)
+      await backendIncoming.put(`/api/v1/receiving-products/update-header/${idHeader}`, payload)
       setModalHeaderVisible(false)
       await fetchData()
     } catch (err) {
@@ -189,7 +189,7 @@ const IncomingPage = () => {
       }
       console.log(payload)
 
-      await backendIncoming.put(`/api/v1/products-receiving/update-detail/${idDetail}`, payload)
+      await backendIncoming.put(`/api/v1/receiving-products/update-detail/${idDetail}`, payload)
       setModalDetailVisible(false)
       await fetchData()
     } catch (err) {
@@ -218,7 +218,7 @@ const IncomingPage = () => {
       <CRow className="mb-3">
         <CCol md={4}>
           <CFormInput
-            placeholder="Cari Reference Code"
+            placeholder="Search Reference PO"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value)
@@ -259,7 +259,10 @@ const IncomingPage = () => {
               </CCardHeader>
               <CCardBody style={cardBodyStyle}>
                 <p>
-                  <strong>Reference Code:</strong> {header.ref_code}
+                  <strong>Reference PO:</strong> {header.reference_po}
+                </p>
+                <p>
+                  <strong>Reference GR:</strong> {header.reference_gr}
                 </p>
                 <p>
                   <strong>Notes:</strong> {header.notes}
@@ -355,8 +358,8 @@ const IncomingPage = () => {
               <CFormLabel className="col-sm-3 col-form-label">Reference Code</CFormLabel>
               <CCol sm={9}>
                 <CFormInput
-                  name="ref_code"
-                  value={formHeaderData.ref_code}
+                  name="reference_po"
+                  value={formHeaderData.reference_po}
                   onChange={handleHeaderChange}
                 />
               </CCol>

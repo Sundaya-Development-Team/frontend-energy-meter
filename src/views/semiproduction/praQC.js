@@ -14,14 +14,20 @@ import {
   CFormTextarea,
   CRow,
 } from '@coreui/react'
-import { backendIncoming, backendPartner, backendProduct, backendTrackedItems } from '../../api/axios'
+import {
+  backendIncoming,
+  backendPartner,
+  backendProduct,
+  backendTrackedItems,
+} from '../../api/axios'
 
 const PraQC = () => {
   const [loading, setLoading] = useState(false)
   const [sapData, setSapData] = useState([])
   const [partnerData, setPartnerData] = useState([])
   const [formData, setFormData] = useState({
-    ref_code: '',
+    reference_po: '',
+    reference_gr: '',
     notes: '',
     sap_code: '',
     partner_code: '',
@@ -58,7 +64,7 @@ const PraQC = () => {
       if (!formData.barcode.trim()) return
       const payload = {
         barcode: formData.barcode,
-        reference_po: formData.ref_code,
+        reference_po: formData.reference_po,
         sap_code: formData.sap_code,
         incoming_batch: Number(formData.incoming_quantity),
         location_detail: formData.location_detail,
@@ -77,7 +83,7 @@ const PraQC = () => {
       setLoading(true)
       // console.log('Form data:', formData)
       // alert(`
-      //   ref_code: ${formData.ref_code}
+      //   reference_po: ${formData.reference_po}
       //   notes: ${formData.notes}
       //   SAP Code: ${formData.sap_code}
       //   partner_code: ${formData.partner_code}
@@ -90,7 +96,8 @@ const PraQC = () => {
       //   Image: ${formData.image?.name}
       // `)
       const payload = {
-        ref_code: formData.ref_code,
+        reference_po: formData.reference_po,
+        reference_gr: formData.reference_gr,
         notes: formData.notes,
         details: [
           {
@@ -107,9 +114,9 @@ const PraQC = () => {
         ],
       }
       // console.log(payload)
-      const res = await backendIncoming.post('/api/v1/products-receiving/add', payload)
+      const res = await backendIncoming.post('/api/v1/receiving-products/add', payload)
       alert(`${res.data?.message}`)
-    } catch (error) {
+    } catch (err) {
       alert(err.response?.data?.message || err.message)
     } finally {
       setLoading(false)
@@ -145,16 +152,33 @@ const PraQC = () => {
 
               {/* PO / AO No */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="ref_code" className="col-sm-2 col-form-label">
-                  Reference Code
+                <CFormLabel htmlFor="reference_po" className="col-sm-2 col-form-label">
+                  Reference PO
                 </CFormLabel>
                 <CCol sm={10}>
                   <CFormInput
                     type="text"
-                    id="ref_code"
-                    name="ref_code"
+                    id="reference_po"
+                    name="reference_po"
                     placeholder="AOxxx"
-                    value={formData.ref_code}
+                    value={formData.reference_po}
+                    onChange={handleChange}
+                    required
+                  />
+                </CCol>
+              </CRow>
+
+              {/* reference_gr */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="reference_gr" className="col-sm-2 col-form-label">
+                  Reference GR
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="text"
+                    id="reference_gr"
+                    name="reference_gr"
+                    value={formData.reference_gr}
                     onChange={handleChange}
                     required
                   />
