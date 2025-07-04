@@ -14,7 +14,7 @@ import {
   CFormTextarea,
   CRow,
 } from '@coreui/react'
-import { backendIncoming, backendPartner, backendProduct } from '../../api/axios'
+import { backendIncoming, backendPartner, backendProduct, backendTrackedItems } from '../../api/axios'
 
 const PraQC = () => {
   const [loading, setLoading] = useState(false)
@@ -32,6 +32,9 @@ const PraQC = () => {
     sample_quantity: '100',
     inspect_quantity: '',
     image: null,
+    barcode: '',
+    location_detail: 'Incoming QC AREA',
+    status: 'in_progress',
   })
 
   /* ---------- Handle ---------- */
@@ -48,6 +51,24 @@ const PraQC = () => {
       ...prev,
       [name]: type === 'file' ? files[0] : value,
     }))
+  }
+
+  const handleBarcode = async () => {
+    try {
+      if (!formData.barcode.trim()) return
+      const payload = {
+        barcode: formData.barcode,
+        reference_po: formData.ref_code,
+        sap_code: formData.sap_code,
+        incoming_batch: Number(formData.incoming_quantity),
+        location_detail: formData.location_detail,
+        status: formData.status,
+      }
+      const res = await backendTrackedItems.post('/api/v1/tracked-items/add', payload)
+      setFormData((p) => ({ ...p, barcode: '' })) // reset
+    } catch (err) {
+      alert(err.response?.data?.message || err.message)
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -368,9 +389,14 @@ const PraQC = () => {
                     type="text"
                     id="barcode"
                     name="barcode"
-                    // value={formData.barcode}
-                    // onChange={handleChange}
-                    required
+                    value={formData.barcode}
+                    onChange={handleChange}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault() // cegah reload / submit form
+                        handleBarcode()
+                      }
+                    }}
                   />
                 </CCol>
               </CRow>
