@@ -9,6 +9,7 @@ const Incoming = React.lazy(() => import('./views/admins/incoming/IncomingPage')
 const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
 const DynamicQuestionForm = React.lazy(() => import('./views/admins/DynamicQuestionForm'))
 const Partner = React.lazy(() => import('./views/admins/partner/PartnerPage'))
+const SemiProductPage = React.lazy(() => import('./views/admins/trackeditems/SemiProductPage'))
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
@@ -125,6 +126,7 @@ const routes = [
   { path: '/admin/incoming', name: 'Admin Incoming', element: Incoming },
   { path: '/admin/partner', name: 'Admin Partner', element: Partner },
   { path: '/admin/product', name: 'Admin Product', element: Product },
+  { path: '/admin/semiproduct', name: 'Admin Semi Product', element: SemiProductPage },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/delivery', name: 'Delivery', element: ScanBeforePacking, exact: true },
   { path: '/delivery/packing/after', name: 'Delivery Packing After', element: ScanAfterPacking },

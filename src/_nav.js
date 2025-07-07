@@ -305,6 +305,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Semi Product',
+    to: '/admin/semiproduct',
+    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Partner',
     to: '/admin/partner',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,

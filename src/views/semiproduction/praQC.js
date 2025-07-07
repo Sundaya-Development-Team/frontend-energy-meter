@@ -39,8 +39,8 @@ const PraQC = () => {
     inspect_quantity: '',
     image: null,
     barcode: '',
-    location_detail: 'Incoming QC AREA',
-    status: 'in_progress',
+    location_detail: 'Incoming Zone',
+    status: 'in_receiving_area',
   })
 
   /* ---------- Handle ---------- */
@@ -63,7 +63,7 @@ const PraQC = () => {
     try {
       if (!formData.barcode.trim()) return
       const payload = {
-        barcode: formData.barcode,
+        partner_barcode: formData.barcode,
         reference_po: formData.reference_po,
         sap_code: formData.sap_code,
         incoming_batch: Number(formData.incoming_quantity),
@@ -95,7 +95,7 @@ const PraQC = () => {
       //   inspect_quantity: ${formData.inspect_quantity}
       //   Image: ${formData.image?.name}
       // `)
-      const payload = {
+      const payloadIncoming = {
         reference_po: formData.reference_po,
         reference_gr: formData.reference_gr,
         notes: formData.notes,
@@ -113,9 +113,25 @@ const PraQC = () => {
           },
         ],
       }
+      const payloadTrackedItems = {
+        reference_po: formData.reference_po,
+        incoming_batch: Number(formData.incoming_batch),
+        updateData: {
+          is_confirm: true,
+          location_detail: formData.location_detail,
+        },
+      }
       // console.log(payload)
-      const res = await backendIncoming.post('/api/v1/receiving-products/add', payload)
-      alert(`${res.data?.message}`)
+      const resIncoming = await backendIncoming.post(
+        '/api/v1/receiving-products/add',
+        payloadIncoming,
+      )
+      const resTrackedItems = await backendTrackedItems.post(
+        '/api/v1/tracked-items/confirm-items',
+        payloadTrackedItems,
+      )
+      alert(`${resIncoming.data?.message}`)
+      alert(`${resTrackedItems.data?.message}`)
     } catch (err) {
       alert(err.response?.data?.message || err.message)
     } finally {
