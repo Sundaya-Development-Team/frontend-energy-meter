@@ -66,7 +66,7 @@ const PraQC = () => {
         partner_barcode: formData.barcode,
         reference_po: formData.reference_po,
         sap_code: formData.sap_code,
-        incoming_batch: Number(formData.incoming_quantity),
+        incoming_batch: Number(formData.incoming_batch),
         location_detail: formData.location_detail,
         status: formData.status,
       }
@@ -78,7 +78,7 @@ const PraQC = () => {
   }
 
   const handleSubmit = async (e) => {
-    // e.preventDefault()
+    e.preventDefault()
     try {
       setLoading(true)
       // console.log('Form data:', formData)
@@ -121,12 +121,14 @@ const PraQC = () => {
           location_detail: formData.location_detail,
         },
       }
-      // console.log(payload)
+      // console.log(payloadIncoming)
+      // console.log(payloadTrackedItems)
+
       const resIncoming = await backendIncoming.post(
         '/api/v1/receiving-products/add',
         payloadIncoming,
       )
-      const resTrackedItems = await backendTrackedItems.post(
+      const resTrackedItems = await backendTrackedItems.put(
         '/api/v1/tracked-items/confirm-items',
         payloadTrackedItems,
       )

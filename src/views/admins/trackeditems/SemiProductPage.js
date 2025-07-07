@@ -25,7 +25,7 @@ import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.html5.js'
 import 'datatables.net-buttons/js/buttons.print.js'
 import JSZip from 'jszip'
-import { backendProduct } from '../../../api/axios'
+import { backendProduct, backendTrackedItems } from '../../../api/axios'
 
 window.JSZip = JSZip
 
@@ -55,7 +55,7 @@ const SemiProductPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendProduct.get('/api/v1/products/all').then((r) => r.data)
+    const { data } = await backendTrackedItems.get('/api/v1/tracked-items/all').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -154,7 +154,7 @@ const SemiProductPage = () => {
           <button class="btn btn-sm btn-primary btn-edit me-1" data-row='${JSON.stringify(row)}'>
             Edit
           </button>
-          <button class="btn btn-sm btn-danger btn-delete" data-id='${row.id}'>
+          <button class="btn btn-sm btn-danger btn-delete" data-partner-barcode='${row.partner_barcode}'>
             Del
           </button>`,
       }
@@ -175,27 +175,24 @@ const SemiProductPage = () => {
         columns: [
           actionCol,
           { title: 'ID', data: 'id' },
-          { title: 'Product Code', data: 'product_code' },
+          { title: 'Item Code', data: 'item_code' },
+          { title: 'Partner Barcode', data: 'partner_barcode' },
+          { title: 'Product Barcode', data: 'product_barcode' },
           { title: 'SAP Code', data: 'sap_code' },
-          { title: 'Name', data: 'name' },
-          { title: 'Unit', data: 'uom', render: (u) => u?.name ?? '-' },
-          { title: 'Type', data: 'product_type', className: 'text-capitalize' },
-          { title: 'Category', data: 'category', render: (c) => c?.name ?? '-' },
+          { title: 'Reference PO', data: 'reference_po' },
+          { title: 'Incoming Batch', data: 'incoming_batch' },
+          { title: 'Production Batch', data: 'production_batch' },
+          { title: 'Aging Batch', data: 'aging_batch' },
+          { title: 'Location', data: 'location_detail' },
+          { title: 'Status', data: 'status' },
           {
-            title: 'Active',
-            data: 'is_active',
+            title: 'Confirm',
+            data: 'is_confirm',
             className: 'text-center',
             render: (a) =>
               a
                 ? '<span class="badge bg-success">Yes</span>'
                 : '<span class="badge bg-danger">No</span>',
-          },
-          {
-            title: 'Image',
-            data: 'img',
-            orderable: false,
-            className: 'text-center',
-            // render: (img) => (img ? `<img src="/assets/img/${img}" alt="${img}" width="40"/>` : '-'),
           },
         ],
       })
@@ -204,9 +201,9 @@ const SemiProductPage = () => {
       /* Daftarkan 1x listener Edit / Delete */
       const $tbl = $(tableRef.current)
       $tbl.on('click', '.btn-delete', async (e) => {
-        const id = $(e.currentTarget).data('id')
+        const barcode = $(e.currentTarget).data('partnerBarcode')
         if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/products/delete/${id}`)
+          await backendTrackedItems.delete(`/api/v1/tracked-items/delete-by-PaBarcode/${barcode}`)
           await refreshTable()
         }
       })
