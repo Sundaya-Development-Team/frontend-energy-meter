@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  frontend-kwhmeter:
+    # Build the image from the Dockerfile in the current directory
+    build: .
+    # Name of the container
+    container_name: frontend-kwhmeter
+    # Restart the container always
+    restart: always
+    # Environment variables
+    env_file:
+      - .env
+    # Expose the port
+    ports:
+      - "${PORT}:${PORT}"
