@@ -290,7 +290,7 @@ const IncomingPage = () => {
                         <strong>Inspect:</strong> {d.inspect_quantity ? '✅' : '❌'}
                       </p>
                       <div className="text-center">
-                        <img src={d.img} alt={d.sap_code} width="100" className="mb-2" />
+                        <img src={d.img} alt={d.img} width="100" className="mb-2" />
                       </div>
                       <div className="d-flex justify-content-center gap-2">
                         <CButton

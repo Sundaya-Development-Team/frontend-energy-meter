@@ -19,6 +19,7 @@ import {
   backendPartner,
   backendProduct,
   backendTrackedItems,
+  backendUploadFile,
 } from '../../api/axios'
 
 const PraQC = () => {
@@ -41,6 +42,7 @@ const PraQC = () => {
     barcode: '',
     location_detail: 'Incoming Zone',
     status: 'in_receiving_area',
+    file: null,
   })
 
   /* ---------- Handle ---------- */
@@ -95,6 +97,21 @@ const PraQC = () => {
       //   inspect_quantity: ${formData.inspect_quantity}
       //   Image: ${formData.image?.name}
       // `)
+      const payloadFile = {
+        file: formData.file,
+      }
+
+      const resFile = await backendUploadFile.post(
+        '/v1/api/upload-service/semi-product',
+        payloadFile,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      )
+      const filename = resFile.data?.fileName
+      // console.log(filename)
       const payloadIncoming = {
         reference_po: formData.reference_po,
         reference_gr: formData.reference_gr,
@@ -109,7 +126,7 @@ const PraQC = () => {
             remaining_quantity: Number(formData.remaining_quantity),
             sample_quantity: Number(formData.sample_quantity),
             inspect_quantity: formData.inspect_quantity,
-            img: formData.image?.name,
+            img: filename,
           },
         ],
       }
@@ -356,11 +373,11 @@ const PraQC = () => {
 
               {/* Image */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="image" className="col-sm-2 col-form-label">
+                <CFormLabel htmlFor="file" className="col-sm-2 col-form-label">
                   Image
                 </CFormLabel>
                 <CCol sm={10}>
-                  <CFormInput type="file" id="image" name="image" onChange={handleChange} />
+                  <CFormInput type="file" id="file" name="file" onChange={handleChange} />
                 </CCol>
               </CRow>
 

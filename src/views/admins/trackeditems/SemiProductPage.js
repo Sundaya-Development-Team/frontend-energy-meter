@@ -16,7 +16,6 @@ import {
   CForm,
   CFormLabel,
   CFormInput,
-  CFormSelect,
 } from '@coreui/react'
 import $ from 'jquery'
 import 'datatables.net-bs5'
@@ -25,7 +24,7 @@ import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.html5.js'
 import 'datatables.net-buttons/js/buttons.print.js'
 import JSZip from 'jszip'
-import { backendProduct, backendTrackedItems } from '../../../api/axios'
+import { backendTrackedItems } from '../../../api/axios'
 
 window.JSZip = JSZip
 
@@ -36,21 +35,15 @@ const SemiProductPage = () => {
   const dtInstance = useRef(null)
   const [loading, setLoading] = useState(false)
   const [tableData, setTableData] = useState([])
-  const [uomData, setUomData] = useState([])
-  const [catData, setCatData] = useState([])
-
   /* form di modal */
   const [modalVisible, setModalVisible] = useState(false)
-  const [modalMode, setModalMode] = useState('add') // 'add' | 'edit'
   const [formData, setFormData] = useState({
-    id: '', // hanya terisi saat edit
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '', // filename saja
+    partner_barcode: '',
+    product_barcode: '',
+    incoming_batch: '',
+    production_batch: '',
+    aging_batch: '',
+    location_detail: '',
   })
 
   /* ---------- helper ---------- */
@@ -59,64 +52,38 @@ const SemiProductPage = () => {
     setTableData(data) // trigger rerender DataTable
   }
 
-  /* ---------- modal helpers ---------- */
-  const emptyForm = {
-    id: '',
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '',
-  }
-
-  const handleOpenModal = (mode, rowData = null) => {
-    setModalMode(mode)
-    if (mode === 'edit' && rowData) {
-      setFormData({
-        id: rowData.id,
-        sapCode: rowData.sap_code ?? '',
-        productName: rowData.name ?? '',
-        uom: rowData.uom?.id ?? '',
-        productType: rowData.product_type ?? '',
-        productCategory: rowData.category?.id ?? '',
-        aktifView: rowData.is_active ?? '',
-        image: rowData.img ?? '',
-      })
-    } else {
-      setFormData(emptyForm)
-    }
+  const handleOpenModal = (rowData = null) => {
+    setFormData({
+      partner_barcode: rowData.partner_barcode,
+      product_barcode: rowData.product_barcode ?? '',
+      incoming_batch: rowData.incoming_batch ?? '',
+      production_batch: rowData.production_batch ?? '',
+      aging_batch: rowData.aging_batch ?? '',
+      location_detail: rowData.location_detail ?? '',
+    })
     setModalVisible(true)
   }
 
   /* onChange semua input */
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    if (name === 'aktifView') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
-    }
     setFormData((p) => ({ ...p, [name]: value }))
   }
 
-  /* ---------- Simpan (Add / Update) ---------- */
   const handleSave = async () => {
     try {
       setLoading(true)
       const payload = {
-        sap_code: formData.sapCode,
-        name: formData.productName,
-        uom_id: Number(formData.uom),
-        category_id: Number(formData.productCategory),
-        is_active: formData.aktifView,
-        product_type: formData.productType,
-        img: formData.image,
+        product_barcode: formData.product_barcode,
+        incoming_batch: Number(formData.incoming_batch),
+        production_batch: Number(formData.production_batch),
+        aging_batch: Number(formData.aging_batch),
+        location_detail: formData.location_detail,
       }
-      if (modalMode === 'add') {
-        await backendProduct.post('/api/v1/products/add', payload)
-      } else {
-        await backendProduct.put(`/api/v1/products/update/${formData.id}`, payload)
-      }
+      await backendTrackedItems.put(
+        `/api/v1/tracked-items/update-by-PaBarcode/${formData.partner_barcode}`,
+        payload,
+      )
       setModalVisible(false)
       await refreshTable()
     } catch (err) {
@@ -128,15 +95,7 @@ const SemiProductPage = () => {
 
   /* ---------- fetch master ---------- */
   useEffect(() => {
-    ;(async () => {
-      const [uomRes, catRes] = await Promise.all([
-        backendProduct.get('/api/v1/uom/all'),
-        backendProduct.get('/api/v1/categories/all'),
-      ])
-      setUomData(uomRes.data.data)
-      setCatData(catRes.data.data)
-      await refreshTable()
-    })()
+    refreshTable()
   }, [])
 
   /* ---------- DataTable init & update ---------- */
@@ -209,7 +168,7 @@ const SemiProductPage = () => {
       })
       $tbl.on('click', '.btn-edit', (e) => {
         const row = JSON.parse($(e.currentTarget).attr('data-row'))
-        handleOpenModal('edit', row)
+        handleOpenModal(row)
       })
     } else {
       /* jika DT sudah ada → update datanya */
@@ -224,14 +183,6 @@ const SemiProductPage = () => {
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>Semi Product List</strong>
-              <CButton
-                className="fw-bold text-white"
-                color="success"
-                size="sm"
-                onClick={() => handleOpenModal('add')}
-              >
-                + Add Product
-              </CButton>
             </CCardHeader>
             <CCardBody>
               <div className="table-responsive">
@@ -249,111 +200,68 @@ const SemiProductPage = () => {
       {/* ---------- MODAL ---------- */}
       <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
         <CModalHeader>
-          <CModalTitle>{modalMode === 'add' ? 'Add Product' : 'Edit Product'}</CModalTitle>
+          <CModalTitle>Edit</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm>
-            {/* SAP Code */}
+            {/* Product Barcode */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">SAP Code</CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label">Product Barcode</CFormLabel>
               <CCol sm={9}>
-                <CFormInput name="sapCode" value={formData.sapCode} onChange={handleInputChange} />
+                <CFormInput
+                  name="product_barcode"
+                  value={formData.product_barcode}
+                  onChange={handleInputChange}
+                />
               </CCol>
             </CRow>
 
-            {/* Product Name */}
+            {/* Incoming Batch */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Name</CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label">Incoming Batch</CFormLabel>
               <CCol sm={9}>
                 <CFormInput
-                  name="productName"
-                  value={formData.productName}
+                  name="incoming_batch"
+                  value={formData.incoming_batch}
                   onChange={handleInputChange}
                   required
                 />
               </CCol>
             </CRow>
 
-            {/* UOM */}
+            {/* Production Batch */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Unit</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect name="uom" value={formData.uom} onChange={handleInputChange}>
-                  <option value="">Select UOM</option>
-                  {uomData.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Product Type */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Type</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productType"
-                  value={formData.productType}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Type</option>
-                  <option value="raw_material">Raw Material</option>
-                  <option value="semi_finished">Semi Finished</option>
-                  <option value="finished_good">Finished Good</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Category */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Category</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productCategory"
-                  value={formData.productCategory}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {catData.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Aktif View */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Aktif View</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="aktifView"
-                  value={String(formData.aktifView)}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Image */}
-            <CRow className="mb-3">
-              <CFormLabel htmlFor="image" className="col-sm-3 col-form-label">
-                Image
-              </CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label">Production Batch</CFormLabel>
               <CCol sm={9}>
                 <CFormInput
-                  type="file"
-                  id="image"
-                  name="image"
+                  name="production_batch"
+                  value={formData.production_batch}
+                  onChange={handleInputChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+
+            {/* Aging Batch */}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label">Aging Batch</CFormLabel>
+              <CCol sm={9}>
+                <CFormInput
+                  name="aging_batch"
+                  value={formData.aging_batch}
+                  onChange={handleInputChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+
+            {/* Location Detail */}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label">Location Detail</CFormLabel>
+              <CCol sm={9}>
+                <CFormInput
+                  name="location_detail"
+                  value={formData.location_detail}
                   onChange={handleInputChange}
                   required
                 />

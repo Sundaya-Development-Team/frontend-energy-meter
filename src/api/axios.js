@@ -6,6 +6,7 @@ const PRODUCT = import.meta.env.VITE_PRODUCT
 const PARTNER = import.meta.env.VITE_PARTNER
 const INCOMING = import.meta.env.VITE_INCOMING
 const TRACKEDITEMS = import.meta.env.VITE_TRACKEDITEMS
+const UPLOADFILE = import.meta.env.VITE_UPLOAD
 
 // console.log("baseURL_BE = " + urlBackendTicket);
 export const backendQualityService = axios.create({
@@ -26,4 +27,8 @@ export const backendIncoming = axios.create({
 
 export const backendTrackedItems = axios.create({
   baseURL: TRACKEDITEMS,
+})
+
+export const backendUploadFile = axios.create({
+  baseURL: UPLOADFILE,
 })
