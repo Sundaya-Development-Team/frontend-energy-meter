@@ -206,7 +206,7 @@ const ProductPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/products/delete/${id}`)
+          await backendProduct.delete(`/api/v1/products/delete/${id}`)
           await refreshTable()
         }
       })
