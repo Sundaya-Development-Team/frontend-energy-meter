@@ -26,6 +26,8 @@ const PraQC = () => {
   const [loading, setLoading] = useState(false)
   const [sapData, setSapData] = useState([])
   const [partnerData, setPartnerData] = useState([])
+  const [trackedTotalData, setTrackedTotalDataData] = useState(0)
+  const [scannedQty, setScannedQty] = useState(0)
   const [formData, setFormData] = useState({
     reference_po: '',
     reference_gr: '',
@@ -35,7 +37,6 @@ const PraQC = () => {
     ref_quantity: '',
     incoming_batch: '',
     incoming_quantity: '',
-    remaining_quantity: '100',
     sample_quantity: '100',
     inspect_quantity: '',
     image: null,
@@ -43,22 +44,55 @@ const PraQC = () => {
     location_detail: 'Incoming Zone',
     status: 'in_receiving_area',
     file: null,
+    uom: '',
   })
 
-  /* ---------- Handle ---------- */
+  // --------------Helper--------
+
+  const remainingQty = Math.max(0, Number(formData.ref_quantity || 0) - trackedTotalData)
+  const savedQty = trackedTotalData
+
+  const fetchTrackedTotal = async () => {
+    if (!formData.reference_po) return // belum ada PO → abaikan
+    try {
+      const { data } = await backendTrackedItems.get('/api/v1/tracked-items/all', {
+        params: { reference_po: formData.reference_po },
+      })
+      setTrackedTotalDataData(data.total) // update state total
+    } catch (err) {
+      console.error('fetch total error', err)
+    }
+  }
+
+  // ---------- Handle ----------
   const handleChange = (e) => {
     const { name, value, type, files } = e.target
+
+    /*  Radio Ya/Tidak */
     if (name === 'inspect_quantity') {
-      return setFormData((p) => ({
-        ...p,
-        inspect_quantity: value === 'true',
-      }))
+      setFormData((p) => ({ ...p, inspect_quantity: value === 'true' }))
+      return
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'file' ? files[0] : value,
-    }))
+    /* File input */
+    if (type === 'file') {
+      setFormData((p) => ({ ...p, [name]: files[0] }))
+      return
+    }
+
+    /* SAP Code dipilih → isi UOM otomatis */
+    if (name === 'sap_code') {
+      const selected = sapData.find((p) => p.sap_code === value)
+      setFormData((p) => ({
+        ...p,
+        sap_code: value,
+        uom: selected ? selected.uom?.code || '' : '', // ← isi otomatis
+      }))
+      return
+    }
+
+    /* Input biasa */
+    setFormData((p) => ({ ...p, [name]: value }))
   }
 
   const handleBarcode = async () => {
@@ -73,7 +107,9 @@ const PraQC = () => {
         status: formData.status,
       }
       const res = await backendTrackedItems.post('/api/v1/tracked-items/add', payload)
+       setScannedQty((q) => q + 1)
       setFormData((p) => ({ ...p, barcode: '' })) // reset
+      await fetchTrackedTotal()
     } catch (err) {
       alert(err.response?.data?.message || err.message)
     }
@@ -83,34 +119,19 @@ const PraQC = () => {
     e.preventDefault()
     try {
       setLoading(true)
-      // console.log('Form data:', formData)
-      // alert(`
-      //   reference_po: ${formData.reference_po}
-      //   notes: ${formData.notes}
-      //   SAP Code: ${formData.sap_code}
-      //   partner_code: ${formData.partner_code}
-      //   ref_quantity: ${formData.ref_quantity}
-      //   incoming_batch: ${formData.incoming_batch}
-      //   incoming_quantity: ${formData.incoming_quantity}
-      //   remaining_quantity: ${formData.remaining_quantity}
-      //   sample_quantity: ${formData.sample_quantity}
-      //   inspect_quantity: ${formData.inspect_quantity}
-      //   Image: ${formData.image?.name}
-      // `)
-      const payloadFile = {
-        file: formData.file,
-      }
-
-      const resFile = await backendUploadFile.post(
-        '/v1/api/upload-service/semi-product',
-        payloadFile,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        },
-      )
-      const filename = resFile.data?.fileName
+      // const payloadFile = {
+      //   file: formData.file,
+      // }
+      // const resFile = await backendUploadFile.post(
+      //   '/v1/api/upload-service/semi-product',
+      //   payloadFile,
+      //   {
+      //     headers: {
+      //       'Content-Type': 'multipart/form-data',
+      //     },
+      //   },
+      // )
+      // const filename = resFile.data?.fileName
       // console.log(filename)
       const payloadIncoming = {
         reference_po: formData.reference_po,
@@ -123,10 +144,11 @@ const PraQC = () => {
             ref_quantity: Number(formData.ref_quantity),
             incoming_batch: Number(formData.incoming_batch),
             incoming_quantity: Number(formData.incoming_quantity),
-            remaining_quantity: Number(formData.remaining_quantity),
+            uom: formData.uom,
+            remaining_quantity: remainingQty,
             sample_quantity: Number(formData.sample_quantity),
             inspect_quantity: formData.inspect_quantity,
-            img: filename,
+            img: 'https://example.com/image2.jpg',
           },
         ],
       }
@@ -169,6 +191,10 @@ const PraQC = () => {
       setPartnerData(partnerRes.data.data)
     })()
   }, [])
+
+  useEffect(() => {
+    fetchTrackedTotal()
+  }, [formData.reference_po])
 
   return (
     <CRow>
@@ -265,6 +291,16 @@ const PraQC = () => {
                 </CCol>
               </CRow>
 
+              {/* UOM */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="uom" className="col-sm-2 col-form-label">
+                  Unit
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput type="text" id="uom" name="uom" value={formData.uom} readOnly />
+                </CCol>
+              </CRow>
+
               {/* Incoming Batch */}
               <CRow className="mb-3">
                 <CFormLabel htmlFor="incoming_batch" className="col-sm-2 col-form-label">
@@ -309,7 +345,7 @@ const PraQC = () => {
                     type="number"
                     id="remaining_quantity"
                     name="remaining_quantity"
-                    value={formData.remaining_quantity}
+                    value={remainingQty}
                     readOnly
                   />
                 </CCol>
@@ -430,8 +466,42 @@ const PraQC = () => {
           </CCardBody>
         </CCard>
       </CCol>
-      {/* barcode form */}
+
       <CCol xs={12} md={6}>
+        {/* Counter Remaining Quantity */}
+        <CCard className="mb-4">
+          <CCardHeader>
+            <strong>Counter Quantity</strong>
+          </CCardHeader>
+          <CCardBody>
+            <CRow className="mb-3">
+              <CCol>
+                <div className="text-center">
+                  <h1 className="display-4 fw-bold">{scannedQty}</h1>
+                  <small className="text-muted">Units</small>
+                </div>
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+
+        {/* Counter Saved Quantity */}
+        <CCard className="mb-4">
+          <CCardHeader>
+            <strong>Counter Saved Quantity</strong>
+          </CCardHeader>
+          <CCardBody>
+            <CRow className="mb-3">
+              <CCol>
+                <div className="text-center">
+                  <h1 className="display-4 fw-bold">{savedQty}</h1>
+                  <small className="text-muted">Units</small>
+                </div>
+              </CCol>
+            </CRow>
+          </CCardBody>
+        </CCard>
+
         <CCard className="mb-4">
           <CCardHeader>
             <strong>Scan Barcode</strong>
@@ -459,12 +529,6 @@ const PraQC = () => {
                   />
                 </CCol>
               </CRow>
-
-              {/* <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">
-                  Submit
-                </CButton>
-              </div> */}
             </CForm>
           </CCardBody>
         </CCard>

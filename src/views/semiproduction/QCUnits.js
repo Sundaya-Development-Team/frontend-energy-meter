@@ -17,13 +17,88 @@ import {
 } from '@coreui/react'
 import { backendQualityService } from '../../api/axios'
 
+const listQuestions1 = [
+  {
+    id: 1,
+    title: 'Visual Inspection',
+    questions: [
+      { id: 1, question: 'Tidak ada cacat fisik ?' },
+      { id: 2, question: 'Terdapat label ?' },
+      { id: 3, question: 'Tidak ada karat ?' },
+    ],
+  },
+  {
+    id: 2,
+    title: 'Uji Fungsi',
+    questions: [{ id: 4, question: 'Produk menyala pada alat tes ON' }],
+  },
+  {
+    id: 3,
+    title: 'Uji Komunikasi',
+    questions: [{ id: 5, question: 'Dapat mengirimkan data saat request' }],
+  },
+]
+const listQuestions2 = [
+  {
+    id: 1,
+    title: 'Visual Inspection',
+    active: true,
+    description: 'this form for visual instpection',
+    createdAt: '2025-06-26T04:00:37.257Z',
+    updatedAt: '2025-06-26T04:00:37.257Z',
+    criteria: {
+      id: 1,
+      threshold: 80,
+      description: 'this criteria for pass or fail',
+      headerId: 1,
+      createdAt: '2025-06-26T04:11:31.070Z',
+      updatedAt: '2025-06-26T04:11:31.070Z',
+    },
+    questions: [
+      {
+        id: 1,
+        question: 'Tidak ada cacat fisik ?',
+        active: true,
+        correctAnswer: true,
+        placeHolder: 'this is place holder',
+        description: 'this is description question',
+        headerId: 1,
+        createdAt: '2025-06-26T04:18:50.836Z',
+        updatedAt: '2025-06-26T04:18:50.836Z',
+      },
+      {
+        id: 2,
+        question: 'Terdapat label ?',
+        active: true,
+        correctAnswer: true,
+        placeHolder: 'this is place holder',
+        description: 'this is description question',
+        headerId: 1,
+        createdAt: '2025-06-26T04:19:06.470Z',
+        updatedAt: '2025-06-26T04:19:06.470Z',
+      },
+      {
+        id: 3,
+        question: 'Tidak ada karat ?',
+        active: true,
+        correctAnswer: true,
+        placeHolder: 'this is place holder',
+        description: 'this is description question',
+        headerId: 1,
+        createdAt: '2025-06-26T04:19:18.968Z',
+        updatedAt: '2025-06-26T04:19:18.968Z',
+      },
+    ],
+  },
+]
 const QCUnits = () => {
   const [questionData, setQuestionData] = useState([])
   const [formData, setFormData] = useState({
-    sapCode: 'SAP123456',
+    partner_barcode: '',
+    qc_name: 'QC Semi Products',
+    inspected_by: '',
     sampleQty: 10,
     totalQty: 100,
-    barcode: '',
     answers: {}, // jawaban untuk pertanyaan dinamis
   })
 
@@ -59,28 +134,6 @@ const QCUnits = () => {
     alert('Form submitted. Check console for data.')
   }
 
-  const listQuestions1 = [
-    {
-      id: 1,
-      title: 'Visual Inspection',
-      questions: [
-        { id: 1, question: 'Tidak ada cacat fisik ?' },
-        { id: 2, question: 'Terdapat label ?' },
-        { id: 3, question: 'Tidak ada karat ?' },
-      ],
-    },
-    {
-      id: 2,
-      title: 'Uji Fungsi',
-      questions: [{ id: 4, question: 'Produk menyala pada alat tes ON' }],
-    },
-    {
-      id: 3,
-      title: 'Uji Komunikasi',
-      questions: [{ id: 5, question: 'Dapat mengirimkan data saat request' }],
-    },
-  ]
-
   const getQuestions = async () => {
     console.log('Getting questions data')
     try {
@@ -93,60 +146,6 @@ const QCUnits = () => {
       console.log('Error fetching question data', error)
     }
   }
-
-  const listQuestions2 = [
-    {
-      id: 1,
-      title: 'Visual Inspection',
-      active: true,
-      description: 'this form for visual instpection',
-      createdAt: '2025-06-26T04:00:37.257Z',
-      updatedAt: '2025-06-26T04:00:37.257Z',
-      criteria: {
-        id: 1,
-        threshold: 80,
-        description: 'this criteria for pass or fail',
-        headerId: 1,
-        createdAt: '2025-06-26T04:11:31.070Z',
-        updatedAt: '2025-06-26T04:11:31.070Z',
-      },
-      questions: [
-        {
-          id: 1,
-          question: 'Tidak ada cacat fisik ?',
-          active: true,
-          correctAnswer: true,
-          placeHolder: 'this is place holder',
-          description: 'this is description question',
-          headerId: 1,
-          createdAt: '2025-06-26T04:18:50.836Z',
-          updatedAt: '2025-06-26T04:18:50.836Z',
-        },
-        {
-          id: 2,
-          question: 'Terdapat label ?',
-          active: true,
-          correctAnswer: true,
-          placeHolder: 'this is place holder',
-          description: 'this is description question',
-          headerId: 1,
-          createdAt: '2025-06-26T04:19:06.470Z',
-          updatedAt: '2025-06-26T04:19:06.470Z',
-        },
-        {
-          id: 3,
-          question: 'Tidak ada karat ?',
-          active: true,
-          correctAnswer: true,
-          placeHolder: 'this is place holder',
-          description: 'this is description question',
-          headerId: 1,
-          createdAt: '2025-06-26T04:19:18.968Z',
-          updatedAt: '2025-06-26T04:19:18.968Z',
-        },
-      ],
-    },
-  ]
 
   useEffect(() => {
     console.log('Component rendered')
@@ -163,18 +162,40 @@ const QCUnits = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              {/* SAP Code */}
+              {/* Barcode */}
               <CRow className="mb-3">
-                <CFormLabel htmlFor="sapCode" className="col-sm-2 col-form-label">
-                  SAP Code
+                <CFormLabel htmlFor="partner_barcode" className="col-sm-2 col-form-label">
+                  Barcode
                 </CFormLabel>
                 <CCol sm={10}>
-                  <CFormInput type="text" id="sapCode" value={formData.sapCode} readOnly />
+                  <CFormInput
+                    type="text"
+                    id="partner_barcode"
+                    name="partner_barcode"
+                    value={formData.partner_barcode}
+                    onChange={handleChange}
+                  />
+                </CCol>
+              </CRow>
+
+              {/* Inspector */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="inspected_by" className="col-sm-2 col-form-label">
+                  Inspector
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CFormInput
+                    type="text"
+                    id="inspected_by"
+                    name="inspected_by"
+                    value={formData.inspected_by}
+                    onChange={handleChange}
+                  />
                 </CCol>
               </CRow>
 
               {/* Sample Qty */}
-              <CRow className="mb-3">
+              {/* <CRow className="mb-3">
                 <CFormLabel htmlFor="sampleQty" className="col-sm-2 col-form-label">
                   Sample Quantity
                 </CFormLabel>
@@ -185,30 +206,13 @@ const QCUnits = () => {
                     <CFormInput type="number" value={formData.totalQty} readOnly />
                   </CInputGroup>
                 </CCol>
-              </CRow>
-
-              {/* Barcode */}
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="barcode" className="col-sm-2 col-form-label">
-                  Barcode
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="text"
-                    id="barcode"
-                    name="barcode"
-                    value={formData.barcode}
-                    onChange={handleChange}
-                    placeholder="Scan barcode"
-                  />
-                </CCol>
-              </CRow>
+              </CRow> */}
 
               {/* Dynamic Questions */}
-              {questionData.length === 0 ? (
+              {listQuestions1.length === 0 ? (
                 <p className="text-muted">Pertanyaan belum tersedia...</p>
               ) : (
-                questionData.map((section) => (
+                listQuestions1.map((section) => (
                   <div key={section.id}>
                     <CFormLabel className="col-form-label mt-3">
                       <strong>{section.title}</strong>
