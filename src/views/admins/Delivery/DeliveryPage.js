@@ -396,7 +396,6 @@ const DeliveryPage = () => {
         //   { extend: 'print', text: 'Print' },
         // ],
         columns: [
-          //   actionCol,
           { title: 'Tanggal Kirim', data: 'tanggal_pengiriman' },
           { title: 'Tanggal QC', data: 'tanggal_qc' },
           { title: 'Nomer Seri', data: 'nomor_seri' },
@@ -406,6 +405,7 @@ const DeliveryPage = () => {
           { title: 'Operator', data: 'operator' },
           { title: 'Hasil QC', data: 'hasil_qc' },
           { title: 'Catatan', data: 'catatan' },
+          actionCol,
         ],
       })
       $(dtInstance.current.buttons().nodes()).addClass('btn btn-sm btn-outline-primary me-1 mb-1')

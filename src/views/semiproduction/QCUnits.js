@@ -97,8 +97,8 @@ const QCUnits = () => {
     partner_barcode: '',
     qc_name: 'QC Semi Products',
     inspected_by: '',
-    sampleQty: 10,
-    totalQty: 100,
+    // sampleQty: 10,
+    // totalQty: 100,
     answers: {}, // jawaban untuk pertanyaan dinamis
   })
 
