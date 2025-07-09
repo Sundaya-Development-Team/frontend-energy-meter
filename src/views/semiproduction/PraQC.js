@@ -15,6 +15,7 @@ import {
   CRow,
 } from '@coreui/react'
 import {
+  backendAql,
   backendIncoming,
   backendPartner,
   backendProduct,
@@ -28,16 +29,17 @@ const PraQC = () => {
   const [partnerData, setPartnerData] = useState([])
   const [trackedTotalData, setTrackedTotalDataData] = useState(0)
   const [scannedQty, setScannedQty] = useState(0)
+  const [sampleQty, setSampleQty] = useState(0)
   const [formData, setFormData] = useState({
     reference_po: '',
     reference_gr: '',
     notes: '',
     sap_code: '',
     partner_code: '',
-    ref_quantity: '',
+    ref_quantity: '0',
     incoming_batch: '',
     incoming_quantity: '',
-    sample_quantity: '100',
+    sample_quantity: '',
     inspect_quantity: '',
     image: null,
     barcode: '',
@@ -61,6 +63,25 @@ const PraQC = () => {
       setTrackedTotalDataData(data.total) // update state total
     } catch (err) {
       console.error('fetch total error', err)
+    }
+  }
+
+
+  const inspection = 'II'
+  const aql = '4'
+  const fetchAql = async (lotSize) => {
+     if (!lotSize) return 0     
+    try {
+      const payload = {
+        lotSize: lotSize,
+        inspectionLevel: inspection,
+        aql: aql,
+      }
+      const { data } = await backendAql.post('/api/v1/aql', payload)
+      return data.sampleSize
+    } catch (err) {
+      console.error('fetch AQL error', err)
+      return 0
     }
   }
 
@@ -107,7 +128,7 @@ const PraQC = () => {
         status: formData.status,
       }
       const res = await backendTrackedItems.post('/api/v1/tracked-items/add', payload)
-       setScannedQty((q) => q + 1)
+      setScannedQty((q) => q + 1)
       setFormData((p) => ({ ...p, barcode: '' })) // reset
       await fetchTrackedTotal()
     } catch (err) {
@@ -132,7 +153,6 @@ const PraQC = () => {
       //   },
       // )
       // const filename = resFile.data?.fileName
-      // console.log(filename)
       const payloadIncoming = {
         reference_po: formData.reference_po,
         reference_gr: formData.reference_gr,
@@ -149,6 +169,7 @@ const PraQC = () => {
             sample_quantity: Number(formData.sample_quantity),
             inspect_quantity: formData.inspect_quantity,
             img: 'https://example.com/image2.jpg',
+            // img: filename,
           },
         ],
       }
@@ -195,6 +216,13 @@ const PraQC = () => {
   useEffect(() => {
     fetchTrackedTotal()
   }, [formData.reference_po])
+
+  useEffect(() => {
+    ;(async () => {
+      const qty = await fetchAql(formData.ref_quantity)
+      setSampleQty(qty)
+    })()
+  }, [formData.ref_quantity])
 
   return (
     <CRow>
@@ -361,7 +389,7 @@ const PraQC = () => {
                     type="number"
                     id="sample_quantity"
                     name="sample_quantity"
-                    value={formData.sample_quantity}
+                    value={sampleQty}
                     readOnly
                   />
                 </CCol>
