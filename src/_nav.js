@@ -316,6 +316,24 @@ const _nav = [
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Warehouses',
+    to: '/admin/warehouse',
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Stock Balance',
+    to: '/admin/stock/balance',
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Stock Movement',
+    to: '/admin/stock/movement',
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'Theme',
   },

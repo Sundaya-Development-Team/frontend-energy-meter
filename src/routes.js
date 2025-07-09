@@ -5,11 +5,14 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
 // Admin
-const Incoming = React.lazy(() => import('./views/admins/incoming/IncomingPage'))
-const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
 const DynamicQuestionForm = React.lazy(() => import('./views/admins/DynamicQuestionForm'))
+const Incoming = React.lazy(() => import('./views/admins/incoming/IncomingPage'))
 const Partner = React.lazy(() => import('./views/admins/partner/PartnerPage'))
+const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
 const SemiProductPage = React.lazy(() => import('./views/admins/trackeditems/SemiProductPage'))
+const WarehousesPage = React.lazy(() => import('./views/admins/warehouses/WarehousesPage'))
+const BalancesPage = React.lazy(() => import('./views/admins/stock/BalancesPage'))
+const MovementsPage = React.lazy(() => import('./views/admins/stock/MovementsPage'))
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
@@ -127,6 +130,9 @@ const routes = [
   { path: '/admin/partner', name: 'Admin Partner', element: Partner },
   { path: '/admin/product', name: 'Admin Product', element: Product },
   { path: '/admin/semiproduct', name: 'Admin Semi Product', element: SemiProductPage },
+  { path: '/admin/stock/balance', name: 'Admin Stock', element: BalancesPage },
+  { path: '/admin/stock/movement', name: 'Admin Stock', element: MovementsPage },
+  { path: '/admin/warehouse', name: 'Admin Warehouse', element: WarehousesPage },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/delivery', name: 'Delivery', element: ScanBeforePacking, exact: true },
   { path: '/delivery/packing/after', name: 'Delivery Packing After', element: ScanAfterPacking },
