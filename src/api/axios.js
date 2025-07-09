@@ -8,6 +8,7 @@ const INCOMING = import.meta.env.VITE_INCOMING
 const TRACKEDITEMS = import.meta.env.VITE_TRACKEDITEMS
 const UPLOADFILE = import.meta.env.VITE_UPLOAD
 const AQL = import.meta.env.VITE_AQL
+const WAREHOUSE = import.meta.env.VITE_WAREHOUSE
 
 // console.log("baseURL_BE = " + urlBackendTicket);
 export const backendQualityService = axios.create({
@@ -36,4 +37,8 @@ export const backendUploadFile = axios.create({
 
 export const backendAql = axios.create({
   baseURL: AQL,
+})
+
+export const backendWarehouse = axios.create({
+  baseURL: WAREHOUSE,
 })

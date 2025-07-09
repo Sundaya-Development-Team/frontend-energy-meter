@@ -287,6 +287,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Delivery',
+    to: '/admin/delivery',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Dynamic Question',
     to: '/admin/dynamicquestion',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,

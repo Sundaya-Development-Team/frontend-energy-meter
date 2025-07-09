@@ -25,7 +25,7 @@ import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.html5.js'
 import 'datatables.net-buttons/js/buttons.print.js'
 import JSZip from 'jszip'
-import { backendProduct } from '../../../api/axios'
+import { backendProduct, backendWarehouse } from '../../../api/axios'
 
 window.JSZip = JSZip
 
@@ -36,39 +36,33 @@ const WarehousesPage = () => {
   const dtInstance = useRef(null)
   const [loading, setLoading] = useState(false)
   const [tableData, setTableData] = useState([])
-  const [uomData, setUomData] = useState([])
-  const [catData, setCatData] = useState([])
+//   const [uomData, setUomData] = useState([])
+//   const [catData, setCatData] = useState([])
 
   /* form di modal */
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState('add') // 'add' | 'edit'
   const [formData, setFormData] = useState({
-    id: '', // hanya terisi saat edit
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '', // filename saja
+    id: '',
+    name: '',
+    location: '',
+    latitude: '',
+    longitude: '',
   })
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendProduct.get('/api/v1/products/all').then((r) => r.data)
+    const { data } = await backendWarehouse.get('/api/v1/warehouses').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
   /* ---------- modal helpers ---------- */
   const emptyForm = {
     id: '',
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '',
+    name: '',
+    location: '',
+    latitude: '',
+    longitude: '',
   }
 
   const handleOpenModal = (mode, rowData = null) => {
@@ -76,13 +70,10 @@ const WarehousesPage = () => {
     if (mode === 'edit' && rowData) {
       setFormData({
         id: rowData.id,
-        sapCode: rowData.sap_code ?? '',
-        productName: rowData.name ?? '',
-        uom: rowData.uom?.id ?? '',
-        productType: rowData.product_type ?? '',
-        productCategory: rowData.category?.id ?? '',
-        aktifView: rowData.is_active ?? '',
-        image: rowData.img ?? '',
+        name: rowData.name ?? '',
+        location: rowData.location ?? '',
+        latitude: rowData.latitude ?? '',
+        longitude: rowData.longitude ?? '',
       })
     } else {
       setFormData(emptyForm)
@@ -93,9 +84,6 @@ const WarehousesPage = () => {
   /* onChange semua input */
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    if (name === 'aktifView') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
-    }
     setFormData((p) => ({ ...p, [name]: value }))
   }
 
@@ -104,18 +92,15 @@ const WarehousesPage = () => {
     try {
       setLoading(true)
       const payload = {
-        sap_code: formData.sapCode,
-        name: formData.productName,
-        uom_id: Number(formData.uom),
-        category_id: Number(formData.productCategory),
-        is_active: formData.aktifView,
-        product_type: formData.productType,
-        img: formData.image,
+        name: formData.name,
+        location: formData.location,
+        latitude: Number(formData.latitude),
+        longitude: Number(formData.longitude),
       }
       if (modalMode === 'add') {
-        await backendProduct.post('/api/v1/products/add', payload)
+        await backendWarehouse.post('/api/v1/warehouses', payload)
       } else {
-        await backendProduct.put(`/api/v1/products/update/${formData.id}`, payload)
+        await backendWarehouse.put(`/api/v1/warehouses/update/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -129,12 +114,6 @@ const WarehousesPage = () => {
   /* ---------- fetch master ---------- */
   useEffect(() => {
     ;(async () => {
-      const [uomRes, catRes] = await Promise.all([
-        backendProduct.get('/api/v1/uom/all'),
-        backendProduct.get('/api/v1/categories/all'),
-      ])
-      setUomData(uomRes.data.data)
-      setCatData(catRes.data.data)
       await refreshTable()
     })()
   }, [])
@@ -175,28 +154,11 @@ const WarehousesPage = () => {
         columns: [
           actionCol,
           { title: 'ID', data: 'id' },
-          { title: 'Product Code', data: 'product_code' },
-          { title: 'SAP Code', data: 'sap_code' },
+          { title: 'Warehouse Code', data: 'warehouse_code' },
           { title: 'Name', data: 'name' },
-          { title: 'Unit', data: 'uom', render: (u) => u?.name ?? '-' },
-          { title: 'Type', data: 'product_type', className: 'text-capitalize' },
-          { title: 'Category', data: 'category', render: (c) => c?.name ?? '-' },
-          {
-            title: 'Active',
-            data: 'is_active',
-            className: 'text-center',
-            render: (a) =>
-              a
-                ? '<span class="badge bg-success">Yes</span>'
-                : '<span class="badge bg-danger">No</span>',
-          },
-          {
-            title: 'Image',
-            data: 'img',
-            orderable: false,
-            className: 'text-center',
-            // render: (img) => (img ? `<img src="/assets/img/${img}" alt="${img}" width="40"/>` : '-'),
-          },
+          { title: 'Location', data: 'location' },
+          { title: 'Latitude', data: 'latitude' },
+          { title: 'Longitude', data: 'longitude' },
         ],
       })
       $(dtInstance.current.buttons().nodes()).addClass('btn btn-sm btn-outline-primary me-1 mb-1')
@@ -206,7 +168,7 @@ const WarehousesPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/api/v1/products/delete/${id}`)
+          await backendWarehouse.delete(`/api/v1/warehouses/delete/${id}`)
           await refreshTable()
         }
       })
@@ -256,107 +218,52 @@ const WarehousesPage = () => {
         </CModalHeader>
         <CModalBody>
           <CForm>
-            {/* SAP Code */}
+            {/* Name */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">SAP Code</CFormLabel>
-              <CCol sm={9}>
-                <CFormInput name="sapCode" value={formData.sapCode} onChange={handleInputChange} />
-              </CCol>
-            </CRow>
-
-            {/* Product Name */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Name</CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label">Name</CFormLabel>
               <CCol sm={9}>
                 <CFormInput
-                  name="productName"
-                  value={formData.productName}
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
                   required
                 />
               </CCol>
             </CRow>
 
-            {/* UOM */}
+            {/* Location */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Unit</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect name="uom" value={formData.uom} onChange={handleInputChange}>
-                  <option value="">Select UOM</option>
-                  {uomData.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Product Type */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Type</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productType"
-                  value={formData.productType}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Type</option>
-                  <option value="raw_material">Raw Material</option>
-                  <option value="semi_finished">Semi Finished</option>
-                  <option value="finished_good">Finished Good</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Category */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Category</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productCategory"
-                  value={formData.productCategory}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {catData.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Aktif View */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Aktif View</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="aktifView"
-                  value={String(formData.aktifView)}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Image */}
-            <CRow className="mb-3">
-              <CFormLabel htmlFor="image" className="col-sm-3 col-form-label">
-                Image
-              </CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label">Location</CFormLabel>
               <CCol sm={9}>
                 <CFormInput
-                  type="file"
-                  id="image"
-                  name="image"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+
+            {/* Latitude*/}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label">Latitude</CFormLabel>
+              <CCol sm={9}>
+                <CFormInput
+                  name="latitude"
+                  value={formData.latitude}
+                  onChange={handleInputChange}
+                  required
+                />
+              </CCol>
+            </CRow>
+
+            {/* Longitude */}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label">Longitude</CFormLabel>
+              <CCol sm={9}>
+                <CFormInput
+                  name="longitude"
+                  value={formData.longitude}
                   onChange={handleInputChange}
                   required
                 />
