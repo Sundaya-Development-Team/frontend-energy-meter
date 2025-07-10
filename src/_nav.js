@@ -330,13 +330,13 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Stock Balance',
-    to: '/admin/stock/balance',
+    to: '/admin/warehouse/stock/balance',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Stock Movement',
-    to: '/admin/stock/movement',
+    to: '/admin/warehouse/stock/movement',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
   {

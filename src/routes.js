@@ -12,8 +12,8 @@ const Partner = React.lazy(() => import('./views/admins/partner/PartnerPage'))
 const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
 const SemiProductPage = React.lazy(() => import('./views/admins/trackeditems/SemiProductPage'))
 const WarehousesPage = React.lazy(() => import('./views/admins/warehouses/WarehousesPage'))
-const BalancesPage = React.lazy(() => import('./views/admins/stock/BalancesPage'))
-const MovementsPage = React.lazy(() => import('./views/admins/stock/MovementsPage'))
+const BalancesPage = React.lazy(() => import('./views/admins/warehouses/BalancesPage'))
+const MovementsPage = React.lazy(() => import('./views/admins/warehouses/MovementsPage'))
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
@@ -126,15 +126,15 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/admin', name: 'Admin', element: DynamicQuestionForm, exact: true },
-  { path: '/admin/delivery', name: 'Admin Delivery', element: DeliveryPage },
+  { path: '/admin/delivery', name: 'Delivery', element: DeliveryPage },
   { path: '/admin/dynamicquestion', name: 'Dynamic Question', element: DynamicQuestionForm },
-  { path: '/admin/incoming', name: 'Admin Incoming', element: Incoming },
-  { path: '/admin/partner', name: 'Admin Partner', element: Partner },
-  { path: '/admin/product', name: 'Admin Product', element: Product },
-  { path: '/admin/semiproduct', name: 'Admin Semi Product', element: SemiProductPage },
-  { path: '/admin/stock/balance', name: 'Admin Stock', element: BalancesPage },
-  { path: '/admin/stock/movement', name: 'Admin Stock', element: MovementsPage },
-  { path: '/admin/warehouse', name: 'Admin Warehouse', element: WarehousesPage },
+  { path: '/admin/incoming', name: 'Incoming', element: Incoming },
+  { path: '/admin/partner', name: 'Partner', element: Partner },
+  { path: '/admin/product', name: 'Product', element: Product },
+  { path: '/admin/semiproduct', name: 'Semi Product', element: SemiProductPage },
+  { path: '/admin/warehouse', name: 'Warehouse', element: WarehousesPage, exact: true },
+  { path: '/admin/warehouse/stock/balance', name: 'Stock Balance', element: BalancesPage },
+  { path: '/admin/warehouse/stock/movement', name: 'Stock Movement', element: MovementsPage },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/delivery', name: 'Delivery', element: ScanBeforePacking, exact: true },
   { path: '/delivery/packing/after', name: 'Delivery Packing After', element: ScanAfterPacking },
