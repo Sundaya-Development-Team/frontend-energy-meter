@@ -374,11 +374,8 @@ const DeliveryPage = () => {
         className: 'text-center',
         orderable: false,
         render: (_, __, row) => `
-          <button class="btn btn-sm btn-primary btn-edit me-1" data-row='${JSON.stringify(row)}'>
-            Edit
-          </button>
-          <button class="btn btn-sm btn-danger btn-delete" data-id='${row.id}'>
-            Del
+          <button class="btn btn-sm btn-success btn-edit me-1 text-white" data-row='${JSON.stringify(row)}'>
+            Details
           </button>`,
       }
 
