@@ -138,14 +138,14 @@ const PraQC = () => {
 
       /* upload file jika ada */
       let uploadedFileName = ''
-      // if (formData.file) {
-      //   const { data } = await backendUploadFile.post(
-      //     '/v1/api/upload-service/semi-product',
-      //     { file: formData.file },
-      //     { headers: { 'Content-Type': 'multipart/form-data' } },
-      //   )
-      //   uploadedFileName = data.URL ?? 'example-image.jpg'
-      // }
+      if (formData.file) {
+        const { data } = await backendUploadFile.post(
+          '/v1/api/upload-service/semi-product',
+          { file: formData.file },
+          { headers: { 'Content-Type': 'multipart/form-data' } },
+        )
+        uploadedFileName = data.URL ?? 'example-image.jpg'
+      }
 
       /* payload utama */
       const resIncoming = await backendIncoming.post('/api/v1/receiving-products/add', {
