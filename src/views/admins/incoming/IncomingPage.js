@@ -48,7 +48,6 @@ const cardBodyStyle = {
 const IncomingPage = () => {
   const [modalImageVisible, setModalImageVisible] = useState(false)
   const [modalImageSrc, setModalImageSrc] = useState('')
-  const [imageUrls, setImageUrls] = useState({})
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(false)
   const [headerLoading, setHeaderLoading] = useState(false)
