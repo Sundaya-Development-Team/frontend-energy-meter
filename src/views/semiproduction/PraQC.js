@@ -329,19 +329,6 @@ const PraQC = () => {
                   placeholder="Select Partner"
                   isClearable
                 />
-                {/* <CFormSelect
-                  name="partner_code"
-                  value={formData.partner_code}
-                  onChange={handleInput}
-                  required
-                >
-                  <option value="">Select Partner</option>
-                  {partnerData.map((p) => (
-                    <option key={p.id} value={p.partner_code}>
-                      {p.name}
-                    </option>
-                  ))}
-                </CFormSelect> */}
               </FormRow>
 
               <FormRow label="Note">

@@ -21,7 +21,12 @@ import {
   CPaginationItem,
   CRow,
 } from '@coreui/react'
-import { backendIncoming, backendPartner, backendProduct } from '../../../api/axios'
+import {
+  backendIncoming,
+  backendPartner,
+  backendProduct,
+  backendUploadFile,
+} from '../../../api/axios'
 
 const formatDate = (iso) =>
   new Date(iso).toLocaleString('id-ID', {
@@ -41,6 +46,9 @@ const cardBodyStyle = {
 }
 
 const IncomingPage = () => {
+  const [modalImageVisible, setModalImageVisible] = useState(false)
+  const [modalImageSrc, setModalImageSrc] = useState('')
+  const [imageUrls, setImageUrls] = useState({})
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(false)
   const [headerLoading, setHeaderLoading] = useState(false)
@@ -71,7 +79,7 @@ const IncomingPage = () => {
     remaining_quantity: '',
     sample_quantity: '',
     inspect_quantity: '',
-    image: '',
+    file: null,
   })
 
   const fetchData = async (page = 1, reference_po = '') => {
@@ -85,6 +93,20 @@ const IncomingPage = () => {
       console.log('error : ~ IncomingPage : fetching data', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchImage = async (path) => {
+    try {
+      const response = await backendUploadFile.get(`/v1/api/upload-service/semi-product/c`, {
+        params: { path },
+        responseType: 'blob', // <-- penting!
+      })
+      const blobUrl = URL.createObjectURL(response.data)
+      return blobUrl
+    } catch (error) {
+      console.log('error : ~ IncomingPage : fetching Image', error)
+      return null
     }
   }
 
@@ -106,6 +128,12 @@ const IncomingPage = () => {
     } catch (error) {
       console.log('error : ~ IncomingPage : deleteDetails', error)
     }
+  }
+
+  const handleFetchImage = async (imgPath) => {
+    const url = await fetchImage(imgPath)
+    setModalImageSrc(url)
+    setModalImageVisible(true)
   }
 
   const handleHeaderChange = (e) => {
@@ -176,6 +204,15 @@ const IncomingPage = () => {
   const handleDetailHeader = async () => {
     try {
       setdetailLoading(true)
+      let uploadedFileName = ''
+      if (formDetailData.file) {
+        const { data } = await backendUploadFile.post(
+          '/v1/api/upload-service/semi-product',
+          { file: formDetailData.file },
+          { headers: { 'Content-Type': 'multipart/form-data' } },
+        )
+        uploadedFileName = data.URL ?? 'example-image.jpg'
+      }
       const payload = {
         sap_code: formDetailData.sap_code,
         partner_code: formDetailData.partner_code,
@@ -185,9 +222,9 @@ const IncomingPage = () => {
         remaining_quantity: Number(formDetailData.remaining_quantity),
         sample_quantity: Number(formDetailData.sample_quantity),
         inspect_quantity: formDetailData.inspect_quantity,
-        img: formDetailData.image?.name,
+        img: uploadedFileName,
       }
-      console.log(payload)
+      // console.log(payload)
 
       await backendIncoming.put(`/api/v1/receiving-products/update-detail/${idDetail}`, payload)
       setModalDetailVisible(false)
@@ -242,7 +279,7 @@ const IncomingPage = () => {
                   <CButton
                     className="fw-bold text-white me-1"
                     size="sm"
-                    color="warning"
+                    color="success"
                     onClick={() => handleOpenModel('header', header)}
                   >
                     Edit
@@ -289,14 +326,21 @@ const IncomingPage = () => {
                       <p>
                         <strong>Inspect:</strong> {d.inspect_quantity ? '✅' : '❌'}
                       </p>
-                      <div className="text-center">
-                        <img src={d.img} alt={d.img} width="100" className="mb-2" />
+                      <div className="text-center ">
+                        <CButton
+                          className="fw-bold text-white"
+                          color="info"
+                          size="sm"
+                          onClick={() => handleFetchImage(d.img)}
+                        >
+                          Lihat Gambar
+                        </CButton>
                       </div>
-                      <div className="d-flex justify-content-center gap-2">
+                      <div className="d-flex justify-content-center gap-2 mt-2">
                         <CButton
                           className="fw-bold text-white me-1"
                           size="sm"
-                          color="warning"
+                          color="success"
                           onClick={() => handleOpenModel('detail', d)}
                         >
                           Edit
@@ -537,11 +581,11 @@ const IncomingPage = () => {
 
           {/* Image */}
           <CRow className="mb-3">
-            <CFormLabel htmlFor="image" className="col-sm-2 col-form-label">
+            <CFormLabel htmlFor="file" className="col-sm-2 col-form-label">
               Image
             </CFormLabel>
             <CCol sm={10}>
-              <CFormInput type="file" id="image" name="image" onChange={handleDetailChange} />
+              <CFormInput type="file" id="file" name="file" onChange={handleDetailChange} />
             </CCol>
           </CRow>
 
@@ -596,6 +640,24 @@ const IncomingPage = () => {
             {detailLoading ? 'Loading...' : 'Save'}
           </CButton>
         </CModalFooter>
+      </CModal>
+
+      {/* -----------Modal Image */}
+      <CModal visible={modalImageVisible} onClose={() => setModalImageVisible(false)} size="xl">
+        <CModalHeader onClose={() => setModalImageVisible(false)}>
+          <CModalTitle>Gambar Produk</CModalTitle>
+        </CModalHeader>
+        <CModalBody className="text-center">
+          {modalImageSrc ? (
+            <img
+              src={modalImageSrc}
+              alt="Product"
+              style={{ maxWidth: '100%', maxHeight: '80vh' }}
+            />
+          ) : (
+            <p>Tidak ada gambar</p>
+          )}
+        </CModalBody>
       </CModal>
     </>
   )
