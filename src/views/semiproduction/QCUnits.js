@@ -130,8 +130,14 @@ const QCUnits = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('QC Result:', formData)
-    alert('Form submitted. Check console for data.')
+    const res = backendQualityService.post(
+      '/v1/api/quality-service/qc-semi-product/submit',
+      formData,
+    )
+    alert(`${res.data?.message}`)
+    console.log('QC Result:', res)
+    // await backendUploadFile.post()
+    // alert('Form submitted. Check console for data.')
   }
 
   const getQuestions = async () => {
@@ -148,8 +154,8 @@ const QCUnits = () => {
   }
 
   useEffect(() => {
-    console.log('Component rendered')
-    getQuestions()
+    // console.log('Component rendered')
+    // getQuestions()
     // console.log("formData berubah:", formData);
   }, [])
 
