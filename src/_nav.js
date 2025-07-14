@@ -255,6 +255,16 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Warehouse',
+  },
+  {
+    component: CNavItem,
+    name: 'Incoming',
+    to: '/warehouse/incoming',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
     name: 'Delivery',
   },
   {

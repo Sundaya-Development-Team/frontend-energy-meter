@@ -71,6 +71,9 @@ const ScanAfterClosingCover = React.lazy(
 // Inventory
 const IncomingUnits = React.lazy(() => import('./views/production/inventory/IncomingUnits'))
 
+// Warehouse
+const IncomingWarehouse = React.lazy(() => import('./views/warehouse/IncomingWarehouse'))
+
 // Delivery
 const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
 const ScanBeforePacking = React.lazy(() => import('./views/delivery/ScanBeforePacking'))
@@ -312,6 +315,8 @@ const routes = [
   { path: '/semiproduction/incoming', name: 'Incoming Semi Product', element: IncomingUnit },
   { path: '/semiproduction/qcunits', name: 'QC Semi Product', element: QCUnits },
   { path: '/semiproduction/reportqcunit', name: 'Report QC Semi Product', element: ReportQCUnit },
+  { path: '/warehouse', name: 'Warehouse', element: IncomingWarehouse, exact: true },
+  { path: '/warehouse/incoming', name: 'Incoming Warehouse', element: IncomingWarehouse },
   { path: '/widgets', name: 'Widgets', element: Widgets },
 ]
 

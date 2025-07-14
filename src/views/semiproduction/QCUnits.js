@@ -154,8 +154,8 @@ const QCUnits = () => {
   }
 
   useEffect(() => {
-    // console.log('Component rendered')
-    // getQuestions()
+    console.log('Component rendered')
+    getQuestions()
     // console.log("formData berubah:", formData);
   }, [])
 
@@ -215,10 +215,10 @@ const QCUnits = () => {
               </CRow> */}
 
               {/* Dynamic Questions */}
-              {listQuestions1.length === 0 ? (
+              {questionData.length === 0 ? (
                 <p className="text-muted">Pertanyaan belum tersedia...</p>
               ) : (
-                listQuestions1.map((section) => (
+                questionData.map((section) => (
                   <div key={section.id}>
                     <CFormLabel className="col-form-label mt-3">
                       <strong>{section.title}</strong>
