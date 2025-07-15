@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import React, { useEffect, useMemo, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   CButton,
   CCard,
@@ -71,12 +71,6 @@ const IncomingWarehouse = () => {
     target_division: 'Warehouse',
   })
 
-  /* ------------------------ derived / memoised value ---------------------- */
-  const remainingQty = useMemo(
-    () => Math.max(0, Number(formData.quantity_total || 0) - trackedTotal),
-    [formData.quantity_total, trackedTotal],
-  )
-
   /* --------------------------- handlers ---------------------------------- */
   const handleInput = (e) => {
     const { name, value, type, files } = e.target
@@ -141,7 +135,16 @@ const IncomingWarehouse = () => {
         target_division: formData.target_division,
       }
       const resIncoming = await backendWarehouse.post('/api/v1/request-movement', payload)
+      refreshMovementList()
       setRequestCode(resIncoming.data?.data?.request_code)
+      setFormData((p) => ({
+        ...p,
+        warehouse_code: '',
+        sap_code: '',
+        quantity_total: '',
+        uom: '',
+        reference: '',
+      }))
       alert(`${resIncoming.data?.message}`)
     } catch (err) {
       alert(err.response?.data?.message || err.message)
@@ -198,164 +201,175 @@ const IncomingWarehouse = () => {
   /* ----------------------------------------------------------------------- */
   /* ------------------------------ render --------------------------------- */
   return (
-    <CRow>
-      {/* FORM KIRI ---------------------------------------------------------- */}
-      <CCol md={6}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Incoming Warehouse</strong>
-          </CCardHeader>
+    <>
+      {/* ROW Header ---------------------------------------------------------- */}
+      <CRow>
+        <CCol md={12}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <strong>Incoming Warehouse</strong>
+            </CCardHeader>
 
-          <CCardBody>
-            <CForm onSubmit={handleSubmit}>
-              {/* ------------ Header (PO / GR) ------------- */}
+            <CCardBody>
+              <CForm onSubmit={handleSubmit}>
+                {/* ------------ Header (PO / GR) ------------- */}
 
-              <FormRow label="Reference PO">
-                <CFormInput
-                  name="reference"
-                  value={formData.reference}
-                  onChange={handleInput}
-                  required
-                />
-              </FormRow>
+                <FormRow label="Reference PO">
+                  <CFormInput
+                    name="reference"
+                    value={formData.reference}
+                    onChange={handleInput}
+                    required
+                  />
+                </FormRow>
 
-              <FormRow label="Warehouse Code">
-                <Select
-                  options={warehouseData.map((u) => ({
-                    value: u.warehouse_code,
-                    label: u.name,
-                  }))}
-                  value={
-                    warehouseData.find((p) => p.warehouse_code === formData.warehouse_code)
-                      ? {
-                          value: formData.warehouse_code,
-                          label: warehouseData.find(
-                            (p) => p.warehouse_code === formData.warehouse_code,
-                          ).name,
-                        }
-                      : null
-                  }
-                  onChange={handleSelectWarehouse}
-                  placeholder="Select Warehouse"
-                  isClearable
-                />
-              </FormRow>
+                <FormRow label="Warehouse Code">
+                  <Select
+                    options={warehouseData.map((u) => ({
+                      value: u.warehouse_code,
+                      label: u.name,
+                    }))}
+                    value={
+                      warehouseData.find((p) => p.warehouse_code === formData.warehouse_code)
+                        ? {
+                            value: formData.warehouse_code,
+                            label: warehouseData.find(
+                              (p) => p.warehouse_code === formData.warehouse_code,
+                            ).name,
+                          }
+                        : null
+                    }
+                    onChange={handleSelectWarehouse}
+                    placeholder="Select Warehouse"
+                    isClearable
+                  />
+                </FormRow>
 
-              <FormRow label="SAP Code">
-                <Select
-                  options={sapData.map((u) => ({ value: u.sap_code, label: u.sap_code }))}
-                  value={
-                    sapData.find((p) => p.sap_code === formData.sap_code)
-                      ? {
-                          value: formData.sap_code,
-                          label: formData.sap_code,
-                        }
-                      : null
-                  }
-                  onChange={handleSelectSap}
-                  placeholder="Select SAP Code"
-                  isClearable
-                />
-              </FormRow>
+                <FormRow label="SAP Code">
+                  <Select
+                    options={sapData.map((u) => ({ value: u.sap_code, label: u.sap_code }))}
+                    value={
+                      sapData.find((p) => p.sap_code === formData.sap_code)
+                        ? {
+                            value: formData.sap_code,
+                            label: formData.sap_code,
+                          }
+                        : null
+                    }
+                    onChange={handleSelectSap}
+                    placeholder="Select SAP Code"
+                    isClearable
+                  />
+                </FormRow>
 
-              <FormRow label="Unit">
-                <CFormInput name="uom" value={formData.uom} readOnly />
-              </FormRow>
+                <FormRow label="Unit">
+                  <CFormInput name="uom" value={formData.uom} readOnly />
+                </FormRow>
 
-              <FormRow label="Total Quantity">
-                <CFormInput
-                  type="number"
-                  name="quantity_total"
-                  value={formData.quantity_total}
-                  onChange={handleInput}
-                  required
-                />
-              </FormRow>
+                <FormRow label="Total Quantity">
+                  <CFormInput
+                    type="number"
+                    name="quantity_total"
+                    value={formData.quantity_total}
+                    onChange={handleInput}
+                    required
+                  />
+                </FormRow>
 
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit" disabled={loading}>
-                  {loading ? 'Saving…' : 'Save'}
-                </CButton>
-              </div>
-            </CForm>
-          </CCardBody>
-        </CCard>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Movement Request List</strong>
-          </CCardHeader>
-          <CCardBody>
-            <CTable striped hover responsive>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell>PO</CTableHeaderCell>
-                  <CTableHeaderCell>Request Code</CTableHeaderCell>
-                  <CTableHeaderCell>Requested At</CTableHeaderCell>
-                  <CTableHeaderCell>Action</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {movementList.map((item) => (
-                  <CTableRow key={item.id}>
-                    <CTableDataCell>{item.reference}</CTableDataCell>
-                    <CTableDataCell>{item.request_code}</CTableDataCell>
-                    <CTableDataCell>{item.requested_at}</CTableDataCell>
-                    <CTableDataCell>
-                      <CButton
-                        color="info"
-                        size="sm"
-                        onClick={() => handleSetRequestCode(item.request_code)}
-                      >
-                        Set
-                      </CButton>
-                    </CTableDataCell>
+                <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <CButton color="primary" type="submit" disabled={loading}>
+                    {loading ? 'Saving…' : 'Save'}
+                  </CButton>
+                </div>
+              </CForm>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+      {/* ROW per Item */}
+      <CRow>
+        {/* Panel KIRI ---------------------------------------------------------- */}
+        <CCol md={6}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <strong>Movement Request List</strong>
+            </CCardHeader>
+            <CCardBody>
+              <CTable striped hover responsive>
+                <CTableHead>
+                  <CTableRow>
+                    <CTableHeaderCell>PO</CTableHeaderCell>
+                    <CTableHeaderCell>Request Code</CTableHeaderCell>
+                    <CTableHeaderCell>Total</CTableHeaderCell>
+                    <CTableHeaderCell>Requested At</CTableHeaderCell>
+                    <CTableHeaderCell>Action</CTableHeaderCell>
                   </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {movementList.map((item) => (
+                    <CTableRow key={item.id}>
+                      <CTableDataCell>{item.reference}</CTableDataCell>
+                      <CTableDataCell>{item.request_code}</CTableDataCell>
+                      <CTableDataCell>{item.quantity_total}</CTableDataCell>
+                      <CTableDataCell>{item.requested_at}</CTableDataCell>
+                      <CTableDataCell>
+                        <CButton
+                          color="info"
+                          size="sm"
+                          onClick={() => handleSetRequestCode(item.request_code)}
+                        >
+                          Set
+                        </CButton>
+                      </CTableDataCell>
+                    </CTableRow>
+                  ))}
+                </CTableBody>
+              </CTable>
+              <CPagination align="end" className="mt-3">
+                {[...Array(movementTotalPages)].map((_, i) => (
+                  <CPaginationItem
+                    key={i + 1}
+                    active={movementPage === i + 1}
+                    onClick={() => setMovementPage(i + 1)}
+                  >
+                    {i + 1}
+                  </CPaginationItem>
                 ))}
-              </CTableBody>
-            </CTable>
-            <CPagination align="end" className="mt-3">
-              {[...Array(movementTotalPages)].map((_, i) => (
-                <CPaginationItem
-                  key={i + 1}
-                  active={movementPage === i + 1}
-                  onClick={() => setMovementPage(i + 1)}
-                >
-                  {i + 1}
-                </CPaginationItem>
-              ))}
-            </CPagination>
-          </CCardBody>
-        </CCard>
-      </CCol>
+              </CPagination>
+            </CCardBody>
+          </CCard>
+        </CCol>
+        {/* PANEL KANAN (counter & barcode) ------------------------------------ */}
+        <CCol md={6}>
+          <CounterCard title="Counter Quantity" value={scannedQty} />
+          <CounterCard title="Saved Quantity" value={trackedTotal} />
 
-      {/* PANEL KANAN (counter & barcode) ------------------------------------ */}
-      <CCol md={6}>
-        <CounterCard title="Counter Quantity" value={scannedQty} />
-        <CounterCard title="Remaining Quantity" value={remainingQty} />
-
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Scan Barcode</strong>
-            {requestCode && <span className="ms-2 text-muted">(Request Code: {requestCode})</span>}
-          </CCardHeader>
-          <CCardBody>
-            <FormRow label="Barcode" labelCols="2">
-              <CFormInput
-                name="barcode"
-                value={formData.barcode}
-                onChange={handleInput}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleBarcode()
-                  }
-                }}
-              />
-            </FormRow>
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <strong>Scan Barcode</strong>
+              {requestCode && (
+                <span className="ms-2 text-muted">(Request Code: {requestCode})</span>
+              )}
+            </CCardHeader>
+            <CCardBody>
+              <FormRow label="Barcode" labelCols="2">
+                <CFormInput
+                  name="barcode"
+                  value={formData.barcode}
+                  onChange={handleInput}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleBarcode()
+                    }
+                  }}
+                />
+              </FormRow>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+    </>
   )
 }
 
