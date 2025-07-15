@@ -215,10 +215,20 @@ const ApprovalStock = () => {
       <CRow>
         {detailList.length > 0 && (
           <CCard className="mb-4">
-            <CCardHeader>
+            <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>
                 Detail {headerDetails} - Total: {detailList.length}
               </strong>
+              <CButton
+                color="danger"
+                size="sm"
+                onClick={() => {
+                  setDetailList([])
+                  setHeaderDetails('')
+                }}
+              >
+                ✖ Close
+              </CButton>
             </CCardHeader>
             <CCardBody>
               <CTable striped responsive border={1}>
