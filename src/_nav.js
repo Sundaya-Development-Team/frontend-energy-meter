@@ -264,6 +264,12 @@ const _nav = [
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Outcoming',
+    to: '/warehouse/outcoming',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'Delivery',
   },

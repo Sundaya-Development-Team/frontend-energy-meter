@@ -73,6 +73,7 @@ const IncomingUnits = React.lazy(() => import('./views/production/inventory/Inco
 
 // Warehouse
 const IncomingWarehouse = React.lazy(() => import('./views/warehouse/IncomingWarehouse'))
+const OutcomingWarehouse = React.lazy(() => import('./views/warehouse/OutcomingWarehouse'))
 
 // Delivery
 const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
@@ -317,6 +318,11 @@ const routes = [
   { path: '/semiproduction/reportqcunit', name: 'Report QC Semi Product', element: ReportQCUnit },
   { path: '/warehouse', name: 'Warehouse', element: IncomingWarehouse, exact: true },
   { path: '/warehouse/incoming', name: 'Incoming Warehouse', element: IncomingWarehouse },
+  {
+    path: '/warehouse/outcoming',
+    name: 'Outcoming Warehouse',
+    element: OutcomingWarehouse,
+  },
   { path: '/widgets', name: 'Widgets', element: Widgets },
 ]
 

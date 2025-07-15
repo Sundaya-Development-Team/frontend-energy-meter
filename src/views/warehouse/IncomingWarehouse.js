@@ -314,6 +314,7 @@ const IncomingWarehouse = () => {
                       <CTableDataCell>{item.requested_at}</CTableDataCell>
                       <CTableDataCell>
                         <CButton
+                          className="fw-bold text-white me-1"
                           color="info"
                           size="sm"
                           onClick={() => handleSetRequestCode(item.request_code)}
@@ -348,7 +349,7 @@ const IncomingWarehouse = () => {
             <CCardHeader>
               <strong>Scan Barcode</strong>
               {requestCode && (
-                <span className="ms-2 text-muted">(Request Code: {requestCode})</span>
+                <span className="ms-2 text-muted">(Request Code : {requestCode})</span>
               )}
             </CCardHeader>
             <CCardBody>
