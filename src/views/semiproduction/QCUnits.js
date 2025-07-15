@@ -128,16 +128,20 @@ const QCUnits = () => {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const res = backendQualityService.post(
-      '/v1/api/quality-service/qc-semi-product/submit',
-      formData,
-    )
-    alert(`${res.data?.message}`)
-    console.log('QC Result:', res)
-    // await backendUploadFile.post()
-    // alert('Form submitted. Check console for data.')
+    try {
+      const res = await backendQualityService.post(
+        '/v1/api/quality-service/qc-semi-product/submit',
+        formData,
+      )
+      alert(`QC processed & forwarded successfully`)
+      console.log('QC Result:', res)
+      // await backendUploadFile.post()
+      // alert('Form submitted. Check console for data.')
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const getQuestions = async () => {

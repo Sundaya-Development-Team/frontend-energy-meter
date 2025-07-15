@@ -5,6 +5,7 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
 // Admin
+const ApprovalStock = React.lazy(() => import('./views/admins/warehouses/ApprovalStock'))
 const DeliveryPage = React.lazy(() => import('./views/admins/Delivery/DeliveryPage'))
 const DynamicQuestionForm = React.lazy(() => import('./views/admins/DynamicQuestionForm'))
 const Incoming = React.lazy(() => import('./views/admins/incoming/IncomingPage'))
@@ -137,6 +138,11 @@ const routes = [
   { path: '/admin/product', name: 'Product', element: Product },
   { path: '/admin/semiproduct', name: 'Semi Product', element: SemiProductPage },
   { path: '/admin/warehouse', name: 'Warehouse', element: WarehousesPage, exact: true },
+  {
+    path: '/admin/warehouse/approval',
+    name: 'Approval Stock',
+    element: ApprovalStock,
+  },
   { path: '/admin/warehouse/stock/balance', name: 'Stock Balance', element: BalancesPage },
   { path: '/admin/warehouse/stock/movement', name: 'Stock Movement', element: MovementsPage },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },

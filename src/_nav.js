@@ -345,6 +345,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Warehouses Approval',
+    to: '/admin/warehouse/approval',
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Stock Balance',
     to: '/admin/warehouse/stock/balance',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
