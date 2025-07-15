@@ -220,6 +220,7 @@ const ApprovalStock = () => {
                 Detail {headerDetails} - Total: {detailList.length}
               </strong>
               <CButton
+                className="fw-bold text-white"
                 color="danger"
                 size="sm"
                 onClick={() => {
