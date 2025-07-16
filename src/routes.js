@@ -70,6 +70,7 @@ const ScanAfterZeroClear = React.lazy(
 const ScanBeforeClosingCover = React.lazy(
   () => import('./views/production/closingcover/ScanBeforeClosingCover'),
 )
+const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
 const ScanAfterClosingCover = React.lazy(
   () => import('./views/production/closingcover/ScanAfterClosingCover'),
 )
@@ -304,6 +305,11 @@ const routes = [
     path: '/production/closingcover/before',
     name: 'Scan Before Closing Cover',
     element: ScanBeforeClosingCover,
+  },
+  {
+    path: '/production/closingcover/qc',
+    name: 'Quality Control Closing Cover',
+    element: QCClosingCover,
   },
   {
     path: '/production/hipot',
