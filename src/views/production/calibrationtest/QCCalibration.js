@@ -93,14 +93,14 @@ const QCCalibration = () => {
   const [questionData, setQuestionData] = useState([])
   const [formData, setFormData] = useState({
     partner_barcode: '',
-    qc_name: 'QC Semi Products',
+    qc_name: 'qc-calibration-test',
     inspected_by: '',
     answers: {},
   })
 
   const emptyForm = {
     partner_barcode: '',
-    qc_name: 'QC Semi Products',
+    qc_name: 'qc-calibration-test',
     inspected_by: '',
     answers: {},
   }

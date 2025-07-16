@@ -139,8 +139,7 @@ const QCUnits = () => {
         formData,
       )
       alert(`QC processed & forwarded successfully`)
-      console.log(formData)
-      console.log(res)
+      console.log('QC Result:', res)
       setFormData(emptyForm)
     } catch (error) {
       console.log(error)

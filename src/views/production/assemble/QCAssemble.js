@@ -93,14 +93,14 @@ const QCAssemble = () => {
   const [questionData, setQuestionData] = useState([])
   const [formData, setFormData] = useState({
     partner_barcode: '',
-    qc_name: 'QC Semi Products',
+    qc_name: 'qc-assembly',
     inspected_by: '',
     answers: {},
   })
 
   const emptyForm = {
     partner_barcode: '',
-    qc_name: 'QC Semi Products',
+    qc_name: 'qc-assembly',
     inspected_by: '',
     answers: {},
   }
