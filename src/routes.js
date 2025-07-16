@@ -61,6 +61,7 @@ const ScanAfterAging = React.lazy(() => import('./views/production/agingtest/Sca
 const ScanBeforeClearZero = React.lazy(
   () => import('./views/production/clearzero/ScanBeforeClearZero'),
 )
+const QCClearZero = React.lazy(() => import('./views/production/clearzero/QCClearZero'))
 const ScanAfterZeroClear = React.lazy(
   () => import('./views/production/clearzero/ScanAfterClearZero'),
 )
@@ -282,6 +283,11 @@ const routes = [
     path: '/production/clearzero/before',
     name: 'Scan Before Clear Zero',
     element: ScanBeforeClearZero,
+  },
+  {
+    path: '/production/clearzero/qc',
+    name: 'Quality Control Clear Zero',
+    element: QCClearZero,
   },
   {
     path: '/production/closingcover',
