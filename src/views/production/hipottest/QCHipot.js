@@ -150,7 +150,7 @@ const QCHipot = () => {
     console.log('Getting questions data')
     try {
       const resQuestion = await backendQualityService.get('v1/api/quality-service/questions', {
-        params: { category: 'qc-semi-product' },
+        params: { category: 'qc-hipot-test' },
       })
       const data = resQuestion.data
       setQuestionData(data.data)

@@ -137,6 +137,7 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/admin', name: 'Admin', element: DynamicQuestionForm, exact: true },
+  { path: '/admin/aql', name: 'Admin', element: DynamicQuestionForm },
   { path: '/admin/delivery', name: 'Delivery', element: DeliveryPage },
   { path: '/admin/dynamicquestion', name: 'Dynamic Question', element: DynamicQuestionForm },
   { path: '/admin/incoming', name: 'Incoming', element: Incoming },

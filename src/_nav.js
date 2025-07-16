@@ -79,7 +79,7 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Assemble',
+    name: 'Assembly',
     to: '/production/assemble',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
@@ -300,6 +300,12 @@ const _nav = [
   {
     component: CNavTitle,
     name: 'Admins',
+  },
+  {
+    component: CNavItem,
+    name: 'AQL',
+    to: '/admin/aql',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,

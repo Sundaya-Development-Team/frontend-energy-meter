@@ -150,7 +150,7 @@ const QCAssemble = () => {
     console.log('Getting questions data')
     try {
       const resQuestion = await backendQualityService.get('v1/api/quality-service/questions', {
-        params: { category: 'qc-semi-product' },
+        params: { category: 'qc-assembly' },
       })
       const data = resQuestion.data
       setQuestionData(data.data)
@@ -172,7 +172,7 @@ const QCAssemble = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Quality Control Assemble</strong>
+            <strong>Quality Control Assembly</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
