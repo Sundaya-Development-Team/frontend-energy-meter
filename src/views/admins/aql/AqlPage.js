@@ -17,6 +17,7 @@ import {
   CFormLabel,
   CFormInput,
   CFormSelect,
+  CFormTextarea,
 } from '@coreui/react'
 import $ from 'jquery'
 import 'datatables.net-bs5'
@@ -25,50 +26,104 @@ import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.html5.js'
 import 'datatables.net-buttons/js/buttons.print.js'
 import JSZip from 'jszip'
-import { backendProduct } from '../../../api/axios'
+import { backendAql, backendProduct } from '../../../api/axios'
+import Select from 'react-select'
 
 window.JSZip = JSZip
 
 /* ---------- Komponen ---------- */
 const AqlPage = () => {
   /* ---------- refs & state ---------- */
+  const [defectData, setDefectData] = useState([])
+  const [sapData, setSapData] = useState([])
+  const [inspectionData, setInspectionData] = useState([])
+  const [aqlData, setAqlData] = useState([])
   const tableRef = useRef(null)
   const dtInstance = useRef(null)
   const [loading, setLoading] = useState(false)
   const [tableData, setTableData] = useState([])
-  const [uomData, setUomData] = useState([])
-  const [catData, setCatData] = useState([])
 
   /* form di modal */
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState('add') // 'add' | 'edit'
   const [formData, setFormData] = useState({
-    id: '', // hanya terisi saat edit
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '', // filename saja
+    id: '',
+    sap_code: '',
+    inspection_level: '',
+    aql_critical: '',
+    aql_major: '',
+    aql_minor: '',
+    used_defects: '',
+    description: '',
   })
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendProduct.get('/api/v1/products/all').then((r) => r.data)
+    const { data } = await backendAql.get('/api/v1/aql-settings').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
   /* ---------- modal helpers ---------- */
   const emptyForm = {
     id: '',
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '',
+    sap_code: '',
+    inspection_level: '',
+    aql_critical: '',
+    aql_major: '',
+    aql_minor: '',
+    used_defects: '',
+    description: '',
+  }
+
+  const handleSelectDefects = (option) => {
+    setFormData((p) => ({
+      ...p,
+      used_defects: option ? option.value : '',
+    }))
+  }
+
+  const handleSelectAqlMinor = (option) => {
+    setFormData((p) => ({
+      ...p,
+      aql_minor: option ? option.value : '',
+    }))
+  }
+
+  const handleSelectAqlMayor = (option) => {
+    setFormData((p) => ({
+      ...p,
+      aql_major: option ? option.value : '',
+    }))
+  }
+
+  const handleSelectAqlCritical = (option) => {
+    setFormData((p) => ({
+      ...p,
+      aql_critical: option ? option.value : '',
+    }))
+  }
+
+  const handleSelectInspection = (option) => {
+    setFormData((p) => ({
+      ...p,
+      inspection_level: option ? option.value : '',
+    }))
+  }
+
+  const handleSelectSap = (option) => {
+    if (!option) {
+      setFormData((p) => ({
+        ...p,
+        sap_code: '',
+      }))
+      return
+    }
+
+    const selected = sapData.find((p) => p.sap_code === option.value)
+    setFormData((p) => ({
+      ...p,
+      sap_code: selected?.sap_code || '',
+    }))
   }
 
   const handleOpenModal = (mode, rowData = null) => {
@@ -76,13 +131,13 @@ const AqlPage = () => {
     if (mode === 'edit' && rowData) {
       setFormData({
         id: rowData.id,
-        sapCode: rowData.sap_code ?? '',
-        productName: rowData.name ?? '',
-        uom: rowData.uom?.id ?? '',
-        productType: rowData.product_type ?? '',
-        productCategory: rowData.category?.id ?? '',
-        aktifView: rowData.is_active ?? '',
-        image: rowData.img ?? '',
+        sap_code: rowData.sap_code ?? '',
+        inspection_level: rowData.inspection_level ?? '',
+        aql_critical: rowData.aql_critical ?? '',
+        aql_major: rowData.aql_major ?? '',
+        aql_minor: rowData.aql_minor ?? '',
+        used_defects: rowData.used_defects ?? '',
+        description: rowData.description ?? '',
       })
     } else {
       setFormData(emptyForm)
@@ -93,9 +148,6 @@ const AqlPage = () => {
   /* onChange semua input */
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    if (name === 'aktifView') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
-    }
     setFormData((p) => ({ ...p, [name]: value }))
   }
 
@@ -104,18 +156,19 @@ const AqlPage = () => {
     try {
       setLoading(true)
       const payload = {
-        sap_code: formData.sapCode,
-        name: formData.productName,
-        uom_id: Number(formData.uom),
-        category_id: Number(formData.productCategory),
-        is_active: formData.aktifView,
-        product_type: formData.productType,
-        img: formData.image,
+        sap_code: formData.sap_code,
+        qc_stage: formData.qc_stage,
+        inspection_level: formData.inspection_level,
+        aql_critical: formData.aql_critical,
+        aql_major: formData.aql_major,
+        aql_minor: formData.aql_minor,
+        used_defects: formData.used_defects,
+        description: formData.description,
       }
       if (modalMode === 'add') {
-        await backendProduct.post('/api/v1/products/add', payload)
+        await backendAql.post('/api/v1/aql-settings', payload)
       } else {
-        await backendProduct.put(`/api/v1/products/update/${formData.id}`, payload)
+        await backendAql.put(`/api/v1/aql-settings/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -129,12 +182,16 @@ const AqlPage = () => {
   /* ---------- fetch master ---------- */
   useEffect(() => {
     ;(async () => {
-      const [uomRes, catRes] = await Promise.all([
-        backendProduct.get('/api/v1/uom/all'),
-        backendProduct.get('/api/v1/categories/all'),
+      const [sapRes, inspectionRes, aqlRes, defectRes] = await Promise.all([
+        backendProduct.get('/api/v1/products/all'),
+        backendAql.get('/api/v1/aql-settings/inspection-level'),
+        backendAql.get('/api/v1/aql-settings/aql-level'),
+        backendAql.get('/api/v1/aql-settings/used-defects'),
       ])
-      setUomData(uomRes.data.data)
-      setCatData(catRes.data.data)
+      setSapData(sapRes.data.data)
+      setInspectionData(inspectionRes.data.data)
+      setAqlData(aqlRes.data.data)
+      setDefectData(defectRes.data.data)
       await refreshTable()
     })()
   }, [])
@@ -175,28 +232,14 @@ const AqlPage = () => {
         columns: [
           actionCol,
           { title: 'ID', data: 'id' },
-          { title: 'Product Code', data: 'product_code' },
           { title: 'SAP Code', data: 'sap_code' },
-          { title: 'Name', data: 'name' },
-          { title: 'Unit', data: 'uom', render: (u) => u?.name ?? '-' },
-          { title: 'Type', data: 'product_type', className: 'text-capitalize' },
-          { title: 'Category', data: 'category', render: (c) => c?.name ?? '-' },
-          {
-            title: 'Active',
-            data: 'is_active',
-            className: 'text-center',
-            render: (a) =>
-              a
-                ? '<span class="badge bg-success">Yes</span>'
-                : '<span class="badge bg-danger">No</span>',
-          },
-          {
-            title: 'Image',
-            data: 'img',
-            orderable: false,
-            className: 'text-center',
-            // render: (img) => (img ? `<img src="/assets/img/${img}" alt="${img}" width="40"/>` : '-'),
-          },
+          { title: 'QC Stage', data: 'qc_stage' },
+          { title: 'Inspection Level', data: 'inspection_level' },
+          { title: 'AQL Critical', data: 'aql_critical' },
+          { title: 'AQL Mayor', data: 'aql_major' },
+          { title: 'AQL Minor', data: 'aql_minor' },
+          { title: 'Used Defect', data: 'used_defects' },
+          { title: 'Description', data: 'description' },
         ],
       })
       $(dtInstance.current.buttons().nodes()).addClass('btn btn-sm btn-outline-primary me-1 mb-1')
@@ -206,7 +249,7 @@ const AqlPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/api/v1/products/delete/${id}`)
+          await backendAql.delete(`/api/v1/aql-settings/${id}`)
           await refreshTable()
         }
       })
@@ -226,14 +269,14 @@ const AqlPage = () => {
         <CCol xs={90}>
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>Product List</strong>
+              <strong>AQL Setting List</strong>
               <CButton
                 className="fw-bold text-white"
                 color="success"
                 size="sm"
                 onClick={() => handleOpenModal('add')}
               >
-                + Add Product
+                + Add AQL Setting
               </CButton>
             </CCardHeader>
             <CCardBody>
@@ -252,7 +295,7 @@ const AqlPage = () => {
       {/* ---------- MODAL ---------- */}
       <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
         <CModalHeader>
-          <CModalTitle>{modalMode === 'add' ? 'Add Product' : 'Edit Product'}</CModalTitle>
+          <CModalTitle>{modalMode === 'add' ? 'Add AQL Setting' : 'Edit AQL Setting'}</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm>
@@ -260,103 +303,169 @@ const AqlPage = () => {
             <CRow className="mb-3">
               <CFormLabel className="col-sm-3 col-form-label">SAP Code</CFormLabel>
               <CCol sm={9}>
-                <CFormInput name="sapCode" value={formData.sapCode} onChange={handleInputChange} />
-              </CCol>
-            </CRow>
-
-            {/* Product Name */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Name</CFormLabel>
-              <CCol sm={9}>
-                <CFormInput
-                  name="productName"
-                  value={formData.productName}
-                  onChange={handleInputChange}
-                  required
+                <Select
+                  options={sapData.map((u) => ({ value: u.sap_code, label: u.sap_code }))}
+                  value={
+                    sapData.find((p) => p.sap_code === formData.sap_code)
+                      ? {
+                          value: formData.sap_code,
+                          label: formData.sap_code,
+                        }
+                      : null
+                  }
+                  onChange={handleSelectSap}
+                  placeholder="Select SAP Code"
+                  isClearable
                 />
               </CCol>
             </CRow>
 
-            {/* UOM */}
+            {/* QC Stage */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Unit</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect name="uom" value={formData.uom} onChange={handleInputChange}>
-                  <option value="">Select UOM</option>
-                  {uomData.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Product Type */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Type</CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label">QC Stage</CFormLabel>
               <CCol sm={9}>
                 <CFormSelect
-                  name="productType"
-                  value={formData.productType}
+                  name="qc_stage"
+                  value={formData.qc_stage}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">Select Type</option>
-                  <option value="raw_material">Raw Material</option>
-                  <option value="semi_finished">Semi Finished</option>
-                  <option value="finished_good">Finished Good</option>
+                  <option value="">Select QC Stage</option>
+                  <option value="Receiving Semi Product">Receiving Semi Product</option>
+                  <option value="Receiving Raw Material">Receiving Raw Material</option>
+                  <option value="Aging Test">Aging Test</option>
                 </CFormSelect>
               </CCol>
             </CRow>
 
-            {/* Category */}
+            {/* Inspection Level */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Category</CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label">Inspection Level</CFormLabel>
               <CCol sm={9}>
-                <CFormSelect
-                  name="productCategory"
-                  value={formData.productCategory}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {catData.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </CFormSelect>
+                <Select
+                  options={inspectionData.map((v) => ({
+                    value: v,
+                    label: v,
+                  }))}
+                  value={
+                    formData.inspection_level
+                      ? {
+                          value: formData.inspection_level,
+                          label: formData.inspection_level,
+                        }
+                      : null
+                  }
+                  onChange={handleSelectInspection}
+                  placeholder="Select Inspection Level"
+                  isClearable
+                />
               </CCol>
             </CRow>
 
-            {/* Aktif View */}
+            {/* AQL Critical */}
             <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Aktif View</CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label"> AQL Critical</CFormLabel>
               <CCol sm={9}>
-                <CFormSelect
-                  name="aktifView"
-                  value={String(formData.aktifView)}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </CFormSelect>
+                <Select
+                  options={aqlData.map((v) => ({
+                    value: v,
+                    label: v,
+                  }))}
+                  value={
+                    formData.aql_critical
+                      ? {
+                          value: formData.aql_critical,
+                          label: formData.aql_critical,
+                        }
+                      : null
+                  }
+                  onChange={handleSelectAqlCritical}
+                  placeholder="Select AQL Critical"
+                  isClearable
+                />
               </CCol>
             </CRow>
 
-            {/* Image */}
+            {/* AQL Mayor */}
             <CRow className="mb-3">
-              <CFormLabel htmlFor="image" className="col-sm-3 col-form-label">
-                Image
-              </CFormLabel>
+              <CFormLabel className="col-sm-3 col-form-label"> AQL Mayor</CFormLabel>
               <CCol sm={9}>
-                <CFormInput
-                  type="file"
-                  id="image"
-                  name="image"
+                <Select
+                  options={aqlData.map((v) => ({
+                    value: v,
+                    label: v,
+                  }))}
+                  value={
+                    formData.aql_major
+                      ? {
+                          value: formData.aql_major,
+                          label: formData.aql_major,
+                        }
+                      : null
+                  }
+                  onChange={handleSelectAqlMayor}
+                  placeholder="Select AQL Mayor"
+                  isClearable
+                />
+              </CCol>
+            </CRow>
+
+            {/* AQL Minor */}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label"> AQL Minor</CFormLabel>
+              <CCol sm={9}>
+                <Select
+                  options={aqlData.map((v) => ({
+                    value: v,
+                    label: v,
+                  }))}
+                  value={
+                    formData.aql_minor
+                      ? {
+                          value: formData.aql_minor,
+                          label: formData.aql_minor,
+                        }
+                      : null
+                  }
+                  onChange={handleSelectAqlMinor}
+                  placeholder="Select AQL Minor"
+                  isClearable
+                />
+              </CCol>
+            </CRow>
+
+            {/* Used Defect */}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label"> Used Defect</CFormLabel>
+              <CCol sm={9}>
+                <Select
+                  options={defectData.map((v) => ({
+                    value: v,
+                    label: v,
+                  }))}
+                  value={
+                    formData.used_defects
+                      ? {
+                          value: formData.used_defects,
+                          label: formData.used_defects,
+                        }
+                      : null
+                  }
+                  onChange={handleSelectDefects}
+                  placeholder="Select Used Defect"
+                  isClearable
+                />
+              </CCol>
+            </CRow>
+
+            {/* Description */}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label"> Description</CFormLabel>
+              <CCol sm={9}>
+                <CFormTextarea
+                  rows={3}
+                  name="description"
+                  value={formData.description}
                   onChange={handleInputChange}
                   required
                 />

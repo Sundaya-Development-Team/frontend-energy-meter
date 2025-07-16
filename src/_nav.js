@@ -303,7 +303,7 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'AQL',
+    name: 'AQL Setting',
     to: '/admin/aql',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },

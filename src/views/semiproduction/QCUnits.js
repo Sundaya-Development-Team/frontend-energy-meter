@@ -93,14 +93,14 @@ const QCUnits = () => {
   const [questionData, setQuestionData] = useState([])
   const [formData, setFormData] = useState({
     partner_barcode: '',
-    qc_name: 'QC Semi Products',
+    qc_name: 'qc-semi-product',
     inspected_by: '',
     answers: {},
   })
 
   const emptyForm = {
     partner_barcode: '',
-    qc_name: 'QC Semi Products',
+    qc_name: 'qc-semi-product',
     inspected_by: '',
     answers: {},
   }
@@ -132,14 +132,15 @@ const QCUnits = () => {
   }
 
   const handleSubmit = async (e) => {
-    // e.preventDefault()
+    e.preventDefault()
     try {
       const res = await backendQualityService.post(
         '/v1/api/quality-service/qc-semi-product/submit',
         formData,
       )
       alert(`QC processed & forwarded successfully`)
-      console.log('QC Result:', res)
+      console.log(formData)
+      console.log(res)
       setFormData(emptyForm)
     } catch (error) {
       console.log(error)

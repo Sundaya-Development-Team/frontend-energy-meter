@@ -150,7 +150,7 @@ const QCClearZero = () => {
     console.log('Getting questions data')
     try {
       const resQuestion = await backendQualityService.get('v1/api/quality-service/questions', {
-        params: { category: 'qc-clear-zero' },
+        params: { category: 'qc-clear-zero-1' },
       })
       const data = resQuestion.data
       setQuestionData(data.data)
