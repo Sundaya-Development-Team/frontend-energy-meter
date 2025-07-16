@@ -46,6 +46,7 @@ const ScanAfterHipot = React.lazy(() => import('./views/production/hipottest/Sca
 const ScanBeforeCalibration = React.lazy(
   () => import('./views/production/calibrationtest/ScanBeforeCalibration'),
 )
+const QCCalibration = React.lazy(() => import('./views/production/calibrationtest/QCCalibration'))
 const ScanAfterCalibration = React.lazy(
   () => import('./views/production/calibrationtest/ScanAfterCalibration'),
 )
@@ -254,6 +255,11 @@ const routes = [
     path: '/production/calibration/before',
     name: 'Scan Before Calibration Testing',
     element: ScanBeforeCalibration,
+  },
+  {
+    path: '/production/calibration/qc',
+    name: 'Quality Control Calibration',
+    element: QCCalibration,
   },
   {
     path: '/production/clearzero',
