@@ -34,10 +34,12 @@ const ScanAfterAssemble = React.lazy(() => import('./views/production/assemble/S
 
 // On
 const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
+const QCOn = React.lazy(() => import('./views/production/ontest/QCOn'))
 const ScanAfterOn = React.lazy(() => import('./views/production/ontest/ScanAfterOn'))
 
 // Hipot
 const ScanBeforeHipot = React.lazy(() => import('./views/production/hipottest/ScanBeforeHipot'))
+const QCHipot = React.lazy(() => import('./views/production/hipottest/QCHipot'))
 const ScanAfterHipot = React.lazy(() => import('./views/production/hipottest/ScanAfterHipot'))
 
 // Calibration
@@ -302,6 +304,11 @@ const routes = [
     element: ScanBeforeHipot,
   },
   {
+    path: '/production/hipot/qc',
+    name: 'Quality Control Hipot',
+    element: QCHipot,
+  },
+  {
     path: '/production/on',
     name: 'On Test',
     element: ScanBeforeOn,
@@ -316,6 +323,11 @@ const routes = [
     path: '/production/on/before',
     name: 'Scan Before On',
     element: ScanBeforeOn,
+  },
+  {
+    path: '/production/on/qc',
+    name: 'Quality Control On',
+    element: QCOn,
   },
   { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
   { path: '/semiproduction/praqc', name: 'Pra-QC Semi Product', element: PraQC },

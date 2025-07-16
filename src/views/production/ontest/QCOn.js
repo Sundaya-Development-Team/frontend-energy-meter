@@ -13,7 +13,7 @@ import {
   CFormLabel,
   CRow,
 } from '@coreui/react'
-import { backendQualityService } from '../../api/axios'
+import { backendQualityService } from '../../../api/axios'
 
 const listQuestions1 = [
   {
@@ -89,7 +89,7 @@ const listQuestions2 = [
     ],
   },
 ]
-const QCUnits = () => {
+const QCOn = () => {
   const [questionData, setQuestionData] = useState([])
   const [formData, setFormData] = useState({
     partner_barcode: '',
@@ -172,7 +172,7 @@ const QCUnits = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Quality Control Semi Product</strong>
+            <strong>Quality Control On</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
@@ -264,4 +264,4 @@ const QCUnits = () => {
   )
 }
 
-export default QCUnits
+export default QCOn
