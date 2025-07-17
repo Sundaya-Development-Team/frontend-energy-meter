@@ -38,11 +38,13 @@ const fetchMasters = () =>
 const fetchTotalTracked = (reference_po) =>
   backendTrackedItems.get('/api/v1/tracked-items/all', { params: { reference_po } })
 
-const fetchAqlSample = (lotSize, inspection = 'II', aql = '4') =>
-  lotSize
+const fetchAqlSample = (sap_code, qc_stage, ref_quantity) =>
+  ref_quantity
     ? backendAql
-        .post('/api/v1/aql', { lotSize, inspectionLevel: inspection, aql })
-        .then((r) => r.data.sampleSize)
+        .get('/api/v1/aql-settings/calculate', {
+          params: { sap_code, qc_stage, total_quantity: ref_quantity },
+        })
+        .then((r) => r.data.data.data.sample_size)
     : Promise.resolve(0)
 
 /* -------------------------------------------------------------------------- */
@@ -72,6 +74,7 @@ const PraQC = () => {
     location_detail: 'Incoming Zone',
     status: 'in_receiving_area',
     file: null,
+    qc_stage: 'Receiving Semi Product',
   })
 
   /* ------------------------ derived / memoised value ---------------------- */
@@ -211,7 +214,7 @@ const PraQC = () => {
 
   /* hitung sample size saat total qty berubah */
   useEffect(() => {
-    fetchAqlSample(formData.ref_quantity).then(setSampleQty)
+    fetchAqlSample(formData.sap_code, formData.qc_stage, formData.ref_quantity).then(setSampleQty)
   }, [formData.ref_quantity])
 
   /* refresh total tracked saat ref PO berubah */
