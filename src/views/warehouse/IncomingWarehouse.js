@@ -10,6 +10,7 @@ import {
   CForm,
   CFormInput,
   CFormLabel,
+  CFormTextarea,
   CPagination,
   CPaginationItem,
   CRow,
@@ -69,6 +70,7 @@ const IncomingWarehouse = () => {
     requested_by: 'admin',
     source_division: 'QC',
     target_division: 'Warehouse',
+    notes: '',
   })
 
   /* --------------------------- handlers ---------------------------------- */
@@ -133,6 +135,7 @@ const IncomingWarehouse = () => {
         requested_by: formData.requested_by,
         source_division: formData.source_division,
         target_division: formData.target_division,
+        notes: formData.notes,
       }
       const resIncoming = await backendWarehouse.post('/api/v1/request-movement', payload)
       refreshMovementList()
@@ -144,6 +147,7 @@ const IncomingWarehouse = () => {
         quantity_total: '',
         uom: '',
         reference: '',
+        notes: '',
       }))
       alert(`${resIncoming.data?.message}`)
     } catch (err) {
@@ -271,6 +275,16 @@ const IncomingWarehouse = () => {
                     type="number"
                     name="quantity_total"
                     value={formData.quantity_total}
+                    onChange={handleInput}
+                    required
+                  />
+                </FormRow>
+
+                <FormRow label="Notes">
+                  <CFormTextarea
+                    type="text"
+                    name="notes"
+                    value={formData.notes}
                     onChange={handleInput}
                     required
                   />
