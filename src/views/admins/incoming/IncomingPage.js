@@ -67,6 +67,7 @@ const IncomingPage = () => {
   })
   const [formHeaderData, setFormHeaderData] = useState({
     reference_po: '',
+    reference_gr: '',
     notes: '',
   })
   const [formDetailData, setFormDetailData] = useState({
@@ -84,7 +85,7 @@ const IncomingPage = () => {
   const fetchData = async (page = 1, reference_po = '') => {
     try {
       setLoading(true)
-      const { data } = await backendIncoming.get(`/api/v1/receiving-products/all`, {
+      const { data } = await backendIncoming.get(`/all`, {
         params: { limit: 12, page, reference_po },
       })
       setIncomingData(data)
@@ -112,7 +113,7 @@ const IncomingPage = () => {
   const deleteHeader = async (id) => {
     if (!window.confirm('Delete this Header')) return
     try {
-      await backendIncoming.delete(`/api/v1/receiving-products/delete-header/${id}`)
+      await backendIncoming.delete(`/delete-header/${id}`)
       fetchData(incomingData.page)
     } catch (error) {
       console.log('error : ~ IncomingPage : deleteHeader', error)
@@ -122,7 +123,7 @@ const IncomingPage = () => {
   const deleteDetails = async (id) => {
     if (!window.confirm('Delete this Detail?')) return
     try {
-      await backendIncoming.delete(`/api/v1/receiving-products/delete-detail/${id}`)
+      await backendIncoming.delete(`/delete-detail/${id}`)
       fetchData(incomingData.page)
     } catch (error) {
       console.log('error : ~ IncomingPage : deleteDetails', error)
@@ -161,6 +162,7 @@ const IncomingPage = () => {
       setIdHeader(rowData.id)
       setFormHeaderData({
         reference_po: rowData.reference_po ?? '',
+        reference_gr: rowData.reference_gr ?? '',
         notes: rowData.notes ?? '',
       })
     }
@@ -186,11 +188,12 @@ const IncomingPage = () => {
       setHeaderLoading(true)
       const payload = {
         reference_po: formHeaderData.reference_po,
+        reference_gr: formHeaderData.reference_gr,
         notes: formHeaderData.notes,
       }
       //   console.log(payload)
 
-      await backendIncoming.put(`/api/v1/receiving-products/update-header/${idHeader}`, payload)
+      await backendIncoming.put(`/update-header/${idHeader}`, payload)
       setModalHeaderVisible(false)
       await fetchData()
     } catch (err) {
@@ -225,7 +228,7 @@ const IncomingPage = () => {
       }
       // console.log(payload)
 
-      await backendIncoming.put(`/api/v1/receiving-products/update-detail/${idDetail}`, payload)
+      await backendIncoming.put(`/update-detail/${idDetail}`, payload)
       setModalDetailVisible(false)
       await fetchData()
     } catch (err) {
@@ -403,6 +406,18 @@ const IncomingPage = () => {
                 <CFormInput
                   name="reference_po"
                   value={formHeaderData.reference_po}
+                  onChange={handleHeaderChange}
+                />
+              </CCol>
+            </CRow>
+
+            {/* Reference GR */}
+            <CRow className="mb-3">
+              <CFormLabel className="col-sm-3 col-form-label">Reference GR</CFormLabel>
+              <CCol sm={9}>
+                <CFormInput
+                  name="reference_gr"
+                  value={formHeaderData.reference_gr}
                   onChange={handleHeaderChange}
                 />
               </CCol>

@@ -151,7 +151,7 @@ const PraQC = () => {
       }
 
       /* payload utama */
-      const resIncoming = await backendIncoming.post('/api/v1/receiving-products/add', {
+      const resIncoming = await backendIncoming.post('/add', {
         reference_po: formData.reference_po,
         reference_gr: formData.reference_gr,
         notes: formData.notes,
