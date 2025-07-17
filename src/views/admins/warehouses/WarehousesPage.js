@@ -214,7 +214,7 @@ const WarehousesPage = () => {
       {/* ---------- MODAL ---------- */}
       <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
         <CModalHeader>
-          <CModalTitle>{modalMode === 'add' ? 'Add Product' : 'Edit Product'}</CModalTitle>
+          <CModalTitle>{modalMode === 'add' ? 'Add Warehouse' : 'Edit Warehouse'}</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm>
