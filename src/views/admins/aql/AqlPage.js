@@ -59,7 +59,7 @@ const AqlPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendAql.get('/api/v1/aql-settings').then((r) => r.data)
+    const { data } = await backendAql.get('/').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -166,9 +166,9 @@ const AqlPage = () => {
         description: formData.description,
       }
       if (modalMode === 'add') {
-        await backendAql.post('/api/v1/aql-settings', payload)
+        await backendAql.post('/', payload)
       } else {
-        await backendAql.put(`/api/v1/aql-settings/${formData.id}`, payload)
+        await backendAql.put(`/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -184,9 +184,9 @@ const AqlPage = () => {
     ;(async () => {
       const [sapRes, inspectionRes, aqlRes, defectRes] = await Promise.all([
         backendProduct.get('/products/all'),
-        backendAql.get('/api/v1/aql-settings/inspection-level'),
-        backendAql.get('/api/v1/aql-settings/aql-level'),
-        backendAql.get('/api/v1/aql-settings/used-defects'),
+        backendAql.get('/inspection-level'),
+        backendAql.get('/aql-level'),
+        backendAql.get('/used-defects'),
       ])
       setSapData(sapRes.data.data)
       setInspectionData(inspectionRes.data.data)
@@ -249,7 +249,7 @@ const AqlPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Product?')) {
-          await backendAql.delete(`/api/v1/aql-settings/${id}`)
+          await backendAql.delete(`/${id}`)
           await refreshTable()
         }
       })
