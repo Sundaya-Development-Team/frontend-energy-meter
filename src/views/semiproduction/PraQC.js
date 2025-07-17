@@ -32,7 +32,7 @@ import {
 const fetchMasters = () =>
   Promise.all([
     backendProduct.get('/products/all'),
-    backendPartner.get('/api/v1/partners/all'),
+    backendPartner.get('/all'),
   ])
 
 const fetchTotalTracked = (reference_po) =>

@@ -240,7 +240,7 @@ const IncomingPage = () => {
     ;(async () => {
       const [sapRes, partnerRes] = await Promise.all([
         backendProduct.get('/products/all'),
-        backendPartner.get('/partners/all'),
+        backendPartner.get('/all'),
       ])
       setSapData(sapRes.data.data)
       setPartnerData(partnerRes.data.data)
