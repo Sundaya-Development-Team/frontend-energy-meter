@@ -48,7 +48,7 @@ const SemiProductPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendTrackedItems.get('/api/v1/tracked-items/all').then((r) => r.data)
+    const { data } = await backendTrackedItems.get('/all').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -81,7 +81,7 @@ const SemiProductPage = () => {
         location_detail: formData.location_detail,
       }
       await backendTrackedItems.put(
-        `/api/v1/tracked-items/update-by-PaBarcode/${formData.partner_barcode}`,
+        `/update-by-PaBarcode/${formData.partner_barcode}`,
         payload,
       )
       setModalVisible(false)
@@ -120,7 +120,7 @@ const SemiProductPage = () => {
 
       dtInstance.current = $(tableRef.current).DataTable({
         data: tableData,
-        responsive: true,
+        responsive: false,
         dom:
           "<'row mb-2'<'col-md-6'B><'col-md-6'f>>" +
           "<'row'<'col-12'tr>>" +
@@ -162,7 +162,7 @@ const SemiProductPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const barcode = $(e.currentTarget).data('partnerBarcode')
         if (window.confirm('Delete this Product?')) {
-          await backendTrackedItems.delete(`/api/v1/tracked-items/delete-by-PaBarcode/${barcode}`)
+          await backendTrackedItems.delete(`/delete-by-PaBarcode/${barcode}`)
           await refreshTable()
         }
       })

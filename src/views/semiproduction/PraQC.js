@@ -36,7 +36,7 @@ const fetchMasters = () =>
   ])
 
 const fetchTotalTracked = (reference_po) =>
-  backendTrackedItems.get('/api/v1/tracked-items/all', { params: { reference_po } })
+  backendTrackedItems.get('/all', { params: { reference_po } })
 
 const fetchAqlSample = (sap_code, qc_stage, ref_quantity) =>
   ref_quantity
@@ -118,7 +118,7 @@ const PraQC = () => {
   const handleBarcode = async () => {
     if (!formData.barcode.trim()) return
     try {
-      await backendTrackedItems.post('/api/v1/tracked-items/add', {
+      await backendTrackedItems.post('/add', {
         partner_barcode: formData.barcode,
         reference_po: formData.reference_po,
         sap_code: formData.sap_code,
@@ -171,7 +171,7 @@ const PraQC = () => {
         ],
       })
 
-      const resTracked = await backendTrackedItems.put('/api/v1/tracked-items/confirm-items', {
+      const resTracked = await backendTrackedItems.put('/confirm-items', {
         reference_po: formData.reference_po,
         incoming_batch: Number(formData.incoming_batch),
         updateData: {
