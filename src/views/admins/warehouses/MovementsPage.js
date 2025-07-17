@@ -17,6 +17,7 @@ import {
   CFormLabel,
   CFormInput,
   CFormSelect,
+  CFormTextarea,
 } from '@coreui/react'
 import $ from 'jquery'
 import 'datatables.net-bs5'
@@ -25,9 +26,16 @@ import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.html5.js'
 import 'datatables.net-buttons/js/buttons.print.js'
 import JSZip from 'jszip'
-import { backendProduct } from '../../../api/axios'
+import { backendProduct, backendWarehouse } from '../../../api/axios'
+import Select from 'react-select'
 
 window.JSZip = JSZip
+
+const fetchMasters = () =>
+  Promise.all([
+    backendProduct.get('/api/v1/products/all'),
+    backendWarehouse.get('/api/v1/warehouses'),
+  ])
 
 /* ---------- Komponen ---------- */
 const MovementsPage = () => {
@@ -36,53 +44,66 @@ const MovementsPage = () => {
   const dtInstance = useRef(null)
   const [loading, setLoading] = useState(false)
   const [tableData, setTableData] = useState([])
-  const [uomData, setUomData] = useState([])
-  const [catData, setCatData] = useState([])
+  const [sapData, setSapData] = useState([])
+  const [warehouseData, setWarehouseData] = useState([])
 
   /* form di modal */
   const [modalVisible, setModalVisible] = useState(false)
   const [modalMode, setModalMode] = useState('add') // 'add' | 'edit'
   const [formData, setFormData] = useState({
-    id: '', // hanya terisi saat edit
-    sapCode: '',
-    productName: '',
+    id: '',
+    request_code: '',
+    warehouse_code: '',
+    movement_type: 'in',
+    sap_code: '',
+    quantity_total: '',
     uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '', // filename saja
+    reference: '',
+    requested_by: '',
+    source_division: '',
+    target_division: '',
+    notes: '',
   })
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendProduct.get('/api/v1/products/all').then((r) => r.data)
-    setTableData(data) // trigger rerender DataTable
+    const { data } = await backendWarehouse
+      .get('/api/v1/request-movement', { params: { limit: 1000000 } })
+      .then((r) => r.data)
+    setTableData(data)
   }
 
   /* ---------- modal helpers ---------- */
   const emptyForm = {
     id: '',
-    sapCode: '',
-    productName: '',
+    request_code: '',
+    warehouse_code: '',
+    movement_type: '',
+    sap_code: '',
+    quantity_total: '',
     uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '',
+    reference: '',
+    requested_by: '',
+    source_division: '',
+    target_division: '',
+    notes: '',
   }
 
   const handleOpenModal = (mode, rowData = null) => {
     setModalMode(mode)
     if (mode === 'edit' && rowData) {
       setFormData({
-        id: rowData.id,
-        sapCode: rowData.sap_code ?? '',
-        productName: rowData.name ?? '',
-        uom: rowData.uom?.id ?? '',
-        productType: rowData.product_type ?? '',
-        productCategory: rowData.category?.id ?? '',
-        aktifView: rowData.is_active ?? '',
-        image: rowData.img ?? '',
+        id: rowData.id ?? '',
+        reference: rowData.reference ?? '',
+        warehouse_code: rowData.warehouse_code ?? '',
+        movement_type: rowData.movement_type ?? '',
+        quantity_total: rowData.quantity_total ?? '',
+        sap_code: rowData.sap_code ?? '',
+        uom: rowData.uom ?? '',
+        requested_by: rowData.requested_by ?? '',
+        source_division: rowData.source_division ?? '',
+        target_division: rowData.target_division ?? '',
+        notes: rowData.notes ?? '',
       })
     } else {
       setFormData(emptyForm)
@@ -91,12 +112,34 @@ const MovementsPage = () => {
   }
 
   /* onChange semua input */
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    if (name === 'aktifView') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
-    }
+  const handleInput = (e) => {
+    const { name, value, type, files } = e.target
     setFormData((p) => ({ ...p, [name]: value }))
+  }
+
+  const handleSelectSap = (option) => {
+    if (!option) {
+      setFormData((p) => ({
+        ...p,
+        sap_code: '',
+        uom: '',
+      }))
+      return
+    }
+
+    const selected = sapData.find((p) => p.sap_code === option.value)
+    setFormData((p) => ({
+      ...p,
+      sap_code: selected?.sap_code || '',
+      uom: selected?.uom?.code || '',
+    }))
+  }
+
+  const handleSelectWarehouse = (option) => {
+    setFormData((p) => ({
+      ...p,
+      warehouse_code: option ? option.value : '',
+    }))
   }
 
   /* ---------- Simpan (Add / Update) ---------- */
@@ -104,18 +147,24 @@ const MovementsPage = () => {
     try {
       setLoading(true)
       const payload = {
-        sap_code: formData.sapCode,
-        name: formData.productName,
-        uom_id: Number(formData.uom),
-        category_id: Number(formData.productCategory),
-        is_active: formData.aktifView,
-        product_type: formData.productType,
-        img: formData.image,
+        reference: formData.reference,
+        warehouse_code: formData.warehouse_code,
+        movement_type: formData.movement_type,
+        quantity_total: Number(formData.quantity_total),
+        sap_code: formData.sap_code,
+        uom: formData.uom,
+        requested_by: formData.requested_by,
+        source_division: formData.source_division,
+        target_division: formData.target_division,
+        notes: formData.notes,
       }
       if (modalMode === 'add') {
-        await backendProduct.post('/api/v1/products/add', payload)
+        await backendWarehouse.post('/api/v1/request-movement', payload)
       } else {
-        await backendProduct.put(`/api/v1/products/update/${formData.id}`, payload)
+        await backendWarehouse.put(
+          `/api/v1/request-movement/update-request/${formData.id}`,
+          payload,
+        )
       }
       setModalVisible(false)
       await refreshTable()
@@ -128,15 +177,13 @@ const MovementsPage = () => {
 
   /* ---------- fetch master ---------- */
   useEffect(() => {
-    ;(async () => {
-      const [uomRes, catRes] = await Promise.all([
-        backendProduct.get('/api/v1/uom/all'),
-        backendProduct.get('/api/v1/categories/all'),
-      ])
-      setUomData(uomRes.data.data)
-      setCatData(catRes.data.data)
-      await refreshTable()
-    })()
+    fetchMasters()
+      .then(([sapRes, warehouseRes]) => {
+        setSapData(sapRes.data.data)
+        setWarehouseData(warehouseRes.data.data)
+      })
+      .catch((err) => console.error('fetch masters', err))
+    refreshTable()
   }, [])
 
   /* ---------- DataTable init & update ---------- */
@@ -154,14 +201,14 @@ const MovementsPage = () => {
           <button class="btn btn-sm btn-primary btn-edit me-1" data-row='${JSON.stringify(row)}'>
             Edit
           </button>
-          <button class="btn btn-sm btn-danger btn-delete" data-id='${row.id}'>
+          <button class="btn btn-sm btn-danger btn-delete" data-request_code='${row.request_code}'>
             Del
           </button>`,
       }
 
       dtInstance.current = $(tableRef.current).DataTable({
         data: tableData,
-        responsive: true,
+        responsive: false,
         dom:
           "<'row mb-2'<'col-md-6'B><'col-md-6'f>>" +
           "<'row'<'col-12'tr>>" +
@@ -175,28 +222,21 @@ const MovementsPage = () => {
         columns: [
           actionCol,
           { title: 'ID', data: 'id' },
-          { title: 'Product Code', data: 'product_code' },
+          { title: 'Request Code', data: 'request_code' },
+          { title: 'Warehouse Code', data: 'warehouse_code' },
+          { title: 'Movement Type', data: 'movement_type' },
           { title: 'SAP Code', data: 'sap_code' },
-          { title: 'Name', data: 'name' },
-          { title: 'Unit', data: 'uom', render: (u) => u?.name ?? '-' },
-          { title: 'Type', data: 'product_type', className: 'text-capitalize' },
-          { title: 'Category', data: 'category', render: (c) => c?.name ?? '-' },
-          {
-            title: 'Active',
-            data: 'is_active',
-            className: 'text-center',
-            render: (a) =>
-              a
-                ? '<span class="badge bg-success">Yes</span>'
-                : '<span class="badge bg-danger">No</span>',
-          },
-          {
-            title: 'Image',
-            data: 'img',
-            orderable: false,
-            className: 'text-center',
-            // render: (img) => (img ? `<img src="/assets/img/${img}" alt="${img}" width="40"/>` : '-'),
-          },
+          { title: 'Quantity Total', data: 'quantity_total' },
+          { title: 'UOM', data: 'uom' },
+          { title: 'PO', data: 'reference' },
+          { title: 'Requested By', data: 'requested_by' },
+          { title: 'Requested At', data: 'requested_at' },
+          { title: 'Status', data: 'status' },
+          { title: 'Approved By', data: 'approved_by' },
+          { title: 'Approved At', data: 'approved_at' },
+          { title: 'Source Division', data: 'source_division' },
+          { title: 'Target Division', data: 'target_division' },
+          { title: 'Notes', data: 'notes' },
         ],
       })
       $(dtInstance.current.buttons().nodes()).addClass('btn btn-sm btn-outline-primary me-1 mb-1')
@@ -204,9 +244,13 @@ const MovementsPage = () => {
       /* Daftarkan 1x listener Edit / Delete */
       const $tbl = $(tableRef.current)
       $tbl.on('click', '.btn-delete', async (e) => {
-        const id = $(e.currentTarget).data('id')
-        if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/api/v1/products/delete/${id}`)
+        const requestCode = $(e.currentTarget).data('request_code')
+        if (window.confirm('Delete this Movement?')) {
+          await backendWarehouse.delete(`/api/v1/request-movement/delete`, {
+            data: {
+              request_code: requestCode,
+            },
+          })
           await refreshTable()
         }
       })
@@ -233,7 +277,7 @@ const MovementsPage = () => {
                 size="sm"
                 onClick={() => handleOpenModal('add')}
               >
-                + Add Warehouse
+                + Add Movement List
               </CButton>
             </CCardHeader>
             <CCardBody>
@@ -256,112 +300,109 @@ const MovementsPage = () => {
         </CModalHeader>
         <CModalBody>
           <CForm>
-            {/* SAP Code */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">SAP Code</CFormLabel>
-              <CCol sm={9}>
-                <CFormInput name="sapCode" value={formData.sapCode} onChange={handleInputChange} />
-              </CCol>
-            </CRow>
+            <FormRow label="Reference PO">
+              <CFormInput
+                name="reference"
+                value={formData.reference}
+                onChange={handleInput}
+                required
+              />
+            </FormRow>
+            <FormRow label="Warehouse Code">
+              <Select
+                options={warehouseData.map((u) => ({
+                  value: u.warehouse_code,
+                  label: u.name,
+                }))}
+                value={
+                  warehouseData.find((p) => p.warehouse_code === formData.warehouse_code)
+                    ? {
+                        value: formData.warehouse_code,
+                        label: warehouseData.find(
+                          (p) => p.warehouse_code === formData.warehouse_code,
+                        ).name,
+                      }
+                    : null
+                }
+                onChange={handleSelectWarehouse}
+                placeholder="Select Warehouse"
+                isClearable
+              />
+            </FormRow>
+            <FormRow label="SAP Code">
+              <Select
+                options={sapData.map((u) => ({ value: u.sap_code, label: u.sap_code }))}
+                value={
+                  sapData.find((p) => p.sap_code === formData.sap_code)
+                    ? {
+                        value: formData.sap_code,
+                        label: formData.sap_code,
+                      }
+                    : null
+                }
+                onChange={handleSelectSap}
+                placeholder="Select SAP Code"
+                isClearable
+              />
+            </FormRow>
+            <FormRow label="Unit">
+              <CFormInput name="uom" value={formData.uom} readOnly />
+            </FormRow>
+            <FormRow label="Total Quantity">
+              <CFormInput
+                type="number"
+                name="quantity_total"
+                value={formData.quantity_total}
+                onChange={handleInput}
+                required
+              />
+            </FormRow>
+            <FormRow label="Movement Type">
+              <CFormInput
+                type="text"
+                name="movement_type"
+                value={formData.movement_type}
+                onChange={handleInput}
+                required
+              />
+            </FormRow>
+            <FormRow label="Requested By">
+              <CFormInput
+                type="text"
+                name="requested_by"
+                value={formData.requested_by}
+                onChange={handleInput}
+                required
+              />
+            </FormRow>
 
-            {/* Product Name */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Name</CFormLabel>
-              <CCol sm={9}>
-                <CFormInput
-                  name="productName"
-                  value={formData.productName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </CCol>
-            </CRow>
-
-            {/* UOM */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Unit</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect name="uom" value={formData.uom} onChange={handleInputChange}>
-                  <option value="">Select UOM</option>
-                  {uomData.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Product Type */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Type</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productType"
-                  value={formData.productType}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Type</option>
-                  <option value="raw_material">Raw Material</option>
-                  <option value="semi_finished">Semi Finished</option>
-                  <option value="finished_good">Finished Good</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Category */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Category</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productCategory"
-                  value={formData.productCategory}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {catData.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Aktif View */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Aktif View</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="aktifView"
-                  value={String(formData.aktifView)}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Image */}
-            <CRow className="mb-3">
-              <CFormLabel htmlFor="image" className="col-sm-3 col-form-label">
-                Image
-              </CFormLabel>
-              <CCol sm={9}>
-                <CFormInput
-                  type="file"
-                  id="image"
-                  name="image"
-                  onChange={handleInputChange}
-                  required
-                />
-              </CCol>
-            </CRow>
+            <FormRow label="Source Division">
+              <CFormInput
+                type="text"
+                name="source_division"
+                value={formData.source_division}
+                onChange={handleInput}
+                required
+              />
+            </FormRow>
+            <FormRow label="Target Division">
+              <CFormInput
+                type="text"
+                name="target_division"
+                value={formData.target_division}
+                onChange={handleInput}
+                required
+              />
+            </FormRow>
+            <FormRow label="Notes">
+              <CFormTextarea
+                type="text"
+                name="notes"
+                value={formData.notes}
+                onChange={handleInput}
+                required
+              />
+            </FormRow>
           </CForm>
         </CModalBody>
         <CModalFooter>
@@ -376,5 +417,12 @@ const MovementsPage = () => {
     </>
   )
 }
+
+const FormRow = ({ label, children, labelCols = '3' }) => (
+  <CRow className="mb-3">
+    <CFormLabel className={`col-sm-${labelCols} col-form-label`}>{label}</CFormLabel>
+    <CCol sm={12 - Number(labelCols)}>{children}</CCol>
+  </CRow>
+)
 
 export default MovementsPage

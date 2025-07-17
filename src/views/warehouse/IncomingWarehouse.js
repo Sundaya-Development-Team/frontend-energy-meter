@@ -216,7 +216,6 @@ const IncomingWarehouse = () => {
 
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
-                {/* ------------ Header (PO / GR) ------------- */}
 
                 <FormRow label="Reference PO">
                   <CFormInput
