@@ -135,7 +135,7 @@ const QCUnits = () => {
     e.preventDefault()
     try {
       const res = await backendQualityService.post(
-        '/v1/api/quality-service/qc-semi-product/submit',
+        '/api/v1/quality-service/qc-semi-product/submit',
         formData,
       )
       alert(`QC processed & forwarded successfully`)
@@ -149,7 +149,7 @@ const QCUnits = () => {
   const getQuestions = async () => {
     console.log('Getting questions data')
     try {
-      const resQuestion = await backendQualityService.get('v1/api/quality-service/questions', {
+      const resQuestion = await backendQualityService.get('api/v1/quality-service/questions', {
         params: { category: 'qc-semi-product' },
       })
       const data = resQuestion.data
@@ -162,9 +162,7 @@ const QCUnits = () => {
   }
 
   useEffect(() => {
-    console.log('Component rendered')
     getQuestions()
-    // console.log("formData berubah:", formData);
   }, [])
 
   return (
