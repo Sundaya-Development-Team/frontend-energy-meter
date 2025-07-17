@@ -32,10 +32,7 @@ import Select from 'react-select'
 window.JSZip = JSZip
 
 const fetchMasters = () =>
-  Promise.all([
-    backendProduct.get('/products/all'),
-    backendWarehouse.get('/api/v1/warehouses'),
-  ])
+  Promise.all([backendProduct.get('/products/all'), backendWarehouse.get('/api/v1/warehouses')])
 
 /* ---------- Komponen ---------- */
 const MovementsPage = () => {
@@ -296,7 +293,9 @@ const MovementsPage = () => {
       {/* ---------- MODAL ---------- */}
       <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
         <CModalHeader>
-          <CModalTitle>{modalMode === 'add' ? 'Add Product' : 'Edit Product'}</CModalTitle>
+          <CModalTitle>
+            {modalMode === 'add' ? 'Add Stock Movement' : 'Edit Stock Movement'}
+          </CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm>
