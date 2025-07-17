@@ -139,7 +139,7 @@ const QCUnits = () => {
     e.preventDefault()
     try {
       const res = await backendQualityService.post(
-        '/api/v1/quality-service/qc-semi-product/submit',
+        '/submit',
         formData,
       )
       alert(`QC processed & forwarded successfully`)
@@ -153,7 +153,7 @@ const QCUnits = () => {
   const getQuestions = async () => {
     console.log('Getting questions data')
     try {
-      const resQuestion = await backendQualityService.get('api/v1/quality-service/questions', {
+      const resQuestion = await backendQualityService.get('/questions', {
         params: { category: 'qc-semi-product' },
       })
       const data = resQuestion.data
