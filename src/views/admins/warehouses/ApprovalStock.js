@@ -30,7 +30,7 @@ import { backendProduct, backendWarehouse } from '../../../api/axios'
 /* -------------------------------------------------------------------------- */
 const fetchMasters = () =>
   Promise.all([
-    backendProduct.get('/api/v1/products/all'),
+    backendProduct.get('/products/all'),
     backendWarehouse.get('/api/v1/warehouses'),
   ])
 

@@ -135,7 +135,7 @@ const QCClosingCover = () => {
     // e.preventDefault()
     try {
       const res = await backendQualityService.post(
-        '/api/v1/quality-service/qc-semi-product/submit',
+        '/v1/api/quality-service/qc-semi-product/submit',
         formData,
       )
       alert(`QC processed & forwarded successfully`)
@@ -149,7 +149,7 @@ const QCClosingCover = () => {
   const getQuestions = async () => {
     console.log('Getting questions data')
     try {
-      const resQuestion = await backendQualityService.get('api/v1/quality-service/questions', {
+      const resQuestion = await backendQualityService.get('v1/api/quality-service/questions', {
         params: { category: 'qc-closing-cover' },
       })
       const data = resQuestion.data

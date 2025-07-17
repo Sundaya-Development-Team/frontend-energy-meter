@@ -183,7 +183,7 @@ const AqlPage = () => {
   useEffect(() => {
     ;(async () => {
       const [sapRes, inspectionRes, aqlRes, defectRes] = await Promise.all([
-        backendProduct.get('/api/v1/products/all'),
+        backendProduct.get('/products/all'),
         backendAql.get('/api/v1/aql-settings/inspection-level'),
         backendAql.get('/api/v1/aql-settings/aql-level'),
         backendAql.get('/api/v1/aql-settings/used-defects'),

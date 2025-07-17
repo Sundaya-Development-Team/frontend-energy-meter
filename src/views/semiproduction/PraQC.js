@@ -31,7 +31,7 @@ import {
 /* -------------------------------------------------------------------------- */
 const fetchMasters = () =>
   Promise.all([
-    backendProduct.get('/api/v1/products/all'),
+    backendProduct.get('/products/all'),
     backendPartner.get('/api/v1/partners/all'),
   ])
 

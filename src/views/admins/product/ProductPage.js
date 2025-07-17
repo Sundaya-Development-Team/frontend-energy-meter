@@ -55,7 +55,7 @@ const ProductPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendProduct.get('/api/v1/products/all').then((r) => r.data)
+    const { data } = await backendProduct.get('/products/all').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -113,9 +113,9 @@ const ProductPage = () => {
         img: formData.image,
       }
       if (modalMode === 'add') {
-        await backendProduct.post('/api/v1/products/add', payload)
+        await backendProduct.post('/products/add', payload)
       } else {
-        await backendProduct.put(`/api/v1/products/update/${formData.id}`, payload)
+        await backendProduct.put(`/products/update/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -130,8 +130,8 @@ const ProductPage = () => {
   useEffect(() => {
     ;(async () => {
       const [uomRes, catRes] = await Promise.all([
-        backendProduct.get('/api/v1/uom/all'),
-        backendProduct.get('/api/v1/categories/all'),
+        backendProduct.get('/uom/all'),
+        backendProduct.get('/categories/all'),
       ])
       setUomData(uomRes.data.data)
       setCatData(catRes.data.data)
@@ -206,7 +206,7 @@ const ProductPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/api/v1/products/delete/${id}`)
+          await backendProduct.delete(`/products/delete/${id}`)
           await refreshTable()
         }
       })

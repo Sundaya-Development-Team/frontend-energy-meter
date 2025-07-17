@@ -25,7 +25,7 @@ import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.html5.js'
 import 'datatables.net-buttons/js/buttons.print.js'
 import JSZip from 'jszip'
-import { backendProduct, backendWarehouse } from '../../../api/axios'
+import { backendWarehouse } from '../../../api/axios'
 
 window.JSZip = JSZip
 
