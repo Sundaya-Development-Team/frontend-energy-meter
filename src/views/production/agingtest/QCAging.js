@@ -11,6 +11,8 @@ import {
   CFormCheck,
   CFormInput,
   CFormLabel,
+  CInputGroup,
+  CInputGroupText,
   CRow,
 } from '@coreui/react'
 import { backendQualityService } from '../../../api/axios'
@@ -95,6 +97,8 @@ const QCAging = () => {
     partner_barcode: '',
     qc_name: 'qc-aging-test',
     inspected_by: '',
+    sample_quantity: '10',
+    number_quantity: '1',
     answers: {},
   })
 
@@ -102,6 +106,8 @@ const QCAging = () => {
     partner_barcode: '',
     qc_name: 'qc-aging-test',
     inspected_by: '',
+    sample_quantity: '',
+    number_quantity: '',
     answers: {},
   }
 
@@ -203,6 +209,34 @@ const QCAging = () => {
                     value={formData.inspected_by}
                     onChange={handleChange}
                   />
+                </CCol>
+              </CRow>
+
+              {/* Quantity */}
+              <CRow className="mb-3">
+                <CFormLabel htmlFor="quantity" className="col-sm-2 col-form-label">
+                  Quantity
+                </CFormLabel>
+                <CCol sm={10}>
+                  <CInputGroup className="mb-3">
+                    <CFormInput
+                      className="text-center fw-bold"
+                      type="number"
+                      id="number_quantity"
+                      name="number_quantity"
+                      value={formData.number_quantity}
+                      readOnly
+                    />
+                    <CInputGroupText>of</CInputGroupText>
+                    <CFormInput
+                      className="text-center fw-bold"
+                      type="number"
+                      id="sample_quantity"
+                      name="sample_quantity"
+                      value={formData.sample_quantity}
+                      readOnly
+                    />
+                  </CInputGroup>
                 </CCol>
               </CRow>
 
