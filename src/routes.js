@@ -5,7 +5,7 @@ const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
 // Admin
-const AqlPage = React.lazy(() => import('./views/admins/aql/aqlPage'))
+const AqlPage = React.lazy(() => import('./views/admins/aql/AqlPage'))
 const ApprovalStock = React.lazy(() => import('./views/admins/warehouses/ApprovalStock'))
 const DeliveryPage = React.lazy(() => import('./views/admins/Delivery/DeliveryPage'))
 const DynamicQuestionForm = React.lazy(() => import('./views/admins/DynamicQuestionForm'))
