@@ -98,7 +98,7 @@ const IncomingPage = () => {
 
   const fetchImage = async (path) => {
     try {
-      const response = await backendUploadFile.get(`/v1/api/upload-service/semi-product/c`, {
+      const response = await backendUploadFile.get(`/images/semi-product`, {
         params: { path },
         responseType: 'blob', // <-- penting!
       })
@@ -209,7 +209,7 @@ const IncomingPage = () => {
       let uploadedFileName = ''
       if (formDetailData.file) {
         const { data } = await backendUploadFile.post(
-          '/v1/api/upload-service/semi-product',
+          '/semi-product',
           { file: formDetailData.file },
           { headers: { 'Content-Type': 'multipart/form-data' } },
         )

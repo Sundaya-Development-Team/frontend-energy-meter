@@ -162,7 +162,7 @@ const PraQC = () => {
       let uploadedFileName = ''
       if (formData.file) {
         const { data } = await backendUploadFile.post(
-          '/v1/api/upload-service/semi-product',
+          '/semi-product',
           { file: formData.file },
           { headers: { 'Content-Type': 'multipart/form-data' } },
         )
@@ -369,7 +369,7 @@ const PraQC = () => {
                   required
                 />
               </FormRow>
-              
+
               <FormRow label="Note">
                 <CFormTextarea
                   rows={3}
@@ -379,7 +379,6 @@ const PraQC = () => {
                   disabled={isFormLocked}
                 />
               </FormRow>
-
 
               {/* ------------ Early Inspection ------------- */}
               {/* <CFormLabel className="col-form-label fw-bold mt-3">Early Inspection</CFormLabel>
