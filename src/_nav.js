@@ -43,17 +43,17 @@ const _nav = [
     component: CNavTitle,
     name: 'Semi Production',
   },
+  // {
+  //   component: CNavItem,
+  //   name: 'Incoming Unit',
+  //   to: '/semiproduction/incoming',
+  //   icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
     name: 'Incoming Unit',
-    to: '/semiproduction/incoming',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Pra - QC',
     to: '/semiproduction/praqc',
-    icon: <CIcon icon={cilCheckAlt} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,

@@ -30,10 +30,7 @@ import {
 /* util helper                                                                */
 /* -------------------------------------------------------------------------- */
 const fetchMasters = () =>
-  Promise.all([
-    backendProduct.get('/products/all'),
-    backendPartner.get('/all'),
-  ])
+  Promise.all([backendProduct.get('/products/all'), backendPartner.get('/all')])
 
 const fetchTotalTracked = (reference_po) =>
   backendTrackedItems.get('/all', { params: { reference_po } })
@@ -58,7 +55,6 @@ const PraQC = () => {
   const [trackedTotal, setTrackedTotal] = useState(0)
   const [scannedQty, setScannedQty] = useState(0)
   const [sampleQty, setSampleQty] = useState(0)
-
   const [formData, setFormData] = useState({
     reference_po: '',
     reference_gr: '',
@@ -76,6 +72,9 @@ const PraQC = () => {
     file: null,
     qc_stage: 'Receiving Semi Product',
   })
+
+  const isFormLocked =
+    !formData.reference_po.trim() || !formData.reference_gr.trim() || !formData.ref_quantity
 
   /* ------------------------ derived / memoised value ---------------------- */
   const remainingQty = useMemo(
@@ -116,15 +115,35 @@ const PraQC = () => {
 
   /* add 1 pada counter, simpan ke DB, lalu refresh total */
   const handleBarcode = async () => {
-    if (!formData.barcode.trim()) return
+    const {
+      barcode,
+      reference_po,
+      sap_code,
+      incoming_batch,
+      location_detail,
+      status,
+      ref_quantity,
+    } = formData
+
+    // Validasi input
+    if (!barcode.trim()) return alert('Barcode is required.')
+    if (!reference_po.trim()) return alert('Reference PO is required.')
+    if (!ref_quantity || isNaN(ref_quantity))
+      return alert('Total Quantity must be a valid number and cannot be empty.')
+    if (!sap_code.trim()) return alert('SAP code is required.')
+    if (!incoming_batch || isNaN(incoming_batch))
+      return alert('Incoming batch must be a valid number and cannot be empty.')
+    if (!location_detail.trim()) return alert('Location detail is required.')
+    if (!status.trim()) return alert('Status is required.')
+
     try {
       await backendTrackedItems.post('/add', {
-        partner_barcode: formData.barcode,
-        reference_po: formData.reference_po,
-        sap_code: formData.sap_code,
-        incoming_batch: Number(formData.incoming_batch),
-        location_detail: formData.location_detail,
-        status: formData.status,
+        partner_barcode: barcode,
+        reference_po,
+        sap_code,
+        incoming_batch: Number(incoming_batch),
+        location_detail,
+        status,
       })
       setScannedQty((q) => q + 1)
       setFormData((p) => ({ ...p, barcode: '' }))
@@ -196,6 +215,7 @@ const PraQC = () => {
     try {
       const { data } = await fetchTotalTracked(formData.reference_po)
       setTrackedTotal(data.total)
+      // setFormData({ sap_code: data.data[0].sap_code, incoming_batch: data.data[0].incoming_batch })
     } catch (err) {
       console.error('fetch total error', err)
     }
@@ -280,11 +300,13 @@ const PraQC = () => {
                   onChange={handleSelectSap}
                   placeholder="Select SAP Code"
                   isClearable
+                  required
+                  isDisabled={isFormLocked}
                 />
               </FormRow>
 
               <FormRow label="Unit">
-                <CFormInput name="uom" value={formData.uom} readOnly />
+                <CFormInput name="uom" value={formData.uom} readOnly disabled={isFormLocked} />
               </FormRow>
 
               <FormRow label="Incoming Batch">
@@ -294,6 +316,7 @@ const PraQC = () => {
                   value={formData.incoming_batch}
                   onChange={handleInput}
                   required
+                  disabled={isFormLocked}
                 />
               </FormRow>
 
@@ -304,15 +327,16 @@ const PraQC = () => {
                   value={formData.incoming_quantity}
                   onChange={handleInput}
                   required
+                  disabled={isFormLocked}
                 />
               </FormRow>
 
               <FormRow label="Remaining Quantity">
-                <CFormInput value={remainingQty} readOnly />
+                <CFormInput value={remainingQty} readOnly disabled={isFormLocked} />
               </FormRow>
 
               <FormRow label="Sample Quantity">
-                <CFormInput value={sampleQty} readOnly />
+                <CFormInput value={sampleQty} readOnly disabled={isFormLocked} />
               </FormRow>
 
               <FormRow label="Partner">
@@ -331,25 +355,34 @@ const PraQC = () => {
                   onChange={handleSelectPartner}
                   placeholder="Select Partner"
                   isClearable
+                  required
+                  isDisabled={isFormLocked}
                 />
               </FormRow>
 
+              <FormRow label="Image">
+                <CFormInput
+                  type="file"
+                  name="file"
+                  onChange={handleInput}
+                  disabled={isFormLocked}
+                  required
+                />
+              </FormRow>
+              
               <FormRow label="Note">
                 <CFormTextarea
                   rows={3}
                   name="notes"
                   value={formData.notes}
                   onChange={handleInput}
-                  required
+                  disabled={isFormLocked}
                 />
               </FormRow>
 
-              <FormRow label="Image">
-                <CFormInput type="file" name="file" onChange={handleInput} />
-              </FormRow>
 
               {/* ------------ Early Inspection ------------- */}
-              <CFormLabel className="col-form-label fw-bold mt-3">Early Inspection</CFormLabel>
+              {/* <CFormLabel className="col-form-label fw-bold mt-3">Early Inspection</CFormLabel>
               <CRow className="mb-3">
                 <CCol>
                   <div className="border rounded p-3">
@@ -371,7 +404,7 @@ const PraQC = () => {
                     </div>
                   </div>
                 </CCol>
-              </CRow>
+              </CRow> */}
 
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit" disabled={loading}>
@@ -404,6 +437,7 @@ const PraQC = () => {
                     handleBarcode()
                   }
                 }}
+                disabled={isFormLocked}
               />
             </FormRow>
           </CCardBody>
