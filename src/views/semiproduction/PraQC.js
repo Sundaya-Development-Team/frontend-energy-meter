@@ -33,7 +33,7 @@ const fetchMasters = () =>
   Promise.all([backendProduct.get('/products/all'), backendPartner.get('/all')])
 
 const fetchTotalTracked = (reference_po) =>
-  backendTrackedItems.get('/all', { params: { reference_po } })
+  backendTrackedItems.get('/master-ti', { params: { reference_po } })
 
 const fetchAqlSample = (sap_code, qc_stage, ref_quantity) =>
   ref_quantity
@@ -98,11 +98,13 @@ const PraQC = () => {
 
   const handleSelectSap = (option) => {
     const selected = sapData.find((p) => p.sap_code === option.value)
-    setFormData((p) => ({
-      ...p,
-      sap_code: selected.sap_code,
-      uom: selected.uom?.code || '',
-    }))
+    if (selected) {
+      setFormData((prev) => ({
+        ...prev,
+        sap_code: selected.sap_code,
+        uom: selected.uom?.code || '',
+      }))
+    }
   }
 
   const handleSelectPartner = (option) => {
@@ -135,7 +137,7 @@ const PraQC = () => {
       return alert('Incoming batch must be a valid number and cannot be empty.')
 
     try {
-      await backendTrackedItems.post('/add', {
+      await backendTrackedItems.post('/master-ti', {
         partner_barcode: barcode,
         reference_po,
         sap_code,
@@ -152,12 +154,12 @@ const PraQC = () => {
   }
 
   const handleSubmit = async (e) => {
-    // e.preventDefault()
+    e.preventDefault()
     try {
+      const { reference_po, sap_code, incoming_batch, ref_quantity } = formData
       setLoading(true)
-      
+
       // Validasi input
-      if (!barcode.trim()) return alert('Barcode is required.')
       if (!reference_po.trim()) return alert('Reference PO is required.')
       if (!ref_quantity || isNaN(ref_quantity))
         return alert('Total Quantity must be a valid number and cannot be empty.')
@@ -197,7 +199,7 @@ const PraQC = () => {
         ],
       })
 
-      const resTracked = await backendTrackedItems.put('/confirm-items', {
+      const resTracked = await backendTrackedItems.put('/master-ti/confirm-items', {
         reference_po: formData.reference_po,
         incoming_batch: Number(formData.incoming_batch),
         updateData: {
@@ -211,6 +213,7 @@ const PraQC = () => {
       /* optionally reset form di sini */
     } catch (err) {
       alert(err.response?.data?.message || err.message)
+      console.log(err)
     } finally {
       setLoading(false)
     }
@@ -222,11 +225,17 @@ const PraQC = () => {
     try {
       const { data } = await fetchTotalTracked(formData.reference_po)
       setTrackedTotal(data.total)
-      // setFormData({ sap_code: data.data[0].sap_code, incoming_batch: data.data[0].incoming_batch })
+      if (isFormLocked && data.data && data.data.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          sap_code: data.data[0].sap_code,
+          incoming_batch: data.data[0].incoming_batch,
+        }))
+      }
     } catch (err) {
       console.error('fetch total error', err)
     }
-  }, [formData.reference_po])
+  }, [formData.reference_po, isFormLocked])
 
   /* ------------------------------ effects -------------------------------- */
   /* masters sekali di mount */
@@ -248,6 +257,18 @@ const PraQC = () => {
   useEffect(() => {
     refreshTrackedTotal()
   }, [refreshTrackedTotal])
+
+  useEffect(() => {
+    if (formData.sap_code && !formData.uom) {
+      const selected = sapData.find((p) => p.sap_code === formData.sap_code)
+      if (selected) {
+        setFormData((prev) => ({
+          ...prev,
+          uom: selected.uom?.code || '',
+        }))
+      }
+    }
+  }, [formData.sap_code, sapData])
 
   /* ----------------------------------------------------------------------- */
   /* ------------------------------ render --------------------------------- */
@@ -388,7 +409,7 @@ const PraQC = () => {
               </FormRow>
 
               {/* ------------ Early Inspection ------------- */}
-              {/* <CFormLabel className="col-form-label fw-bold mt-3">Early Inspection</CFormLabel>
+              <CFormLabel className="col-form-label fw-bold mt-3">Early Inspection</CFormLabel>
               <CRow className="mb-3">
                 <CCol>
                   <div className="border rounded p-3">
@@ -410,7 +431,7 @@ const PraQC = () => {
                     </div>
                   </div>
                 </CCol>
-              </CRow> */}
+              </CRow>
 
               <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                 <CButton color="primary" type="submit" disabled={loading}>
