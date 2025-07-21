@@ -133,8 +133,6 @@ const PraQC = () => {
     if (!sap_code.trim()) return alert('SAP code is required.')
     if (!incoming_batch || isNaN(incoming_batch))
       return alert('Incoming batch must be a valid number and cannot be empty.')
-    if (!location_detail.trim()) return alert('Location detail is required.')
-    if (!status.trim()) return alert('Status is required.')
 
     try {
       await backendTrackedItems.post('/add', {
@@ -157,6 +155,15 @@ const PraQC = () => {
     // e.preventDefault()
     try {
       setLoading(true)
+      
+      // Validasi input
+      if (!barcode.trim()) return alert('Barcode is required.')
+      if (!reference_po.trim()) return alert('Reference PO is required.')
+      if (!ref_quantity || isNaN(ref_quantity))
+        return alert('Total Quantity must be a valid number and cannot be empty.')
+      if (!sap_code.trim()) return alert('SAP code is required.')
+      if (!incoming_batch || isNaN(incoming_batch))
+        return alert('Incoming batch must be a valid number and cannot be empty.')
 
       /* upload file jika ada */
       let uploadedFileName = ''

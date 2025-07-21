@@ -29,13 +29,10 @@ import { backendProduct, backendWarehouse } from '../../../api/axios'
 /* util helper                                                                */
 /* -------------------------------------------------------------------------- */
 const fetchMasters = () =>
-  Promise.all([
-    backendProduct.get('/products/all'),
-    backendWarehouse.get('/api/v1/warehouses'),
-  ])
+  Promise.all([backendProduct.get('/products/all'), backendWarehouse.get('/')])
 
 const fetchMovementList = (page = 1, reference = '') =>
-  backendWarehouse.get('/api/v1/request-movement', {
+  backendWarehouse.get('/request-movement', {
     params: {
       status: 'pending',
       page,
@@ -61,10 +58,7 @@ const ApprovalStock = () => {
   const handleApprove = async (code) => {
     try {
       const payload = { request_code: code, approved_by: 'admin' }
-      const res = await backendWarehouse.post(
-        '/api/v1/stock-movement/approve-from-request',
-        payload,
-      )
+      const res = await backendWarehouse.post('/stock-movement/approve-from-request', payload)
       alert(`${res.data?.message}`)
       refreshMovementList()
     } catch (error) {
@@ -72,10 +66,10 @@ const ApprovalStock = () => {
     }
   }
 
-  const handleReject = async (code) => {
+  const handleReject = async (code, id) => {
     try {
       const payload = { request_code: code, approved_by: 'admin' }
-      const res = await backendWarehouse.put('/api/v1/request-movement/reject', payload)
+      const res = await backendWarehouse.put(`/request-movement/reject/${id}`, payload)
       alert(`${res.data?.message}`)
       refreshMovementList()
     } catch (error) {
@@ -85,7 +79,7 @@ const ApprovalStock = () => {
 
   const handleDetail = async (code) => {
     try {
-      const res = await backendWarehouse.get('/api/v1/request-movement/items', {
+      const res = await backendWarehouse.get('/request-movement/items', {
         params: { request_code: code },
       })
       const { data } = res
@@ -188,7 +182,7 @@ const ApprovalStock = () => {
                           className="fw-bold text-white"
                           color="danger"
                           size="sm"
-                          onClick={() => handleReject(item.request_code)}
+                          onClick={() => handleReject(item.request_code, item.id)}
                         >
                           Reject
                         </CButton>

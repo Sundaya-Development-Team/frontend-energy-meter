@@ -32,7 +32,7 @@ import Select from 'react-select'
 window.JSZip = JSZip
 
 const fetchMasters = () =>
-  Promise.all([backendProduct.get('/products/all'), backendWarehouse.get('/api/v1/warehouses')])
+  Promise.all([backendProduct.get('/products/all'), backendWarehouse.get('/master-warehouses')])
 
 /* ---------- Komponen ---------- */
 const MovementsPage = () => {
@@ -65,7 +65,7 @@ const MovementsPage = () => {
   /* ---------- helper ---------- */
   const refreshTable = async () => {
     const { data } = await backendWarehouse
-      .get('/api/v1/request-movement', { params: { limit: 1000000 } })
+      .get('/request-movement', { params: { limit: 1000000 } })
       .then((r) => r.data)
     setTableData(data)
   }
@@ -156,12 +156,9 @@ const MovementsPage = () => {
         notes: formData.notes,
       }
       if (modalMode === 'add') {
-        await backendWarehouse.post('/api/v1/request-movement', payload)
+        await backendWarehouse.post('/request-movement', payload)
       } else {
-        await backendWarehouse.put(
-          `/api/v1/request-movement/update-request/${formData.id}`,
-          payload,
-        )
+        await backendWarehouse.put(`/request-movement/request/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -198,7 +195,7 @@ const MovementsPage = () => {
           <button class="btn btn-sm btn-primary btn-edit me-1" data-row='${JSON.stringify(row)}'>
             Edit
           </button>
-          <button class="btn btn-sm btn-danger btn-delete" data-request_code='${row.request_code}'>
+          <button class="btn btn-sm btn-danger btn-delete" data-id='${row.id}'>
             Del
           </button>`,
       }
@@ -241,13 +238,9 @@ const MovementsPage = () => {
       /* Daftarkan 1x listener Edit / Delete */
       const $tbl = $(tableRef.current)
       $tbl.on('click', '.btn-delete', async (e) => {
-        const requestCode = $(e.currentTarget).data('request_code')
+        const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Movement?')) {
-          await backendWarehouse.delete(`/api/v1/request-movement/delete`, {
-            data: {
-              request_code: requestCode,
-            },
-          })
+          await backendWarehouse.delete(`/request-movement/request/${id}`)
           await refreshTable()
         }
       })

@@ -52,7 +52,7 @@ const WarehousesPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendWarehouse.get('/api/v1/warehouses').then((r) => r.data)
+    const { data } = await backendWarehouse.get('/master-warehouses').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -98,9 +98,9 @@ const WarehousesPage = () => {
         longitude: Number(formData.longitude),
       }
       if (modalMode === 'add') {
-        await backendWarehouse.post('/api/v1/warehouses', payload)
+        await backendWarehouse.post('/master-warehouses', payload)
       } else {
-        await backendWarehouse.put(`/api/v1/warehouses/update/${formData.id}`, payload)
+        await backendWarehouse.put(`master-warehouses/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -168,7 +168,7 @@ const WarehousesPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Product?')) {
-          await backendWarehouse.delete(`/api/v1/warehouses/delete/${id}`)
+          await backendWarehouse.delete(`/master-warehouses/${id}`)
           await refreshTable()
         }
       })

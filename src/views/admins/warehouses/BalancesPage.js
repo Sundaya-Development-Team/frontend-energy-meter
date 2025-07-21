@@ -53,7 +53,7 @@ const BalancesPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendWarehouse.get('/api/v1/stock-balances').then((r) => r.data)
+    const { data } = await backendWarehouse.get('/stock-balances').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -117,9 +117,9 @@ const BalancesPage = () => {
         uom: formData.uom,
       }
       if (modalMode === 'add') {
-        await backendWarehouse.post('/api/v1/stock-balances', payload)
+        await backendWarehouse.post('/stock-balances', payload)
       } else {
-        await backendWarehouse.put(`/api/v1/stock-balances/update/${formData.id}`, payload)
+        await backendWarehouse.put(`/stock-balances/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -134,7 +134,7 @@ const BalancesPage = () => {
   useEffect(() => {
     ;(async () => {
       const [warehouseRes, sapRes] = await Promise.all([
-        backendWarehouse.get('/api/v1/warehouses'),
+        backendWarehouse.get('/master-warehouses'),
         backendProduct.get('/products/all'),
       ])
       setWarehouseData(warehouseRes.data.data)
@@ -192,7 +192,7 @@ const BalancesPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Stock?')) {
-          await backendWarehouse.delete(`/api/v1/stock-balances/delete/${id}`)
+          await backendWarehouse.delete(`/stock-balances/${id}`)
           await refreshTable()
         }
       })

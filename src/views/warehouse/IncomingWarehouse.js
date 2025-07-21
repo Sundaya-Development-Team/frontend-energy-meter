@@ -31,14 +31,14 @@ import { backendProduct, backendWarehouse } from '../../api/axios'
 const fetchMasters = () =>
   Promise.all([
     backendProduct.get('/products/all'),
-    backendWarehouse.get('/api/v1/warehouses'),
+    backendWarehouse.get('/master-warehouses'),
   ])
 
 const fetchTotalTracked = (request_code) =>
-  backendWarehouse.get('/api/v1/request-movement/items', { params: { request_code } })
+  backendWarehouse.get('/request-movement/items', { params: { request_code } })
 
 const fetchMovementList = (page = 1) =>
-  backendWarehouse.get('/api/v1/request-movement', {
+  backendWarehouse.get('/request-movement', {
     params: {
       status: 'pending',
       movement_type: 'in',
@@ -108,7 +108,7 @@ const IncomingWarehouse = () => {
   const handleBarcode = async () => {
     if (!formData.barcode.trim()) return
     try {
-      await backendWarehouse.post('/api/v1/request-movement/items', {
+      await backendWarehouse.post('/request-movement/items', {
         partner_barcode: formData.barcode,
         request_code: requestCode,
         scanned_by: 'admin',
@@ -137,7 +137,7 @@ const IncomingWarehouse = () => {
         target_division: formData.target_division,
         notes: formData.notes,
       }
-      const resIncoming = await backendWarehouse.post('/api/v1/request-movement', payload)
+      const resIncoming = await backendWarehouse.post('/request-movement', payload)
       refreshMovementList()
       setRequestCode(resIncoming.data?.data?.request_code)
       setFormData((p) => ({
