@@ -350,13 +350,17 @@ const MovementsPage = () => {
               />
             </FormRow>
             <FormRow label="Movement Type">
-              <CFormInput
+              <CFormSelect
                 type="text"
                 name="movement_type"
                 value={formData.movement_type}
                 onChange={handleInput}
                 required
-              />
+              >
+                <option value="">Select Movement Type</option>
+                <option value="in">In</option>
+                <option value="out">Out</option>
+              </CFormSelect>
             </FormRow>
             <FormRow label="Requested By">
               <CFormInput

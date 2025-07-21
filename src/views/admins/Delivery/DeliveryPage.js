@@ -278,7 +278,7 @@ const DeliveryPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendWarehouse.get('/').then((r) => r.data)
+    const { data } = await backendWarehouse.get('/master-warehouses').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
