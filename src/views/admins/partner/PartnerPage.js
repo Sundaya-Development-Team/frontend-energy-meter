@@ -58,7 +58,7 @@ const PartnerPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendPartner.get('/all').then((r) => r.data)
+    const { data } = await backendPartner.get('/master').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -125,9 +125,9 @@ const PartnerPage = () => {
         is_active: formData.is_active,
       }
       if (modalMode === 'add') {
-        await backendPartner.post('/add', payload)
+        await backendPartner.post('/master', payload)
       } else {
-        await backendPartner.put(`/update/${formData.id}`, payload)
+        await backendPartner.put(`/master/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -147,7 +147,7 @@ const PartnerPage = () => {
 
     try {
       setLoading(true)
-      await backendPartner.post('/upload-excel', formData, {
+      await backendPartner.post('/master/upload-excel', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       setVisibleBulk(false)
@@ -163,7 +163,7 @@ const PartnerPage = () => {
   /* ---------- fetch master ---------- */
   useEffect(() => {
     ;(async () => {
-      const [typeRes] = await Promise.all([backendPartner.get('/types')])
+      const [typeRes] = await Promise.all([backendPartner.get('/master/types')])
       setTypeData(typeRes.data.data)
       await refreshTable()
     })()
@@ -232,7 +232,7 @@ const PartnerPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Partner?')) {
-          await backendPartner.delete(`/delete/${id}`)
+          await backendPartner.delete(`/master/${id}`)
           await refreshTable()
         }
       })

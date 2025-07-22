@@ -30,7 +30,7 @@ import {
 /* util helper                                                                */
 /* -------------------------------------------------------------------------- */
 const fetchMasters = () =>
-  Promise.all([backendProduct.get('/master-products'), backendPartner.get('/all')])
+  Promise.all([backendProduct.get('/master-products'), backendPartner.get('/master')])
 
 const fetchTotalTracked = (reference_po) =>
   backendTrackedItems.get('/master-ti', { params: { reference_po } })
