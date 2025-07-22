@@ -48,7 +48,7 @@ const SemiProductPage = () => {
 
   /* ---------- helper ---------- */
   const refreshTable = async () => {
-    const { data } = await backendTrackedItems.get('/all').then((r) => r.data)
+    const { data } = await backendTrackedItems.get('/master-ti').then((r) => r.data)
     setTableData(data) // trigger rerender DataTable
   }
 
@@ -81,13 +81,14 @@ const SemiProductPage = () => {
         location_detail: formData.location_detail,
       }
       await backendTrackedItems.put(
-        `/update-by-PaBarcode/${formData.partner_barcode}`,
+        `/master-ti/partner-barcode/${formData.partner_barcode}`,
         payload,
       )
       setModalVisible(false)
       await refreshTable()
     } catch (err) {
       alert(err.response?.data?.message || err.message)
+      console.log(err)
     } finally {
       setLoading(false)
     }
@@ -162,7 +163,7 @@ const SemiProductPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const barcode = $(e.currentTarget).data('partnerBarcode')
         if (window.confirm('Delete this Product?')) {
-          await backendTrackedItems.delete(`/delete-by-PaBarcode/${barcode}`)
+          await backendTrackedItems.delete(`/master-ti/partner-barcode/${barcode}`)
           await refreshTable()
         }
       })
