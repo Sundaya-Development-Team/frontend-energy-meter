@@ -38,7 +38,7 @@ const fetchTotalTracked = (reference_po) =>
 const fetchAqlSample = (sap_code, qc_stage, ref_quantity) =>
   ref_quantity
     ? backendAql
-        .get('/calculate', {
+        .get('/aql-settings/calculate', {
           params: { sap_code, qc_stage, total_quantity: ref_quantity },
         })
         .then((r) => r.data.data.data.sample_size)
