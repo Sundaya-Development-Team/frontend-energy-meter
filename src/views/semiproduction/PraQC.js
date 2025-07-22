@@ -74,7 +74,7 @@ const PraQC = () => {
   })
 
   const isFormLocked =
-    !formData.reference_po.trim() || !formData.reference_gr.trim() || !formData.ref_quantity
+    !formData.reference_po.trim() || !formData.reference_gr.trim() || !formData.sap_code
 
   /* ------------------------ derived / memoised value ---------------------- */
   const remainingQty = useMemo(
@@ -311,6 +311,7 @@ const PraQC = () => {
                   value={formData.ref_quantity}
                   onChange={handleInput}
                   required
+                  disabled={isFormLocked}
                 />
               </FormRow>
 
@@ -329,7 +330,6 @@ const PraQC = () => {
                   placeholder="Select SAP Code"
                   isClearable
                   required
-                  isDisabled={isFormLocked}
                 />
               </FormRow>
 
