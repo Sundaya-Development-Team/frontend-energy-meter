@@ -91,7 +91,7 @@ const PartnerPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target
     if (name === 'is_active') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
+      return setFormData((p) => ({ ...p, is_active: value === 'true' }))
     }
     setFormData((p) => ({ ...p, [name]: value }))
   }
@@ -191,7 +191,7 @@ const PartnerPage = () => {
 
       dtInstance.current = $(tableRef.current).DataTable({
         data: tableData,
-        responsive: true,
+        responsive: false,
         dom:
           "<'row mb-2'<'col-md-6'B><'col-md-6'f>>" +
           "<'row'<'col-12'tr>>" +
@@ -398,8 +398,8 @@ const PartnerPage = () => {
               <CFormLabel className="col-sm-3 col-form-label">Aktif View</CFormLabel>
               <CCol sm={9}>
                 <CFormSelect
-                  name="aktifView"
-                  value={String(formData.aktifView)}
+                  name="is_active"
+                  value={String(formData.is_active)}
                   onChange={handleInputChange}
                   required
                 >
