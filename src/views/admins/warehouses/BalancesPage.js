@@ -135,7 +135,7 @@ const BalancesPage = () => {
     ;(async () => {
       const [warehouseRes, sapRes] = await Promise.all([
         backendWarehouse.get('/master-warehouses'),
-        backendProduct.get('/products/all'),
+        backendProduct.get('/master-products'),
       ])
       setWarehouseData(warehouseRes.data.data)
       setSapData(sapRes.data.data)

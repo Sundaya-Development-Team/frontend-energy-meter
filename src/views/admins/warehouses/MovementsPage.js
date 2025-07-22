@@ -32,7 +32,7 @@ import Select from 'react-select'
 window.JSZip = JSZip
 
 const fetchMasters = () =>
-  Promise.all([backendProduct.get('/products/all'), backendWarehouse.get('/master-warehouses')])
+  Promise.all([backendProduct.get('/master-products'), backendWarehouse.get('/master-warehouses')])
 
 /* ---------- Komponen ---------- */
 const MovementsPage = () => {

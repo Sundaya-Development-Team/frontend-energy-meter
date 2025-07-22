@@ -242,7 +242,7 @@ const IncomingPage = () => {
   useEffect(() => {
     ;(async () => {
       const [sapRes, partnerRes] = await Promise.all([
-        backendProduct.get('/products/all'),
+        backendProduct.get('/master-products'),
         backendPartner.get('/all'),
       ])
       setSapData(sapRes.data.data)

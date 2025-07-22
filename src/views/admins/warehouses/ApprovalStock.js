@@ -21,15 +21,12 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import Select from 'react-select'
 
-import { backendProduct, backendWarehouse } from '../../../api/axios'
+import { backendWarehouse } from '../../../api/axios'
 
 /* -------------------------------------------------------------------------- */
 /* util helper                                                                */
 /* -------------------------------------------------------------------------- */
-const fetchMasters = () =>
-  Promise.all([backendProduct.get('/products/all'), backendWarehouse.get('/')])
 
 const fetchMovementList = (page = 1, reference = '') =>
   backendWarehouse.get('/request-movement', {

@@ -336,9 +336,9 @@ const DeliveryPage = () => {
         img: formData.image,
       }
       if (modalMode === 'add') {
-        await backendProduct.post('/products/add', payload)
+        await backendProduct.post('/master-products', payload)
       } else {
-        await backendProduct.put(`/products/update/${formData.id}`, payload)
+        await backendProduct.put(`/master-products/${formData.id}`, payload)
       }
       setModalVisible(false)
       await refreshTable()
@@ -353,8 +353,8 @@ const DeliveryPage = () => {
   useEffect(() => {
     ;(async () => {
       const [uomRes, catRes] = await Promise.all([
-        backendProduct.get('/uom/all'),
-        backendProduct.get('/categories/all'),
+        backendProduct.get('/uom'),
+        backendProduct.get('/categories'),
       ])
       setUomData(uomRes.data.data)
       setCatData(catRes.data.data)
@@ -412,7 +412,7 @@ const DeliveryPage = () => {
       $tbl.on('click', '.btn-delete', async (e) => {
         const id = $(e.currentTarget).data('id')
         if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/products/delete/${id}`)
+          await backendProduct.delete(`/master-products/${id}?force=true`)
           await refreshTable()
         }
       })
