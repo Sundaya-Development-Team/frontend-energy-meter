@@ -179,7 +179,7 @@ const PraQC = () => {
       }
 
       /* payload utama */
-      const resIncoming = await backendIncoming.post('/add', {
+      const resIncoming = await backendIncoming.post('/master-rp', {
         reference_po: formData.reference_po,
         reference_gr: formData.reference_gr,
         notes: formData.notes,

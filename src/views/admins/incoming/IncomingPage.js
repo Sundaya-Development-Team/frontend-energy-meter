@@ -85,7 +85,7 @@ const IncomingPage = () => {
   const fetchData = async (page = 1, reference_po = '') => {
     try {
       setLoading(true)
-      const { data } = await backendIncoming.get(`/all`, {
+      const { data } = await backendIncoming.get(`/master-rp`, {
         params: { limit: 12, page, reference_po },
       })
       setIncomingData(data)
@@ -113,7 +113,7 @@ const IncomingPage = () => {
   const deleteHeader = async (id) => {
     if (!window.confirm('Delete this Header')) return
     try {
-      await backendIncoming.delete(`/delete-header/${id}`)
+      await backendIncoming.delete(`/master-rp/header/${id}`)
       fetchData(incomingData.page)
     } catch (error) {
       console.log('error : ~ IncomingPage : deleteHeader', error)
@@ -123,7 +123,7 @@ const IncomingPage = () => {
   const deleteDetails = async (id) => {
     if (!window.confirm('Delete this Detail?')) return
     try {
-      await backendIncoming.delete(`/delete-detail/${id}`)
+      await backendIncoming.delete(`/master-rp/detail/${id}`)
       fetchData(incomingData.page)
     } catch (error) {
       console.log('error : ~ IncomingPage : deleteDetails', error)
@@ -193,7 +193,7 @@ const IncomingPage = () => {
       }
       //   console.log(payload)
 
-      await backendIncoming.put(`/update-header/${idHeader}`, payload)
+      await backendIncoming.put(`/master-rp/header/${idHeader}`, payload)
       setModalHeaderVisible(false)
       await fetchData()
     } catch (err) {
@@ -228,7 +228,7 @@ const IncomingPage = () => {
       }
       // console.log(payload)
 
-      await backendIncoming.put(`/update-detail/${idDetail}`, payload)
+      await backendIncoming.put(`/master-rp/detail/${idDetail}`, payload)
       setModalDetailVisible(false)
       await fetchData()
     } catch (err) {
