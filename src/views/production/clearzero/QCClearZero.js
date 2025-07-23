@@ -213,7 +213,7 @@ const QCClearZero = () => {
               </CRow>
 
               {/* Quantity */}
-              <CRow className="mb-3">
+              {/* <CRow className="mb-3">
                 <CFormLabel htmlFor="quantity" className="col-sm-2 col-form-label">
                   Quantity
                 </CFormLabel>
@@ -238,7 +238,7 @@ const QCClearZero = () => {
                     />
                   </CInputGroup>
                 </CCol>
-              </CRow>
+              </CRow> */}
 
               {/* Dynamic Questions */}
               {questionData.length === 0 ? (
