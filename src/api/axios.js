@@ -2,11 +2,11 @@
 import axios from 'axios'
 
 const QUALITY_SERVICE = import.meta.env.VITE_QUALITY_SERVICE
+const UPLOADFILE = import.meta.env.VITE_UPLOAD
 const PRODUCT = import.meta.env.VITE_PRODUCT
 const PARTNER = import.meta.env.VITE_PARTNER
 const INCOMING = import.meta.env.VITE_INCOMING
 const TRACKEDITEMS = import.meta.env.VITE_TRACKEDITEMS
-const UPLOADFILE = import.meta.env.VITE_UPLOAD
 const AQL = import.meta.env.VITE_AQL
 const WAREHOUSE = import.meta.env.VITE_WAREHOUSE
 
