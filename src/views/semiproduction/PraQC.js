@@ -224,7 +224,7 @@ const PraQC = () => {
     if (!formData.reference_po) return
     try {
       const { data } = await fetchTotalTracked(formData.reference_po)
-      setTrackedTotal(data.total)
+      setTrackedTotal(data.pagination.total)
       if (isFormLocked && data.data && data.data.length > 0) {
         setFormData((prev) => ({
           ...prev,
