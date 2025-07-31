@@ -20,8 +20,12 @@ const BASE_SERVER = import.meta.env.VITE_SERVER
 //   baseURL: `${BASE_SERVER}/v1/upload-service`,
 // })
 
+// export const backendProduct = axios.create({
+//   baseURL: `${BASE_SERVER}/v1/products`,
+// })
+
 export const backendProduct = axios.create({
-  baseURL: `${BASE_SERVER}/v1/products`,
+  baseURL: `${PRODUCT}/api/products`,
 })
 
 export const backendPartner = axios.create({

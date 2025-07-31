@@ -41,6 +41,16 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Recevicing Products',
+  },
+  {
+    component: CNavItem,
+    name: 'Recevicing Products',
+    to: '/receiving/receivingHeader',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
     name: 'Semi Production',
   },
   // {

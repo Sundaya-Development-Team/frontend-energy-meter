@@ -66,6 +66,7 @@ const PraQC = () => {
     incoming_quantity: '',
     inspect_quantity: '',
     barcode: '',
+    name: '',
     uom: '',
     location_detail: 'Incoming Zone',
     status: 'in_receiving_area',
@@ -102,6 +103,7 @@ const PraQC = () => {
       setFormData((prev) => ({
         ...prev,
         sap_code: selected.sap_code,
+        name: selected.name,
         uom: selected.uom?.code || '',
       }))
     }
@@ -331,6 +333,10 @@ const PraQC = () => {
                   isClearable
                   required
                 />
+              </FormRow>
+
+              <FormRow label="Product Name">
+                <CFormInput name="name" value={formData.name} readOnly disabled={isFormLocked} />
               </FormRow>
 
               <FormRow label="Unit">

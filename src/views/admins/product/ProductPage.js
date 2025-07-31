@@ -1,379 +1,261 @@
 /* eslint-disable prettier/prettier */
-
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   CButton,
   CCard,
   CCardBody,
   CCardHeader,
   CCol,
-  CRow,
+  CForm,
+  CFormInput,
+  CFormLabel,
   CModal,
-  CModalHeader,
-  CModalTitle,
   CModalBody,
   CModalFooter,
-  CForm,
-  CFormLabel,
-  CFormInput,
-  CFormSelect,
+  CModalHeader,
+  CModalTitle,
+  CRow,
+  CSpinner,
 } from '@coreui/react'
-import $ from 'jquery'
-import 'datatables.net-bs5'
-import 'datatables.net-responsive-bs5'
-import 'datatables.net-buttons-bs5'
-import 'datatables.net-buttons/js/buttons.html5.js'
-import 'datatables.net-buttons/js/buttons.print.js'
-import JSZip from 'jszip'
 import { backendProduct } from '../../../api/axios'
+import DataTable from 'react-data-table-component'
+import { toast } from 'react-toastify'
 
-window.JSZip = JSZip
-
-/* ---------- Komponen ---------- */
 const ProductPage = () => {
-  /* ---------- refs & state ---------- */
-  const tableRef = useRef(null)
-  const dtInstance = useRef(null)
-  const [loading, setLoading] = useState(false)
-  const [tableData, setTableData] = useState([])
-  const [uomData, setUomData] = useState([])
-  const [catData, setCatData] = useState([])
-
-  /* form di modal */
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
-  const [modalMode, setModalMode] = useState('add') // 'add' | 'edit'
-  const [formData, setFormData] = useState({
-    id: '', // hanya terisi saat edit
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '', // filename saja
-  })
+  const [editData, setEditData] = useState(null)
+  const [form, setForm] = useState({ name: '', sap_code: '', type: '', supplier: '', active: '' })
 
-  /* ---------- helper ---------- */
-  const refreshTable = async () => {
-    const { data } = await backendProduct.get('/master-products').then((r) => r.data)
-    setTableData(data) // trigger rerender DataTable
-  }
-
-  /* ---------- modal helpers ---------- */
-  const emptyForm = {
-    id: '',
-    sapCode: '',
-    productName: '',
-    uom: '',
-    productType: '',
-    productCategory: '',
-    aktifView: '',
-    image: '',
-  }
-
-  const handleOpenModal = (mode, rowData = null) => {
-    setModalMode(mode)
-    if (mode === 'edit' && rowData) {
-      setFormData({
-        id: rowData.id,
-        sapCode: rowData.sap_code ?? '',
-        productName: rowData.name ?? '',
-        uom: rowData.uom?.id ?? '',
-        productType: rowData.product_type ?? '',
-        productCategory: rowData.category?.id ?? '',
-        aktifView: rowData.is_active ?? '',
-        image: rowData.img ?? '',
-      })
-    } else {
-      setFormData(emptyForm)
-    }
-    setModalVisible(true)
-  }
-
-  /* onChange semua input */
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    if (name === 'aktifView') {
-      return setFormData((p) => ({ ...p, aktifView: value === 'true' }))
-    }
-    setFormData((p) => ({ ...p, [name]: value }))
-  }
-
-  /* ---------- Simpan (Add / Update) ---------- */
-  const handleSave = async () => {
+  const fetchProducts = async () => {
+    setLoading(true)
     try {
-      setLoading(true)
-      const payload = {
-        sap_code: formData.sapCode,
-        name: formData.productName,
-        uom_id: Number(formData.uom),
-        category_id: Number(formData.productCategory),
-        is_active: formData.aktifView,
-        product_type: formData.productType,
-        img: formData.image,
-      }
-      if (modalMode === 'add') {
-        await backendProduct.post('/master-products', payload)
-      } else {
-        await backendProduct.put(`/master-products/${formData.id}`, payload)
-      }
-      setModalVisible(false)
-      await refreshTable()
-    } catch (err) {
-      alert(err.response?.data?.message || err.message)
+      const res = await backendProduct.get('/', {
+        params: {
+          page: 1,
+          limit: 10,
+          sortBy: 'name',
+          sortOrder: 'asc',
+          include_details: true,
+          include_categories: true,
+          include_components: true,
+        },
+      })
+      setProducts(res.data.data || [])
+    } catch (error) {
+      toast.error('Failed to fetch products')
     } finally {
       setLoading(false)
     }
   }
 
-  /* ---------- fetch master ---------- */
   useEffect(() => {
-    ;(async () => {
-      const [uomRes, catRes] = await Promise.all([
-        backendProduct.get('/uom'),
-        backendProduct.get('/categories'),
-      ])
-      setUomData(uomRes.data.data)
-      setCatData(catRes.data.data)
-      await refreshTable()
-    })()
+    fetchProducts()
   }, [])
 
-  /* ---------- DataTable init & update ---------- */
-  useEffect(() => {
-    if (!tableData.length) return
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
 
-    /* jika DT belum ada → inisialisasi */
-    if (!dtInstance.current) {
-      const actionCol = {
-        title: 'Action',
-        data: null,
-        className: 'text-center',
-        orderable: false,
-        render: (_, __, row) => `
-          <button class="btn btn-sm btn-primary btn-edit me-1" data-row='${JSON.stringify(row)}'>
-            Edit
-          </button>
-          <button class="btn btn-sm btn-danger btn-delete" data-id='${row.id}'>
-            Del
-          </button>`,
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      if (editData) {
+        await backendProduct.put(`/${editData.id}`, form)
+        toast.success('Product updated')
+      } else {
+        await backendProduct.post('/', form)
+        toast.success('Product created')
       }
-
-      dtInstance.current = $(tableRef.current).DataTable({
-        data: tableData,
-        responsive: false,
-        dom:
-          "<'row mb-2'<'col-md-6'B><'col-md-6'f>>" +
-          "<'row'<'col-12'tr>>" +
-          "<'row mt-2'<'col-md-6'i><'col-md-6'p>>",
-        buttons: [
-          { extend: 'copyHtml5', text: 'Copy' },
-          { extend: 'excelHtml5', text: 'Excel' },
-          { extend: 'csvHtml5', text: 'CSV' },
-          { extend: 'print', text: 'Print' },
-        ],
-        columns: [
-          actionCol,
-          { title: 'ID', data: 'id' },
-          { title: 'Product Code', data: 'product_code' },
-          { title: 'SAP Code', data: 'sap_code' },
-          { title: 'Name', data: 'name' },
-          { title: 'Unit', data: 'uom', render: (u) => u?.name ?? '-' },
-          { title: 'Type', data: 'product_type', className: 'text-capitalize' },
-          { title: 'Category', data: 'category', render: (c) => c?.name ?? '-' },
-          {
-            title: 'Active',
-            data: 'is_active',
-            className: 'text-center',
-            render: (a) =>
-              a
-                ? '<span class="badge bg-success">Yes</span>'
-                : '<span class="badge bg-danger">No</span>',
-          },
-          {
-            title: 'Image',
-            data: 'img',
-            orderable: false,
-            className: 'text-center',
-            // render: (img) => (img ? `<img src="/assets/img/${img}" alt="${img}" width="40"/>` : '-'),
-          },
-        ],
-      })
-      $(dtInstance.current.buttons().nodes()).addClass('btn btn-sm btn-outline-primary me-1 mb-1')
-
-      /* Daftarkan 1x listener Edit / Delete */
-      const $tbl = $(tableRef.current)
-      $tbl.on('click', '.btn-delete', async (e) => {
-        const id = $(e.currentTarget).data('id')
-        if (window.confirm('Delete this Product?')) {
-          await backendProduct.delete(`/master-products/${id}?force=true`)
-          await refreshTable()
-        }
-      })
-      $tbl.on('click', '.btn-edit', (e) => {
-        const row = JSON.parse($(e.currentTarget).attr('data-row'))
-        handleOpenModal('edit', row)
-      })
-    } else {
-      /* jika DT sudah ada → update datanya */
-      dtInstance.current.clear().rows.add(tableData).draw(false)
+      setModalVisible(false)
+      fetchProducts()
+      setForm({ name: '', sap_code: '', type: '', supplier: '', active: '' })
+      setEditData(null)
+    } catch (error) {
+      toast.error('Failed to save product')
     }
-  }, [tableData])
-  /* ---------- render ---------- */
+  }
+
+  const handleEdit = (row) => {
+    setEditData(row)
+    setForm({
+      name: row.name,
+      sap_code: row.sap_code,
+      type: row.details?.[0]?.type?.name,
+      supplier: row.details?.[0]?.supplier?.name,
+      active: row.active || '',
+    })
+    setModalVisible(true)
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return
+    try {
+      await backendProduct.delete(`/${id}`)
+      toast.success('Product deleted')
+      fetchProducts()
+    } catch (error) {
+      toast.error('Failed to delete product')
+    }
+  }
+
+  const columns = [
+    {
+      name: 'No',
+      selector: (row, index) => index + 1,
+      width: '60px',
+      cell: (row, index) => <div style={{ textAlign: 'center', width: '100%' }}>{index + 1}</div>,
+    },
+    { name: 'Name', selector: (row) => row.name, sortable: true },
+    { name: 'SAP Code', selector: (row) => row.sap_code, sortable: true },
+    {
+      name: 'Type',
+      selector: (row) => row.details?.[0]?.type?.name || '-',
+      sortable: true,
+    },
+    { name: 'Supplier', selector: (row) => row.details?.[0]?.supplier?.name, sortable: true },
+    { name: 'Active', selector: (row) => row.active || '-', sortable: true },
+    {
+      name: 'Actions',
+      cell: (row) => (
+        <div className="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+          <CButton size="sm" color="warning" className="px-3" onClick={() => handleEdit(row)}>
+            Edit
+          </CButton>
+          <CButton size="sm" color="danger" className="px-3" onClick={() => handleDelete(row.id)}>
+            Delete
+          </CButton>
+        </div>
+      ),
+    },
+  ]
+
+  const ExpandedComponent = ({ data }) => {
+    const detail = data.details?.[0] || {}
+
+    return (
+      <div className="p-3 border-top bg-light rounded">
+        <CRow className="mb-2">
+          <CCol xs={12} md={6}>
+            <strong>Name:</strong> {data.name}
+          </CCol>
+          <CCol xs={12} md={6}>
+            <strong>SAP Code:</strong> {data.sap_code}
+          </CCol>
+        </CRow>
+
+        <CRow className="mb-2">
+          <CCol xs={12} md={6}>
+            <strong>Type:</strong> {detail.type?.name || '-'}
+          </CCol>
+          <CCol xs={12} md={6}>
+            <strong>Supplier:</strong> {detail.supplier?.name || '-'}
+          </CCol>
+        </CRow>
+
+        <CRow className="mb-2">
+          <CCol xs={12} md={6}>
+            <strong>Active:</strong> {data.active ? 'Yes' : 'No'}
+          </CCol>
+        </CRow>
+
+        <CRow className="mb-2">
+          <CCol xs={12}>
+            <strong>Image:</strong>
+            <div className="mt-2">
+              <img
+                src={
+                  'http://192.168.100.226:5000/api/v1/images/semi-product?path=2025-07-18_15-56-32-atas 4.jpg'
+                }
+                alt="Product"
+                style={{
+                  width: '100%',
+                  maxWidth: '300px',
+                  height: 'auto',
+                  borderRadius: '8px',
+                }}
+              />
+            </div>
+          </CCol>
+        </CRow>
+      </div>
+    )
+  }
+
   return (
-    <>
-      <CRow>
-        <CCol xs={90}>
-          <CCard className="mb-4">
-            <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>Product List</strong>
-              <CButton
-                className="fw-bold text-white"
-                color="success"
-                size="sm"
-                onClick={() => handleOpenModal('add')}
-              >
-                + Add Product
-              </CButton>
-            </CCardHeader>
-            <CCardBody>
-              <div className="table-responsive">
-                <table
-                  ref={tableRef}
-                  className="table table-striped table-bordered align-middle"
-                  style={{ width: '100%' }}
-                />
+    <CRow>
+      <CCol xs={12}>
+        <CCard className="mb-4">
+          <CCardHeader className="d-flex justify-content-between align-items-center">
+            <strong>Product List</strong>
+            <CButton onClick={() => setModalVisible(true)}>Add Product</CButton>
+          </CCardHeader>
+          <CCardBody>
+            {loading ? (
+              <div className="text-center">
+                <CSpinner />
               </div>
-            </CCardBody>
-          </CCard>
-        </CCol>
-      </CRow>
+            ) : (
+              <DataTable
+                columns={columns}
+                data={products}
+                pagination
+                responsive
+                highlightOnHover
+                striped
+                expandableRows
+                expandableRowsComponent={ExpandedComponent}
+              />
+            )}
+          </CCardBody>
+        </CCard>
+      </CCol>
 
-      {/* ---------- MODAL ---------- */}
-      <CModal visible={modalVisible} onClose={() => setModalVisible(false)} size="lg">
+      {/* Modal */}
+      <CModal visible={modalVisible} onClose={() => setModalVisible(false)}>
         <CModalHeader>
-          <CModalTitle>{modalMode === 'add' ? 'Add Product' : 'Edit Product'}</CModalTitle>
+          <CModalTitle>{editData ? 'Edit Product' : 'Add Product'}</CModalTitle>
         </CModalHeader>
-        <CModalBody>
-          <CForm>
-            {/* SAP Code */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">SAP Code</CFormLabel>
-              <CCol sm={9}>
-                <CFormInput name="sapCode" value={formData.sapCode} onChange={handleInputChange} />
-              </CCol>
-            </CRow>
+        <CForm onSubmit={handleSubmit}>
+          <CModalBody>
+            <CFormLabel>Name</CFormLabel>
+            <CFormInput name="name" value={form.name} onChange={handleInputChange} required />
 
-            {/* Product Name */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Name</CFormLabel>
-              <CCol sm={9}>
-                <CFormInput
-                  name="productName"
-                  value={formData.productName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </CCol>
-            </CRow>
+            <CFormLabel className="mt-2">SAP Code</CFormLabel>
+            <CFormInput
+              name="sap_code"
+              value={form.sap_code}
+              onChange={handleInputChange}
+              required
+            />
 
-            {/* UOM */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Unit</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect name="uom" value={formData.uom} onChange={handleInputChange}>
-                  <option value="">Select UOM</option>
-                  {uomData.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
+            <CFormLabel className="mt-2">Type</CFormLabel>
+            <CFormInput name="type" value={form.type} onChange={handleInputChange} required />
 
-            {/* Product Type */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Product Type</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productType"
-                  value={formData.productType}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Type</option>
-                  <option value="raw_material">Raw Material</option>
-                  <option value="semi_finished">Semi Finished</option>
-                  <option value="finished_good">Finished Good</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
+            <CFormLabel className="mt-2">Supplier</CFormLabel>
+            <CFormInput
+              name="supplier"
+              value={form.supplier}
+              onChange={handleInputChange}
+              required
+            />
 
-            {/* Category */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Category</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="productCategory"
-                  value={formData.productCategory}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {catData.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Aktif View */}
-            <CRow className="mb-3">
-              <CFormLabel className="col-sm-3 col-form-label">Aktif View</CFormLabel>
-              <CCol sm={9}>
-                <CFormSelect
-                  name="aktifView"
-                  value={String(formData.aktifView)}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
-
-            {/* Image */}
-            <CRow className="mb-3">
-              <CFormLabel htmlFor="image" className="col-sm-3 col-form-label">
-                Image
-              </CFormLabel>
-              <CCol sm={9}>
-                <CFormInput
-                  type="file"
-                  id="image"
-                  name="image"
-                  onChange={handleInputChange}
-                  required
-                />
-              </CCol>
-            </CRow>
-          </CForm>
-        </CModalBody>
-        <CModalFooter>
-          <CButton color="secondary" onClick={() => setModalVisible(false)}>
-            Cancel
-          </CButton>
-          <CButton color="primary" onClick={handleSave} disabled={loading}>
-            {loading ? 'Loading...' : 'Save'}
-          </CButton>
-        </CModalFooter>
+            <CFormLabel className="mt-2">Active</CFormLabel>
+            <CFormInput name="active" value={form.active} onChange={handleInputChange} />
+          </CModalBody>
+          <CModalFooter>
+            <CButton color="secondary" onClick={() => setModalVisible(false)}>
+              Cancel
+            </CButton>
+            <CButton type="submit" color="primary">
+              {editData ? 'Update' : 'Create'}
+            </CButton>
+          </CModalFooter>
+        </CForm>
       </CModal>
-    </>
+    </CRow>
   )
 }
 

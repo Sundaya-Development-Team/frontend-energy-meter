@@ -17,6 +17,9 @@ const WarehousesPage = React.lazy(() => import('./views/admins/warehouses/Wareho
 const BalancesPage = React.lazy(() => import('./views/admins/warehouses/BalancesPage'))
 const MovementsPage = React.lazy(() => import('./views/admins/warehouses/MovementsPage'))
 
+//Receiving
+const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHeader'))
+
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
 const PraQC = React.lazy(() => import('./views/semiproduction/PraQC'))
@@ -355,6 +358,7 @@ const routes = [
     name: 'Quality Control On',
     element: QCOn,
   },
+  { path: '/receiving/receivingHeader', name: 'Receving Header', element: ReceivingHeader },
   { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
   { path: '/semiproduction/praqc', name: 'Pra-QC Semi Product', element: PraQC },
   { path: '/semiproduction/incoming', name: 'Incoming Semi Product', element: IncomingUnit },
