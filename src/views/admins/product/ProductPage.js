@@ -28,13 +28,17 @@ const ProductPage = () => {
   const [editData, setEditData] = useState(null)
   const [form, setForm] = useState({ name: '', sap_code: '', type: '', supplier: '', active: '' })
 
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  const [totalRows, setTotalRows] = useState(0)
+
   const fetchProducts = async () => {
     setLoading(true)
     try {
       const res = await backendProduct.get('/', {
         params: {
-          page: 1,
-          limit: 10,
+          page,
+          limit,
           sortBy: 'name',
           sortOrder: 'asc',
           include_details: true,
@@ -42,7 +46,9 @@ const ProductPage = () => {
           include_components: true,
         },
       })
+      const totalData = res.data.meta.pagination.totalItems
       setProducts(res.data.data || [])
+      setTotalRows(totalData || 0)
     } catch (error) {
       toast.error('Failed to fetch products')
     } finally {
@@ -52,7 +58,7 @@ const ProductPage = () => {
 
   useEffect(() => {
     fetchProducts()
-  }, [])
+  }, [page, limit])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -70,9 +76,9 @@ const ProductPage = () => {
         toast.success('Product created')
       }
       setModalVisible(false)
-      fetchProducts()
       setForm({ name: '', sap_code: '', type: '', supplier: '', active: '' })
       setEditData(null)
+      fetchProducts()
     } catch (error) {
       toast.error('Failed to save product')
     }
@@ -83,9 +89,9 @@ const ProductPage = () => {
     setForm({
       name: row.name,
       sap_code: row.sap_code,
-      type: row.details?.[0]?.type?.name,
-      supplier: row.details?.[0]?.supplier?.name,
-      active: row.active || '',
+      type: row.type.name || '',
+      supplier: row.supplier.name || '',
+      active: row.is_active ? 'Yes' : 'No' || '',
     })
     setModalVisible(true)
   }
@@ -104,27 +110,36 @@ const ProductPage = () => {
   const columns = [
     {
       name: 'No',
-      selector: (row, index) => index + 1,
       width: '60px',
-      cell: (row, index) => <div style={{ textAlign: 'center', width: '100%' }}>{index + 1}</div>,
+      cell: (row, index) => (
+        <div style={{ textAlign: 'center', width: '100%' }}>{(page - 1) * limit + index + 1}</div>
+      ),
     },
     { name: 'Name', selector: (row) => row.name, sortable: true },
     { name: 'SAP Code', selector: (row) => row.sap_code, sortable: true },
     {
       name: 'Type',
-      selector: (row) => row.details?.[0]?.type?.name || '-',
+      selector: (row) => row.type.name || '-',
       sortable: true,
     },
-    { name: 'Supplier', selector: (row) => row.details?.[0]?.supplier?.name, sortable: true },
-    { name: 'Active', selector: (row) => row.active || '-', sortable: true },
+    {
+      name: 'Supplier',
+      selector: (row) => row.supplier.name || '-',
+      sortable: true,
+    },
+    {
+      name: 'Active',
+      selector: (row) => (row.is_active ? 'Yes' : 'No'),
+      sortable: true,
+    },
     {
       name: 'Actions',
       cell: (row) => (
         <div className="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
-          <CButton size="sm" color="warning" className="px-3" onClick={() => handleEdit(row)}>
+          <CButton size="sm" color="warning" onClick={() => handleEdit(row)}>
             Edit
           </CButton>
-          <CButton size="sm" color="danger" className="px-3" onClick={() => handleDelete(row.id)}>
+          <CButton size="sm" color="danger" onClick={() => handleDelete(row.id)}>
             Delete
           </CButton>
         </div>
@@ -145,30 +160,25 @@ const ProductPage = () => {
             <strong>SAP Code:</strong> {data.sap_code}
           </CCol>
         </CRow>
-
         <CRow className="mb-2">
           <CCol xs={12} md={6}>
-            <strong>Type:</strong> {detail.type?.name || '-'}
+            <strong>Type:</strong> {data.type.name || '-'}
           </CCol>
           <CCol xs={12} md={6}>
-            <strong>Supplier:</strong> {detail.supplier?.name || '-'}
+            <strong>Supplier:</strong> {data.supplier.name || '-'}
           </CCol>
         </CRow>
-
         <CRow className="mb-2">
           <CCol xs={12} md={6}>
-            <strong>Active:</strong> {data.active ? 'Yes' : 'No'}
+            <strong>Active:</strong> {data.is_active ? 'Yes' : 'No'}
           </CCol>
         </CRow>
-
         <CRow className="mb-2">
           <CCol xs={12}>
             <strong>Image:</strong>
             <div className="mt-2">
               <img
-                src={
-                  'http://192.168.100.226:5000/api/v1/images/semi-product?path=2025-07-18_15-56-32-atas 4.jpg'
-                }
+                src={data.image_url || '-'}
                 alt="Product"
                 style={{
                   width: '100%',
@@ -202,6 +212,14 @@ const ProductPage = () => {
                 columns={columns}
                 data={products}
                 pagination
+                paginationServer
+                paginationTotalRows={totalRows}
+                paginationDefaultPage={page}
+                onChangePage={(page) => setPage(page)}
+                onChangeRowsPerPage={(newLimit, newPage) => {
+                  setLimit(newLimit)
+                  setPage(1)
+                }}
                 responsive
                 highlightOnHover
                 striped
