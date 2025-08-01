@@ -39,14 +39,13 @@ const ProductPage = () => {
   })
 
   const [imagePreview, setImagePreview] = useState(null)
-
   const [suppliers, setSuppliers] = useState([])
   const [types, setTypes] = useState([])
-
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [totalRows, setTotalRows] = useState(0)
 
+  // ambil data produk
   const fetchProducts = async () => {
     setLoading(true)
     try {
@@ -71,6 +70,7 @@ const ProductPage = () => {
     }
   }
 
+  //ambil data supplier
   const fetchSuppliers = async () => {
     try {
       const res = await axios.get('http://192.168.3.171:3030/api/suppliers', {
@@ -105,6 +105,7 @@ const ProductPage = () => {
     setForm((prev) => ({ ...prev, [name]: newValue }))
   }
 
+  // handle untuk create dan edit data
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -133,6 +134,7 @@ const ProductPage = () => {
     }
   }
 
+  // besihkan form
   const resetForm = () => {
     setForm({
       name: '',
@@ -146,6 +148,7 @@ const ProductPage = () => {
     setEditData(null)
   }
 
+  // handle untuk show modal dan data edit produk
   const handleEdit = (row) => {
     setEditData(row)
     setForm({
@@ -160,6 +163,7 @@ const ProductPage = () => {
     setModalVisible(true)
   }
 
+  // delete produk
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return
 
@@ -180,6 +184,7 @@ const ProductPage = () => {
     }
   }
 
+  // kolom / table
   const columns = [
     {
       name: 'No',
@@ -220,6 +225,7 @@ const ProductPage = () => {
     },
   ]
 
+  // details produk
   const ExpandedComponent = ({ data }) => (
     <div className="p-3 border-top bg-light rounded">
       <CRow className="mb-2">
