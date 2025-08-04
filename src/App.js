@@ -11,6 +11,9 @@ import './scss/examples.scss'
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
+// ToastContainer
+import ToastContainerWrapper from './views/components/ToastContainerWrapper'
+
 // Pages
 const Login = React.lazy(() => import('./views/pages/login/Login'))
 const Register = React.lazy(() => import('./views/pages/register/Register'))
@@ -37,6 +40,7 @@ const App = () => {
 
   return (
     <HashRouter>
+      <ToastContainerWrapper />
       <Suspense
         fallback={
           <div className="pt-3 text-center">

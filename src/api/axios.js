@@ -3,7 +3,8 @@ import axios from 'axios'
 
 const QUALITY_SERVICE = import.meta.env.VITE_QUALITY_SERVICE
 const UPLOADFILE = import.meta.env.VITE_UPLOAD
-const PRODUCT = import.meta.env.VITE_PRODUCT
+const VITE_PRODUCT = import.meta.env.VITE_PRODUCT
+const VITE_RECEIVING = import.meta.env.VITE_RECEIVING
 const PARTNER = import.meta.env.VITE_PARTNER
 const INCOMING = import.meta.env.VITE_INCOMING
 const TRACKEDITEMS = import.meta.env.VITE_TRACKEDITEMS
@@ -25,7 +26,11 @@ const BASE_SERVER = import.meta.env.VITE_SERVER
 // })
 
 export const backendProduct = axios.create({
-  baseURL: `${PRODUCT}/api/products`,
+  baseURL: `${VITE_PRODUCT}/api/products`,
+})
+
+export const backendReceving = axios.create({
+  baseURL: `${VITE_RECEIVING}/api/v1/purchase-orders`,
 })
 
 export const backendPartner = axios.create({
