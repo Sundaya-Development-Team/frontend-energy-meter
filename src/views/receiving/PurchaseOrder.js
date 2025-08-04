@@ -1,10 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from 'react'
-import axios from 'axios'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
 import { toast } from 'react-toastify'
-import { backendReceving } from '../../api/axios'
+import { backendReceiving } from '../../api/axios'
 
 import {
   CButton,
@@ -20,10 +17,16 @@ import {
   CSpinner,
 } from '@coreui/react'
 
+const getTodayJakarta = () => {
+  const now = new Date()
+  const jakartaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }))
+  return jakartaTime.toISOString().split('T')[0]
+}
+
 const ReceivingHeader = () => {
   const [formData, setFormData] = useState({
     po_number: '',
-    order_date: new Date(),
+    order_date: getTodayJakarta(),
     notes: '',
   })
 
@@ -41,24 +44,34 @@ const ReceivingHeader = () => {
     e.preventDefault()
     setLoading(true)
 
+    const jakartaDate = new Date(
+      new Date(formData.order_date).toLocaleString('en-US', {
+        timeZone: 'Asia/Jakarta',
+      }),
+    )
+
     const payload = {
       po_number: formData.po_number,
-      order_date: formData.order_date.toISOString(), // ISO format
+      order_date: formData.order_date,
       notes: formData.notes,
     }
 
+    // console.log('payload :', payload)
+
     try {
-      const response = await backendReceving.post('/', payload)
+      const response = await backendReceiving.post('/purchase-orders', payload)
       console.log('Success:', response.data)
       toast.success('Purchase Order submitted successfully!')
       setFormData({
         po_number: '',
-        order_date: new Date(),
+        order_date: getTodayJakarta(),
         notes: '',
       })
     } catch (error) {
       console.error('Error submitting PO:', error)
-      toast.error('Failed to submit PO. See console for details.')
+      const errorMessage =
+        error.response?.data?.message || 'Failed to submit PO. See console for details.'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -84,12 +97,11 @@ const ReceivingHeader = () => {
               </FormRow>
 
               <FormRow label="Order Date">
-                <DatePicker
-                  selected={formData.order_date}
-                  onChange={(date) => setFormData((prev) => ({ ...prev, order_date: date }))}
-                  dateFormat="yyyy-MM-dd"
-                  className="form-control"
-                  placeholderText="Select a date"
+                <CFormInput
+                  type="date"
+                  name="order_date"
+                  value={formData.order_date}
+                  onChange={handleInput}
                   required
                 />
               </FormRow>

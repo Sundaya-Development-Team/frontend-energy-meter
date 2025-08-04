@@ -13,61 +13,69 @@ import {
   CRow,
 } from '@coreui/react'
 import Select from 'react-select'
-import { backendProduct, backendPartner, backendAql } from '../../api/axios'
+import { backendProduct, backendReceiving } from '../../api/axios'
 
-/* -------------------------------------------------------------------------- */
-/* Helper functions                                                            */
-/* -------------------------------------------------------------------------- */
-
-// Ambil master product & partner data
 const fetchMasters = () =>
-  Promise.all([backendProduct.get('/master-products'), backendPartner.get('/master')])
+  backendProduct.get('/', {
+    params: {
+      page: 1,
+      limit: 100,
+      search: '',
+      sortBy: 'name',
+      sortOrder: 'asc',
+      include_details: true,
+      include_categories: true,
+      include_components: true,
+    },
+  })
 
-// Hitung sample size AQL berdasarkan quantity
-const fetchAqlSample = (sap_code, qc_stage, ref_quantity) =>
-  ref_quantity
-    ? backendAql
-        .get('/aql-settings/calculate', {
-          params: { sap_code, qc_stage, total_quantity: ref_quantity },
-        })
-        .then((r) => r.data.data.data.sample_size)
-    : Promise.resolve(0)
+const fetchPOs = () =>
+  backendReceiving.get('/purchase-orders', {
+    params: {
+      page: 1,
+      limit: 100,
+    },
+  })
 
-/* -------------------------------------------------------------------------- */
-/* Main component                                                              */
-/* -------------------------------------------------------------------------- */
 const ReceivingHeader = () => {
-  // Master data
-  const [sapData, setSapData] = useState([])
-  const [partnerData, setPartnerData] = useState([])
-
-  // Loading state
+  const [productsData, setProductsData] = useState([])
+  const [poOptions, setPoOptions] = useState([])
   const [loading, setLoading] = useState(false)
 
-  // Form data: partner_code pindah ke header
   const [formData, setFormData] = useState({
     reference_po: '',
     reference_gr: '',
-    partner_code: '',
     notes: '',
-    details: [], // array produk
+    receiving_date: '',
+    details: [],
   })
 
-  /* --------------------------- Effects ---------------------------------- */
-
-  // Ambil data master saat mount pertama kali
   useEffect(() => {
+    const todayJakarta = new Date().toLocaleDateString('en-CA', {
+      timeZone: 'Asia/Jakarta',
+    })
+    setFormData((prev) => ({ ...prev, receiving_date: todayJakarta }))
+
     fetchMasters()
-      .then(([sapRes, partnerRes]) => {
-        setSapData(sapRes.data.data)
-        setPartnerData(partnerRes.data.data)
+      .then((res) => setProductsData(res.data.data))
+      .catch((err) => console.error('Fetch masters error:', err))
+
+    fetchPOs()
+      .then((res) => {
+        const options = res.data.data.map((po) => ({
+          value: po.po_number,
+          label: po.po_number,
+        }))
+        setPoOptions(options)
       })
-      .catch((err) => console.error('fetch masters error:', err))
+      .catch((err) => console.error('Fetch POs error:', err))
   }, [])
 
-  /* ------------------------ Handlers ----------------------------------- */
+  const handleInput = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-  // Tambahkan row product baru
   const addProduct = () => {
     setFormData((prev) => ({
       ...prev,
@@ -75,92 +83,106 @@ const ReceivingHeader = () => {
         ...prev.details,
         {
           sap_code: '',
-          ref_quantity: '',
           name: '',
-          uom: '',
-          sample_size: 0, // nilai sample size per product
+          product_id: '',
+          product_type: '',
+          ref_quantity: '',
+          serialize: false,
         },
       ],
     }))
   }
 
-  // Handler field header (PO, GR, notes, partner)
-  const handleInput = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  // Handler partner dropdown
-  const handleSelectPartner = (option) => {
-    setFormData((prev) => ({
-      ...prev,
-      partner_code: option ? option.value : '',
-    }))
-  }
-
-  // Handler perubahan field product
-  const handleDetailChange = async (index, field, value) => {
+  const handleDetailChange = (index, field, value) => {
     setFormData((prev) => {
       const updated = [...prev.details]
+      const item = updated[index]
 
       if (field === 'sap_code') {
-        // update name & uom otomatis
-        const found = sapData.find((p) => p.sap_code === value)
-        updated[index].sap_code = value
-        updated[index].name = found ? found.name : ''
-        updated[index].uom = found?.uom?.code || ''
+        const selected = productsData.find((p) => p.sap_code === value)
+        item.sap_code = value
+        item.name = selected?.name || ''
+        item.product_id = selected?.id || ''
+        item.product_type = selected?.type?.name || ''
       } else if (field === 'ref_quantity') {
-        updated[index][field] = value
-
-        // Fetch sample size ketika quantity berubah
-        fetchAqlSample(updated[index].sap_code, 'Receiving Semi Product', Number(value))
-          .then((sample) => {
-            updated[index].sample_size = sample
-            setFormData((p) => ({ ...p, details: updated }))
-          })
-          .catch((err) => console.error('fetch sample error:', err))
-
-        return { ...prev } // keluar, biar sample update async
+        item[field] = Number(value)
       } else {
-        updated[index][field] = value
+        item[field] = value
       }
+
       return { ...prev, details: updated }
     })
   }
 
-  // Submit: tampilkan payload di console
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     try {
-      if (!formData.reference_po.trim()) return alert('Reference PO is required.')
-      if (!formData.partner_code.trim()) return alert('Partner is required.')
-      if (formData.details.length === 0) return alert('Please add at least one product.')
+      if (!formData.reference_po.trim()) {
+        alert('Reference PO is required.')
+        return
+      }
+
+      if (formData.details.length === 0) {
+        alert('Please add at least one product.')
+        return
+      }
+
+      const hasMissingProduct = formData.details.some(
+        (d) => !d.product_id || !d.ref_quantity || d.ref_quantity <= 0,
+      )
+
+      if (hasMissingProduct) {
+        alert('Ensure each product is selected and quantity is more than 0.')
+        return
+      }
+
       setLoading(true)
 
-      // Payload
       const payload = {
         reference_po: formData.reference_po,
         reference_gr: formData.reference_gr,
-        partner_code: formData.partner_code,
         notes: formData.notes,
+        receiving_date: formData.receiving_date,
+        received_by: 1001,
+        status: 'pending',
+        location: 'Receiving Area',
         details: formData.details.map((d) => ({
-          sap_code: d.sap_code,
-          ref_quantity: Number(d.ref_quantity),
-          sample_size: d.sample_size,
+          product_id: d.product_id,
+          quantity: Number(d.ref_quantity),
+          is_serialized: d.serialize,
         })),
       }
 
       console.log('Payload:', payload)
-      // await backendIncoming.post('/master-rp', payload)
-      // alert('Success')
+      console.log('PayloadDetails:', payload.details)
+
+      const response = await backendReceiving.post('//receiving-headers', payload)
+      toast.success('Purchase Order submitted successfully!')
+      const message =
+        response?.data?.message || 'Failed to submit Receiving. See console for details.'
+      toast.error(message)
+      // Reset form
+
+      const todayJakarta = new Date().toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Jakarta',
+      })
+      setFormData({
+        reference_po: '',
+        reference_gr: '',
+        notes: '',
+        receiving_date: todayJakarta,
+        details: [],
+      })
     } catch (err) {
-      alert(err.response?.data?.message || err.message)
+      const errorMessage =
+        error.response?.data?.message || 'Failed to submit PO. See console for details.'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
-  /* ------------------------------ Render --------------------------------- */
   return (
     <CRow>
       <CCol md={12}>
@@ -170,13 +192,15 @@ const ReceivingHeader = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              {/* Header */}
               <FormRow label="Reference PO">
-                <CFormInput
-                  name="reference_po"
-                  value={formData.reference_po}
-                  onChange={handleInput}
-                  required
+                <Select
+                  options={poOptions}
+                  value={poOptions.find((opt) => opt.value === formData.reference_po) || null}
+                  onChange={(opt) =>
+                    setFormData((prev) => ({ ...prev, reference_po: opt ? opt.value : '' }))
+                  }
+                  isClearable
+                  placeholder="Select PO"
                 />
               </FormRow>
 
@@ -188,25 +212,12 @@ const ReceivingHeader = () => {
                 />
               </FormRow>
 
-              <FormRow label="Partner">
-                <Select
-                  options={partnerData.map((p) => ({
-                    value: p.partner_code,
-                    label: p.name,
-                  }))}
-                  value={
-                    formData.partner_code
-                      ? {
-                          value: formData.partner_code,
-                          label:
-                            partnerData.find((p) => p.partner_code === formData.partner_code)
-                              ?.name || '',
-                        }
-                      : null
-                  }
-                  onChange={handleSelectPartner}
-                  placeholder="Select Partner"
-                  isClearable
+              <FormRow label="Receiving Date">
+                <CFormInput
+                  type="date"
+                  name="receiving_date"
+                  value={formData.receiving_date}
+                  onChange={handleInput}
                   required
                 />
               </FormRow>
@@ -220,22 +231,21 @@ const ReceivingHeader = () => {
                 />
               </FormRow>
 
-              {/* List products */}
               <CFormLabel className="fw-bold mt-3">List of Product</CFormLabel>
               <br />
-              <CButton color="primary" type="button" onClick={addProduct}>
+              <CButton color="primary" type="button" onClick={addProduct} className="mb-2">
                 + Add Product
               </CButton>
 
-              <table className="table table-bordered mt-2">
+              <table className="table table-bordered">
                 <thead>
                   <tr>
                     <th>#</th>
                     <th>SAP Code</th>
                     <th>Product Name</th>
-                    <th>UOM</th>
+                    <th>Product Type</th>
+                    <th>Serialize</th>
                     <th>Order Qty</th>
-                    <th>Sample Size</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -244,7 +254,7 @@ const ReceivingHeader = () => {
                       <td>{index + 1}</td>
                       <td>
                         <Select
-                          options={sapData.map((p) => ({
+                          options={productsData.map((p) => ({
                             value: p.sap_code,
                             label: p.sap_code,
                           }))}
@@ -261,19 +271,31 @@ const ReceivingHeader = () => {
                         <CFormInput value={item.name} readOnly />
                       </td>
                       <td>
-                        <CFormInput value={item.uom} readOnly />
+                        <CFormInput value={item.product_type ?? ''} readOnly />
+                      </td>
+                      <td>
+                        <Select
+                          options={[
+                            { value: true, label: 'True' },
+                            { value: false, label: 'False' },
+                          ]}
+                          value={{
+                            value: item.serialize,
+                            label: item.serialize ? 'True' : 'False',
+                          }}
+                          onChange={(opt) => handleDetailChange(index, 'serialize', opt.value)}
+                        />
                       </td>
                       <td>
                         <CFormInput
                           type="number"
-                          value={item.ref_quantity}
-                          onChange={(e) =>
-                            handleDetailChange(index, 'ref_quantity', e.target.value)
-                          }
+                          min={0}
+                          value={item.ref_quantity ?? ''}
+                          onChange={(e) => {
+                            const val = Math.max(0, Number(e.target.value))
+                            handleDetailChange(index, 'ref_quantity', val)
+                          }}
                         />
-                      </td>
-                      <td>
-                        <CFormInput value={item.sample_size} readOnly />
                       </td>
                     </tr>
                   ))}
@@ -293,7 +315,6 @@ const ReceivingHeader = () => {
   )
 }
 
-/* Komponen kecil util: FormRow */
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3">
     <CFormLabel className="col-sm-3 col-form-label">{label}</CFormLabel>

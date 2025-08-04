@@ -29,13 +29,17 @@ export const backendProduct = axios.create({
   baseURL: `${VITE_PRODUCT}/api/products`,
 })
 
-export const backendReceving = axios.create({
-  baseURL: `${VITE_RECEIVING}/api/v1/purchase-orders`,
+export const backendSupplier = axios.create({
+  baseURL: `${VITE_PRODUCT}/api/suppliers`,
 })
 
-export const backendPartner = axios.create({
-  baseURL: `${BASE_SERVER}/v1/partner`,
+export const backendReceiving = axios.create({
+  baseURL: `${VITE_RECEIVING}/api/v1`,
 })
+
+// export const backendPartner = axios.create({
+//   baseURL: `${BASE_SERVER}/v1/partner`,
+// })
 
 export const backendIncoming = axios.create({
   baseURL: `${BASE_SERVER}/v1/receiving-products`,
@@ -65,9 +69,9 @@ export const backendUploadFile = axios.create({
 //   baseURL: PRODUCT,
 // })
 
-// export const backendPartner = axios.create({
-//   baseURL: PARTNER,
-// })
+export const backendPartner = axios.create({
+  baseURL: PARTNER,
+})
 
 // export const backendIncoming = axios.create({
 //   baseURL: INCOMING,
