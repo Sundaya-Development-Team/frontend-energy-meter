@@ -22,7 +22,7 @@ import DataTable from 'react-data-table-component'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import axios from 'axios'
-import { backendProduct } from '../../../api/axios'
+import { backendProduct, backendSupplier, backendProductTypes } from '../../../api/axios'
 import AsyncSelect from 'react-select/async'
 
 const SearchBar = ({ value, onChange }) => (
@@ -97,7 +97,7 @@ const ProductPage = () => {
 
   const loadSupplierOptions = async (inputValue) => {
     try {
-      const res = await axios.get('http://192.168.3.171:3030/api/suppliers', {
+      const res = await backendSupplier.get('/', {
         params: {
           search: inputValue,
           page: 1,
@@ -118,7 +118,7 @@ const ProductPage = () => {
 
   const loadTypeOptions = async (inputValue) => {
     try {
-      const res = await axios.get('http://192.168.3.171:3030/api/product-types', {
+      const res = await backendProductTypes.get('/', {
         params: {
           search: inputValue,
           page: 1,

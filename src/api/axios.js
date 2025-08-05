@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const QUALITY_SERVICE = import.meta.env.VITE_QUALITY_SERVICE
 const UPLOADFILE = import.meta.env.VITE_UPLOAD
-const VITE_PRODUCT = import.meta.env.VITE_PRODUCT
+const VITE_MASTER_DATA = import.meta.env.VITE_MASTER_DATA
 const VITE_RECEIVING = import.meta.env.VITE_RECEIVING
 const PARTNER = import.meta.env.VITE_PARTNER
 const INCOMING = import.meta.env.VITE_INCOMING
@@ -12,6 +12,7 @@ const AQL = import.meta.env.VITE_AQL
 const WAREHOUSE = import.meta.env.VITE_WAREHOUSE
 
 const BASE_SERVER = import.meta.env.VITE_SERVER
+const VITE_SERVER_DATA = import.meta.env.VITE_SERVER_DATA
 
 // export const backendQualityService = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/quality-service`,
@@ -26,15 +27,19 @@ const BASE_SERVER = import.meta.env.VITE_SERVER
 // })
 
 export const backendProduct = axios.create({
-  baseURL: `${VITE_PRODUCT}/api/products`,
+  baseURL: `${VITE_SERVER_DATA}/api/v2/master-data/products`,
 })
 
 export const backendSupplier = axios.create({
-  baseURL: `${VITE_PRODUCT}/api/suppliers`,
+  baseURL: `${VITE_SERVER_DATA}/api/v2/master-data/suppliers`,
+})
+
+export const backendProductTypes = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/master-data/product-types`,
 })
 
 export const backendReceiving = axios.create({
-  baseURL: `${VITE_RECEIVING}/api/v1`,
+  baseURL: `${VITE_SERVER_DATA}/api/v2/receiving`,
 })
 
 // export const backendPartner = axios.create({
