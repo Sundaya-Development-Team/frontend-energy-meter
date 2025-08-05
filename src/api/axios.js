@@ -26,6 +26,7 @@ const VITE_SERVER_DATA = import.meta.env.VITE_SERVER_DATA
 //   baseURL: `${BASE_SERVER}/v1/products`,
 // })
 
+//Master Data
 export const backendProduct = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/master-data/products`,
 })
@@ -38,6 +39,7 @@ export const backendProductTypes = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/master-data/product-types`,
 })
 
+//Receiving
 export const backendReceiving = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/receiving`,
 })

@@ -12,7 +12,7 @@ import './scss/examples.scss'
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
 // ToastContainer
-import ToastContainerWrapper from './views/components/ToastContainerWrapper'
+import ToastContainerWrapper from './components/ToastContainerWrapper'
 
 // Pages
 const Login = React.lazy(() => import('./views/pages/login/Login'))

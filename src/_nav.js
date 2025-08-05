@@ -51,6 +51,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Recevicing List',
+    to: '/receiving/receivingList',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Recevicing Products',
     to: '/receiving/receivingHeader',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,

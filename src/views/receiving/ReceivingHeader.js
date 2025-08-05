@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import {
   CButton,
   CCard,
@@ -47,6 +48,7 @@ const ReceivingHeader = () => {
     reference_gr: '',
     notes: '',
     receiving_date: '',
+    receiving_batch: '',
     details: [],
   })
 
@@ -63,7 +65,7 @@ const ReceivingHeader = () => {
     fetchPOs()
       .then((res) => {
         const options = res.data.data.map((po) => ({
-          value: po.po_number,
+          value: po.id,
           label: po.po_number,
         }))
         setPoOptions(options)
@@ -118,7 +120,7 @@ const ReceivingHeader = () => {
     e.preventDefault()
 
     try {
-      if (!formData.reference_po.trim()) {
+      if (!formData.reference_po) {
         alert('Reference PO is required.')
         return
       }
@@ -140,28 +142,31 @@ const ReceivingHeader = () => {
       setLoading(true)
 
       const payload = {
-        reference_po: formData.reference_po,
-        reference_gr: formData.reference_gr,
+        purchase_orders_id: formData.reference_po,
+        gr_number: formData.reference_gr,
         notes: formData.notes,
-        receiving_date: formData.receiving_date,
-        received_by: 1001,
-        status: 'pending',
-        location: 'Receiving Area',
-        details: formData.details.map((d) => ({
+        received_date: formData.receiving_date, // sesuai Postman kamu
+        received_by: 5, // atau ambil dari user login jika perlu
+        batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`, // pastikan string
+        location: 'Warehouse B', // bisa kamu ubah sesuai lokasi default
+        receiving_items: formData.details.map((d) => ({
           product_id: d.product_id,
-          quantity: Number(d.ref_quantity),
           is_serialized: d.serialize,
+          quantity: Number(d.ref_quantity),
+          item_type: d.product_type,
+          notes: d.notes || '', // jika kamu mau tambahkan catatan per item
         })),
       }
 
       console.log('Payload:', payload)
       console.log('PayloadDetails:', payload.details)
 
-      const response = await backendReceiving.post('//receiving-headers', payload)
-      toast.success('Purchase Order submitted successfully!')
+      const response = await backendReceiving.post('/receiving-headers', payload)
+
       const message =
         response?.data?.message || 'Failed to submit Receiving. See console for details.'
-      toast.error(message)
+
+      toast.success(message)
       // Reset form
 
       const todayJakarta = new Date().toLocaleDateString('en-CA', {
@@ -172,11 +177,13 @@ const ReceivingHeader = () => {
         reference_gr: '',
         notes: '',
         receiving_date: todayJakarta,
+        receiving_batch: '',
         details: [],
       })
     } catch (err) {
+      console.error('Submit error:', err)
       const errorMessage =
-        error.response?.data?.message || 'Failed to submit PO. See console for details.'
+        err.response?.data?.message || 'Failed to submit PO. See console for details.'
       toast.error(errorMessage)
     } finally {
       setLoading(false)
@@ -218,6 +225,19 @@ const ReceivingHeader = () => {
                   name="receiving_date"
                   value={formData.receiving_date}
                   onChange={handleInput}
+                  required
+                />
+              </FormRow>
+
+              <FormRow label="Receiving Batch">
+                <CFormInput
+                  type="text"
+                  name="receiving_batch"
+                  value={formData.receiving_batch}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '') // hanya angka, tetap string
+                    setFormData((prev) => ({ ...prev, receiving_batch: value }))
+                  }}
                   required
                 />
               </FormRow>
