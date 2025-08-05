@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState, useCallback } from 'react'
 import {
-  CButton,
   CCard,
   CCardBody,
   CCardHeader,
@@ -9,10 +8,12 @@ import {
   CFormInput,
   CRow,
   CSpinner,
+  CButton,
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { useNavigate } from 'react-router-dom'
 import { backendReceiving } from '../../api/axios'
 
 const SearchBar = ({ value, onChange }) => (
@@ -36,6 +37,13 @@ const ReceivingList = () => {
   const [totalRows, setTotalRows] = useState(0)
   const [searchKeyword, setSearchKeyword] = useState('')
 
+  const navigate = useNavigate()
+
+  const handleDetailClick = (id) => {
+    navigate(`/receiving/receivingDetail/${id}`)
+  }
+
+  // Fetch receiving data
   const fetchReceiving = useCallback(async () => {
     setLoading(true)
     try {
@@ -47,6 +55,7 @@ const ReceivingList = () => {
           status: '',
         },
       })
+
       setData(res.data.data || [])
       setTotalRows(res.data.pagination?.totalCount || 0)
     } catch (error) {
@@ -60,9 +69,11 @@ const ReceivingList = () => {
     const delayDebounce = setTimeout(() => {
       fetchReceiving()
     }, 500)
+
     return () => clearTimeout(delayDebounce)
   }, [fetchReceiving])
 
+  // DataTable columns
   const columns = [
     {
       name: 'No',
@@ -72,48 +83,27 @@ const ReceivingList = () => {
     { name: 'GR Number', selector: (row) => row.gr_number, sortable: true },
     { name: 'PO Number', selector: (row) => row.purchase_order?.po_number || '-', sortable: true },
     { name: 'Batch', selector: (row) => row.batch },
-    { name: 'Received Date', selector: (row) => new Date(row.received_date).toLocaleDateString() },
+    {
+      name: 'Received Date',
+      selector: (row) =>
+        row.received_date ? new Date(row.received_date).toLocaleDateString() : '-',
+    },
     { name: 'Location', selector: (row) => row.location },
-    { name: 'Status', selector: (row) => row.status },
+    { name: 'Status', selector: (row) => row.status || '-' },
+    {
+      name: 'Actions',
+      cell: (row) => (
+        <div className="d-flex gap-2">
+          <CButton size="sm" color="info" onClick={() => handleDetailClick(row.id)}>
+            Detail
+          </CButton>
+        </div>
+      ),
+      ignoreRowClick: true,
+      // allowOverflow: true,
+      // button: true,
+    },
   ]
-
-  const ExpandedComponent = ({ data }) => (
-    <div className="p-3 border-top bg-light rounded">
-      <CRow className="mb-2">
-        <CCol md={6}>
-          <strong>GR Number:</strong> {data.gr_number}
-        </CCol>
-        <CCol md={6}>
-          <strong>PO Number:</strong> {data.purchase_order?.po_number || '-'}
-        </CCol>
-      </CRow>
-      <CRow className="mb-2">
-        <CCol md={6}>
-          <strong>Received By:</strong> {data.received_by}
-        </CCol>
-        <CCol md={6}>
-          <strong>Location:</strong> {data.location}
-        </CCol>
-      </CRow>
-      <CRow>
-        <CCol md={12}>
-          <strong>Notes:</strong> {data.notes || '-'}
-        </CCol>
-      </CRow>
-      <CRow className="mb-2">
-        <CCol md={12}>
-          <strong>Items:</strong>
-          <ul className="mt-2">
-            {data.receiving_items?.map((item, index) => (
-              <li key={index}>
-                <strong>{item.item_type}</strong> – Qty: {item.quantity}
-              </li>
-            ))}
-          </ul>
-        </CCol>
-      </CRow>
-    </div>
-  )
 
   return (
     <CRow>
@@ -153,8 +143,6 @@ const ReceivingList = () => {
                 responsive
                 highlightOnHover
                 striped
-                expandableRows
-                expandableRowsComponent={ExpandedComponent}
               />
             )}
           </CCardBody>

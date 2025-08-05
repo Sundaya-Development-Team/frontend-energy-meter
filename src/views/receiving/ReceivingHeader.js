@@ -148,7 +148,7 @@ const ReceivingHeader = () => {
         received_date: formData.receiving_date, // sesuai Postman kamu
         received_by: 5, // atau ambil dari user login jika perlu
         batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`, // pastikan string
-        location: 'Warehouse B', // bisa kamu ubah sesuai lokasi default
+        location: 'Receiving Area', // bisa kamu ubah sesuai lokasi default
         receiving_items: formData.details.map((d) => ({
           product_id: d.product_id,
           is_serialized: d.serialize,

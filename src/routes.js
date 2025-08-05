@@ -21,6 +21,7 @@ const MovementsPage = React.lazy(() => import('./views/admins/warehouses/Movemen
 const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder'))
 const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHeader'))
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
+const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDetail'))
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
@@ -361,8 +362,14 @@ const routes = [
     element: QCOn,
   },
   { path: '/receiving/receivingList', name: 'Receving Header', element: ReceivingList },
+  {
+    path: '/receiving/receivingDetail/:receivingHeaderId',
+    name: 'Receiving Detail',
+    element: ReceivingDetail,
+  },
   { path: '/receiving/receivingHeader', name: 'Receving Header', element: ReceivingHeader },
   { path: '/receiving/purchaseOrder', name: 'Purchase Order', element: PurchaseOrder },
+
   { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
   { path: '/semiproduction/praqc', name: 'Pra-QC Semi Product', element: PraQC },
   { path: '/semiproduction/incoming', name: 'Incoming Semi Product', element: IncomingUnit },
