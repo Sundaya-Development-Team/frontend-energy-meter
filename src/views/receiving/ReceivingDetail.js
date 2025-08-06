@@ -19,6 +19,7 @@ import {
   CFormInput,
   CPagination,
   CPaginationItem,
+  CFormTextarea,
 } from '@coreui/react'
 import { backendReceiving } from '../../api/axios'
 import { toast } from 'react-toastify'
@@ -48,7 +49,10 @@ const ReceivingDetail = () => {
   const [items, setItems] = useState([])
 
   const [scanningItem, setScanningItem] = useState(null)
-  const [formData, setFormData] = useState({ serialNumber: '' })
+  const [formData, setFormData] = useState({
+    serialNumber: '',
+    notes: '',
+  })
   const [scannedQty, setScannedQty] = useState(0)
   const [trackedTotal, setTrackedTotal] = useState(0)
   const [isFormLocked, setIsFormLocked] = useState(false)
@@ -160,6 +164,42 @@ const ReceivingDetail = () => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleAccept = async () => {
+    console.log('Accept Handle')
+
+    try {
+      const payload = {
+        status: 'accept',
+      }
+
+      await backendReceiving.put(`/receiving-headers/${receivingHeaderId}`, payload)
+      toast.success('Receiving rejected successfully')
+      fetchDetail() // refresh detail after reject
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || error?.message || 'Gagal melakukan reject pada receiving',
+      )
+    }
+  }
+
+  const handleReject = async () => {
+    if (!window.confirm('Are you sure you want to REJECT this receiving?')) return
+
+    try {
+      const payload = {
+        status: 'reject',
+      }
+
+      await backendReceiving.put(`/receiving-headers/${receivingHeaderId}`, payload)
+      toast.success('Receiving rejected successfully')
+      fetchDetail() // refresh detail after reject
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || error?.message || 'Gagal melakukan reject pada receiving',
+      )
+    }
+  }
+
   const handleSerial = async () => {
     const serialNumber = formData.serialNumber.replace(/\s+/g, '')
     if (!serialNumber) return
@@ -223,38 +263,69 @@ const ReceivingDetail = () => {
             <strong>Receiving Detail - GR Number: {header?.gr_number}</strong>
           </CCardHeader>
           <CCardBody>
-            <p>
-              <strong>PO Number:</strong> {header?.purchase_order?.po_number || '-'}
-            </p>
-            <p>
-              <strong>Batch:</strong> {header?.batch}
-            </p>
-            <p>
-              <strong>Status:</strong>{' '}
-              <CBadge
-                color={
-                  header?.status === 'completed'
-                    ? 'success'
-                    : header?.status === 'rejected'
-                      ? 'danger'
-                      : 'warning'
-                }
-              >
-                {header?.status}
-              </CBadge>
-            </p>
-            <p>
-              <strong>Received Date:</strong>{' '}
-              {header?.received_date ? new Date(header.received_date).toLocaleDateString() : '-'}
-            </p>
-            <p>
-              <strong>Location:</strong> {header?.location}
-            </p>
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">PO Number</div>
+                <div>{header?.purchase_order?.po_number || '-'}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">Batch</div>
+                <div>{header?.batch || '-'}</div>
+              </CCol>
+            </CRow>
 
-            <h5 className="mt-4">Receiving Items</h5>
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">Status</div>
+                <CBadge
+                  color={
+                    header?.status === 'completed'
+                      ? 'success'
+                      : header?.status === 'rejected'
+                        ? 'danger'
+                        : 'warning'
+                  }
+                >
+                  {header?.status}
+                </CBadge>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">Received Date</div>
+                <div>
+                  {header?.received_date
+                    ? new Date(header.received_date).toLocaleDateString()
+                    : '-'}
+                </div>
+              </CCol>
+            </CRow>
+
+            {/* <CRow className="mb-3">
+              <CCol md={6}>
+                <FormRow label="Notes">
+                  <CFormTextarea
+                    rows={3}
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInput}
+                    placeholder="Write any additional notes"
+                  />
+                </FormRow>
+              </CCol>
+
+              <CCol md={6}>
+                <div className="fw-semibold">Location</div>
+                <div>{header?.location || '-'}</div>
+              </CCol>
+            </CRow> */}
+
+            <CRow className="mb-3"></CRow>
+
+            <h5 className="mt-4">
+              <b>Receiving Items</b>
+            </h5>
             <CTable bordered responsive>
               <CTableHead>
-                <CTableRow>
+                <CTableRow className="text-center">
                   <CTableHeaderCell>No</CTableHeaderCell>
                   <CTableHeaderCell>Product</CTableHeaderCell>
                   <CTableHeaderCell>Item Type</CTableHeaderCell>
@@ -266,7 +337,7 @@ const ReceivingDetail = () => {
               <CTableBody>
                 {items.length > 0 ? (
                   items.map((item, index) => (
-                    <CTableRow key={item.id || index}>
+                    <CTableRow key={item.id || index} className="text-center">
                       <CTableDataCell>{index + 1}</CTableDataCell>
                       <CTableDataCell>{item.product.data.name || '-'}</CTableDataCell>
                       <CTableDataCell>{item.item_type}</CTableDataCell>
@@ -274,7 +345,12 @@ const ReceivingDetail = () => {
                       <CTableDataCell>{item.is_serialized ? 'Yes' : 'No'}</CTableDataCell>
                       <CTableDataCell>
                         {item.is_serialized && (
-                          <CButton size="sm" color="primary" onClick={() => handleScan(item)}>
+                          <CButton
+                            size="sm"
+                            color="primary"
+                            onClick={() => handleScan(item)}
+                            className="d-block mx-auto"
+                          >
                             Scan
                           </CButton>
                         )}
@@ -290,6 +366,19 @@ const ReceivingDetail = () => {
                 )}
               </CTableBody>
             </CTable>
+
+            {header?.status !== 'completed' && (
+              <div className="d-flex justify-content-between mt-3">
+                <CCol md={12} className="d-flex justify-content-end align-items-end">
+                  <CButton color="danger" className="me-2 text-white" onClick={handleReject}>
+                    Reject
+                  </CButton>
+                  <CButton color="success" className="text-white" onClick={handleAccept}>
+                    Accept
+                  </CButton>
+                </CCol>
+              </div>
+            )}
           </CCardBody>
         </CCard>
       </CCol>
