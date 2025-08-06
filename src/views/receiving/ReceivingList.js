@@ -52,7 +52,7 @@ const ReceivingList = () => {
           page,
           limit,
           search: searchKeyword,
-          status: '',
+          status: '', //
         },
       })
 
