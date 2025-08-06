@@ -295,43 +295,40 @@ const ReceivingDetail = () => {
       </CCol>
 
       {scanningItem && (
-        <CRow className="align-items-stretch">
-          {/* Kiri: Info dan Input */}
-          <CCol md={6} className="h-100">
-            <CCard className="mb-4 h-100">
-              <CCardHeader>
-                <strong>Scan Serial Number : {scanningItem.itemName || '-'} </strong>
-              </CCardHeader>
-              <CCardBody>
-                {/* <h5>Scan For: {scanningItem.itemName || '-'}</h5> */}
-                <FormRow label="Serial Number" labelCols="2">
-                  <CFormInput
-                    name="serialNumber"
-                    value={formData.serialNumber}
-                    onChange={handleInput}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        handleSerial()
-                      }
-                    }}
-                    disabled={isFormLocked}
-                  />
-                </FormRow>
-                <CounterCard title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                <CounterCard title="Remaining Quantity" value={scanningItem.remainingStage} />
-              </CCardBody>
-            </CCard>
-          </CCol>
-
-          {/* Kanan: Tabel Serial Numbers */}
-          {scanningItem?.serialNumbers?.length > 0 && (
-            <CCol md={6} className="h-100">
+        <CCol xs={12}>
+          <CRow>
+            {' '}
+            {/* Kiri: Info dan Input */}
+            <CCol md={6}>
               <CCard className="mb-4 h-100">
                 <CCardHeader>
-                  <strong>
-                    Staged Serial Numbers || Total Staged: {scanningItem.totalStaged}{' '}
-                  </strong>
+                  <strong>Scan Serial Number : {scanningItem.itemName || '-'}</strong>
+                </CCardHeader>
+                <CCardBody>
+                  <FormRow label="Serial Number" labelCols="2">
+                    <CFormInput
+                      name="serialNumber"
+                      value={formData.serialNumber}
+                      onChange={handleInput}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleSerial()
+                        }
+                      }}
+                      disabled={isFormLocked}
+                    />
+                  </FormRow>
+                  <CounterCard title="Expected Quantity" value={scanningItem.expectedQuantity} />
+                  <CounterCard title="Remaining Quantity" value={scanningItem.remainingStage} />
+                </CCardBody>
+              </CCard>
+            </CCol>
+            {/* Kanan: Tabel Serial Numbers */}
+            <CCol md={6}>
+              <CCard className="mb-4 h-100">
+                <CCardHeader>
+                  <strong>Staged Serial Numbers || Total Staged: {scanningItem.totalStaged}</strong>
                 </CCardHeader>
                 <CCardBody className="d-flex flex-column">
                   <div className="flex-grow-1 overflow-auto">
@@ -368,7 +365,6 @@ const ReceivingDetail = () => {
                       >
                         Previous
                       </CPaginationItem>
-
                       {Array.from({
                         length: Math.ceil(scanningItem.serialNumbers.length / itemsPerPage),
                       }).map((_, i) => (
@@ -380,7 +376,6 @@ const ReceivingDetail = () => {
                           {i + 1}
                         </CPaginationItem>
                       ))}
-
                       <CPaginationItem
                         disabled={
                           currentPage ===
@@ -395,8 +390,8 @@ const ReceivingDetail = () => {
                 </CCardBody>
               </CCard>
             </CCol>
-          )}
-        </CRow>
+          </CRow>
+        </CCol>
       )}
     </CRow>
   )
