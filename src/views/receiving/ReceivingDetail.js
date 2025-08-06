@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -59,8 +58,7 @@ const ReceivingDetail = () => {
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
-
-  const fetchDetail = async () => {
+  const fetchDetail = useCallback(async () => {
     setLoading(true)
     try {
       const res = await backendReceiving.get(`/receiving-headers/${receivingHeaderId}`)
@@ -72,23 +70,11 @@ const ReceivingDetail = () => {
     } finally {
       setLoading(false)
     }
-  }
-
-  // const fetchStaging = async () => {
-  //   setLoading(true)
-  //   try {
-  //     await backendReceiving.get(`/serial-staging/receiving-header/${receivingHeaderId}`)
-  //   } catch (error) {
-  //     toast.error('Failed to fetch receiving Staging')
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
+  }, [receivingHeaderId]) // cegah dependency
 
   useEffect(() => {
     fetchDetail()
-    // fetchStaging()
-  }, [receivingHeaderId])
+  }, [fetchDetail])
 
   const handleScan = (item) => {
     fetchStagingItem(item)
