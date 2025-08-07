@@ -63,8 +63,19 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Tracking',
+  },
+  {
+    component: CNavItem,
+    name: 'Tracking List',
+    to: '/tracking/trackingList',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
     name: 'Semi Production',
   },
+
   // {
   //   component: CNavItem,
   //   name: 'Incoming Unit',
