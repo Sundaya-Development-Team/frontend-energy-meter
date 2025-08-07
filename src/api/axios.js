@@ -44,6 +44,10 @@ export const backendReceiving = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/receiving`,
 })
 
+export const backendTracking = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/tracking`,
+})
+
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,
 // })

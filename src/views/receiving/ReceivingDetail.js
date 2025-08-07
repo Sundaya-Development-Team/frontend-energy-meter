@@ -272,9 +272,9 @@ const ReceivingDetail = () => {
                 <div className="fw-semibold">Status</div>
                 <CBadge
                   color={
-                    header?.status === 'completed'
+                    header?.status === 'complete'
                       ? 'success'
-                      : header?.status === 'rejected'
+                      : header?.status === 'reject'
                         ? 'danger'
                         : 'warning'
                   }
