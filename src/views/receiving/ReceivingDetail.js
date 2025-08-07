@@ -172,7 +172,7 @@ const ReceivingDetail = () => {
       const successMessage = response?.data?.message || 'Receiving updated successfully'
       console.log('message : ', successMessage)
       toast.success(successMessage)
-      // fetchDetail() // refresh detail
+      fetchDetail() // refresh detail
     } catch (error) {
       const failures = error?.response?.data?.message?.failures
 
