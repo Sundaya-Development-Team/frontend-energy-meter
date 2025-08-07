@@ -66,9 +66,10 @@ const ReceivingList = () => {
   }, [page, limit, searchKeyword])
 
   useEffect(() => {
+    const debounceDelay = 10
     const delayDebounce = setTimeout(() => {
       fetchReceiving()
-    }, 500)
+    }, debounceDelay)
 
     return () => clearTimeout(delayDebounce)
   }, [fetchReceiving])
