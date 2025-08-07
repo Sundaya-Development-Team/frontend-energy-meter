@@ -168,7 +168,7 @@ const TrackingDetail = () => {
         )}
 
         {/* Parent Of */}
-        {detail.parentOf?.length > 0 && (
+        {/* {detail.parentOf?.length > 0 && (
           <>
             <h5 className="mt-4 mb-3">Parent Of (Child Components)</h5>
             <CTable bordered>
@@ -190,10 +190,10 @@ const TrackingDetail = () => {
               </CTableBody>
             </CTable>
           </>
-        )}
+        )} */}
 
         {/* Component Of */}
-        {detail.componentOf?.length > 0 && (
+        {/* {detail.componentOf?.length > 0 && (
           <>
             <h5 className="mt-4 mb-3">Component Of (Parent Assembly)</h5>
             <CTable bordered>
@@ -215,7 +215,7 @@ const TrackingDetail = () => {
               </CTableBody>
             </CTable>
           </>
-        )}
+        )} */}
       </CCardBody>
     </CCard>
   )
