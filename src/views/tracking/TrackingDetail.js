@@ -143,6 +143,7 @@ const TrackingDetail = () => {
                   <CTableHeaderCell>Result</CTableHeaderCell>
                   <CTableHeaderCell>Location</CTableHeaderCell>
                   <CTableHeaderCell>Notes</CTableHeaderCell>
+                  <CTableHeaderCell>Download Report</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
@@ -160,6 +161,7 @@ const TrackingDetail = () => {
                     </CTableDataCell>
                     <CTableDataCell>{qc.qc_place}</CTableDataCell>
                     <CTableDataCell>{qc.notes}</CTableDataCell>
+                    <CTableDataCell>{'-'}</CTableDataCell>
                   </CTableRow>
                 ))}
               </CTableBody>
