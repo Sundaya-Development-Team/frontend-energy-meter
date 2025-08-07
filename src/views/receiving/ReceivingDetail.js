@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CCard,
@@ -77,7 +77,14 @@ const ReceivingDetail = () => {
   }, [fetchDetail])
 
   const handleScan = (item) => {
-    fetchStagingItem(item)
+    if (scanningItem?.itemId === item.id) {
+      setScanningItem(null)
+      setCurrentPage(1)
+    } else {
+      fetchStagingItem(item)
+      setCurrentPage(1)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   const paginatedSerialNumbers = useMemo(() => {
@@ -103,7 +110,7 @@ const ReceivingDetail = () => {
   }
 
   const filterStageingItem = (item, stagingRes) => {
-    console.log('item scan : ', item.id)
+    // console.log('item scan : ', item.id)
 
     const itemName = item.product.data.name
     const stagingSummary = stagingRes.data.data.staging_summary
