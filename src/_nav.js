@@ -68,7 +68,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Tracking List',
-    to: '/tracking/trackingList',
+    to: '/tracking/list',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {

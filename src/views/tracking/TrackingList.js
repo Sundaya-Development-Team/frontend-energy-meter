@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { CCard, CCardBody, CFormCheck, CSpinner } from '@coreui/react'
+import { CCard, CCardBody, CFormCheck, CSpinner, CButton } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { toast } from 'react-toastify'
 import { backendTracking } from '../../api/axios'
+import { useNavigate } from 'react-router-dom'
+
 const TrackingList = () => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
@@ -12,6 +14,8 @@ const TrackingList = () => {
   const [searchKeyword, setSearchKeyword] = useState('')
   const [filterSerialized, setFilterSerialized] = useState(true)
   const [filterNonSerialized, setFilterNonSerialized] = useState(true)
+
+  const navigate = useNavigate()
 
   const fetchTracking = useCallback(async () => {
     setLoading(true)
@@ -33,8 +37,6 @@ const TrackingList = () => {
       } else if (!filterSerialized && filterNonSerialized) {
         params.is_serialize = false
       }
-      // jika keduanya true, tidak kirim filter
-      // jika keduanya false, tetap dikirim agar backend tahu (optional)
 
       const res = await backendTracking.get('/', { params })
 
@@ -65,13 +67,27 @@ const TrackingList = () => {
     setPage(1)
   }
 
+  const handleDetailClick = (id) => {
+    const trackingId = id
+    navigate(`/tracking/detail/${trackingId}`)
+  }
+
   const columns = [
     { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
     { name: 'Item Code', selector: (row) => row.code_item, sortable: true },
     { name: 'Batch', selector: (row) => row.batch, sortable: true },
     { name: 'Qty', selector: (row) => row.original_quantity, sortable: true },
     { name: 'Serialized', selector: (row) => (row.is_serialize ? 'Yes' : 'No'), sortable: true },
-    { name: 'Status', selector: (row) => row.status, sortable: true },
+    { name: 'Tracking', selector: (row) => row.tracking_type, sortable: true },
+    {
+      name: 'Actions',
+      cell: (row) => (
+        <CButton size="sm" color="primary" onClick={() => handleDetailClick(row.id)}>
+          Detail
+        </CButton>
+      ),
+      ignoreRowClick: true,
+    },
   ]
 
   return (

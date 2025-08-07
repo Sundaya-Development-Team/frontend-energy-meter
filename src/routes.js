@@ -25,6 +25,7 @@ const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDeta
 
 //Tracking
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
+const TrackingDetail = React.lazy(() => import('./views/tracking/TrackingDetail'))
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
@@ -374,7 +375,10 @@ const routes = [
   { path: '/receiving/receivingHeader', name: 'Receving Header', element: ReceivingHeader },
   { path: '/receiving/purchaseOrder', name: 'Purchase Order', element: PurchaseOrder },
   //Tracking
-  { path: '/tracking/TrackingList', name: 'Tracking List', element: TrackingList },
+  { path: '/tracking/list', name: 'Tracking List', element: TrackingList },
+  { path: '/tracking/detail/:trackingId', name: 'Tracking Detail', element: TrackingDetail },
+
+  //Semi Production
   { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
   { path: '/semiproduction/praqc', name: 'Pra-QC Semi Product', element: PraQC },
   { path: '/semiproduction/incoming', name: 'Incoming Semi Product', element: IncomingUnit },
