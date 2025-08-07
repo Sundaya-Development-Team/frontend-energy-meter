@@ -165,13 +165,26 @@ const ReceivingDetail = () => {
         status: 'accept',
       }
 
-      await backendReceiving.put(`/receiving-headers/${receivingHeaderId}`, payload)
-      toast.success('Receiving rejected successfully')
-      fetchDetail() // refresh detail after reject
-    } catch (error) {
-      toast.error(
-        error?.response?.data?.message || error?.message || 'Gagal melakukan reject pada receiving',
+      const response = await backendReceiving.put(
+        `/receiving-headers/${receivingHeaderId}`,
+        payload,
       )
+      const successMessage = response?.data?.message || 'Receiving updated successfully'
+      console.log('message : ', successMessage)
+      toast.success(successMessage)
+      // fetchDetail() // refresh detail
+    } catch (error) {
+      const failures = error?.response?.data?.message?.failures
+
+      if (Array.isArray(failures) && failures.length > 0) {
+        failures.forEach((f) => {
+          toast.error(f.message)
+        })
+      } else {
+        toast.error(
+          error?.response?.data?.message?.message || 'Gagal melakukan update pada receiving',
+        )
+      }
     }
   }
 
