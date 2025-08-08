@@ -33,6 +33,9 @@ const PraQC = React.lazy(() => import('./views/semiproduction/PraQC'))
 const QCUnits = React.lazy(() => import('./views/semiproduction/QCUnits'))
 const ReportQCUnit = React.lazy(() => import('./views/semiproduction/ReportQCUnit'))
 
+//MasterForm QC
+const NonAqlUnits = React.lazy(() => import('./views/production/master-format/nonaql-units'))
+
 //Production
 const BatchingProduction = React.lazy(() => import('./views/production/BatchingProduction'))
 
@@ -210,7 +213,8 @@ const routes = [
   // { path: '/notifications/alerts', name: 'Alerts', element: Alerts },
   // { path: '/notifications/badges', name: 'Badges', element: Badges },
   // { path: '/notifications/modals', name: 'Modals', element: Modals },
-  // { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
+  // { path: '/notifications/toasts', name: 'Toasts', element: Toasts },NonAqlUnits
+  { path: '/production/nonaql-units', name: 'Non Aql Units', element: NonAqlUnits, exact: true },
   { path: '/production', name: 'Production', element: IncomingUnit, exact: true },
   { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
   {
