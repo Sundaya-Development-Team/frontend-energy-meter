@@ -106,6 +106,12 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Non AQL Units',
+    to: '/production/nonaql-units',
+    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
     name: 'Batch Production',
     to: '/production/batch',
     icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
@@ -116,21 +122,21 @@ const _nav = [
     to: '/production/assemble',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/assemble/before',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan Before',
+      //   to: '/production/assemble/before',
+      // },
       {
         component: CNavItem,
         name: 'Quality Control',
         to: '/production/assemble/qc',
       },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/assemble/after',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan After',
+      //   to: '/production/assemble/after',
+      // },
     ],
   },
   {
@@ -139,21 +145,21 @@ const _nav = [
     to: '/production/on',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/on/before',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan Before',
+      //   to: '/production/on/before',
+      // },
       {
         component: CNavItem,
         name: 'Quality Control',
         to: '/production/on/qc',
       },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/on/after',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan After',
+      //   to: '/production/on/after',
+      // },
     ],
   },
   {
@@ -162,21 +168,21 @@ const _nav = [
     to: '/production/hipot',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/hipot/before',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan Before',
+      //   to: '/production/hipot/before',
+      // },
       {
         component: CNavItem,
         name: 'Quality Control',
         to: '/production/hipot/qc',
       },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/hipot/after',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan After',
+      //   to: '/production/hipot/after',
+      // },
     ],
   },
   {
@@ -185,21 +191,21 @@ const _nav = [
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/calibration/before',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan Before',
+      //   to: '/production/calibration/before',
+      // },
       {
         component: CNavItem,
         name: 'Quality Control',
         to: '/production/calibration/qc',
       },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/calibration/after',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan After',
+      //   to: '/production/calibration/after',
+      // },
     ],
   },
   {
