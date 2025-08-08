@@ -188,6 +188,7 @@ const NonAqlUnits = () => {
                 <strong>Detail</strong>
               </CCardHeader>
               <CCardBody>
+                <FormRow label="Product Detail :"></FormRow>
                 <CRow className="mb-3">
                   <CCol md={6}>
                     <div className="fw-semibold">PO Number</div>
@@ -204,31 +205,16 @@ const NonAqlUnits = () => {
                     <div className="fw-semibold">Status</div>
                     <div>{getStatusBadge(data.status)}</div>
                   </CCol>
+                </CRow>
+                <FormRow label="AQL Setting :"></FormRow>
+                <CRow className="mb-3">
                   <CCol md={6}>
                     <div className="fw-semibold">Inspection Level</div>
                     <div>{data.inspection_level}</div>
                   </CCol>
-                </CRow>
-
-                <CRow className="mb-3">
-                  <CCol md={6}>
-                    <div className="fw-semibold">AQL Critical</div>
-                    <div>{data.aql_critical}</div>
-                  </CCol>
                   <CCol md={6}>
                     <div className="fw-semibold">AQL Major</div>
                     <div>{data.aql_major}</div>
-                  </CCol>
-                </CRow>
-
-                <CRow className="mb-3">
-                  <CCol md={6}>
-                    <div className="fw-semibold">AQL Minor</div>
-                    <div>{data.aql_minor}</div>
-                  </CCol>
-                  <CCol md={6}>
-                    <div className="fw-semibold">Total Quantity</div>
-                    <div>{data.total_quantity}</div>
                   </CCol>
                 </CRow>
 
@@ -274,17 +260,6 @@ const NonAqlUnits = () => {
               <CCol md={6}>
                 <div className="fw-semibold">Inspection Level</div>
                 <div>{data.inspection_level}</div>
-              </CCol>
-            </CRow>
-
-            <CRow className="mb-3">
-              <CCol md={6}>
-                <div className="fw-semibold">AQL Critical</div>
-                <div>{data.aql_critical}</div>
-              </CCol>
-              <CCol md={6}>
-                <div className="fw-semibold">AQL Major</div>
-                <div>{data.aql_major}</div>
               </CCol>
             </CRow>
 
