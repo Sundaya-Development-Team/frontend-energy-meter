@@ -22,6 +22,7 @@ const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder')
 const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHeader'))
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
 const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDetail'))
+const ReceivingSerialQc = React.lazy(() => import('./views/receiving/ReceivingSerialQc'))
 
 //Tracking
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
@@ -34,8 +35,8 @@ const QCUnits = React.lazy(() => import('./views/semiproduction/QCUnits'))
 const ReportQCUnit = React.lazy(() => import('./views/semiproduction/ReportQCUnit'))
 
 //MasterForm QC
-const NonAqlUnits = React.lazy(() => import('./views/production/master-format/NonAqlUnits'))
-const AqlNonBarcode = React.lazy(() => import('./views/production/master-format/AqlNonBarcode'))
+const NonAqlUnits = React.lazy(() => import('./views/production/masterqcformat/NonAqlUnits'))
+const AqlNonBarcode = React.lazy(() => import('./views/production/masterqcformat/AqlNonBarcode'))
 
 //Production
 const BatchingProduction = React.lazy(() => import('./views/production/BatchingProduction'))
@@ -377,7 +378,7 @@ const routes = [
     element: QCOn,
   },
   //Receiving
-  { path: '/receiving/receivingList', name: 'Receving Header', element: ReceivingList },
+  { path: '/receiving/receivingList', name: 'Receving List', element: ReceivingList },
   {
     path: '/receiving/receivingDetail/:receivingHeaderId',
     name: 'Receiving Detail',
@@ -385,6 +386,7 @@ const routes = [
   },
   { path: '/receiving/receivingHeader', name: 'Receving Header', element: ReceivingHeader },
   { path: '/receiving/purchaseOrder', name: 'Purchase Order', element: PurchaseOrder },
+  { path: '/receiving/receivingSerialQc', name: 'Reciving Serial QC', element: ReceivingSerialQc },
   //Tracking
   { path: '/tracking/list', name: 'Tracking List', element: TrackingList },
   { path: '/tracking/detail/:trackingId', name: 'Tracking Detail', element: TrackingDetail },

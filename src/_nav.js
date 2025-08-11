@@ -62,6 +62,12 @@ const _nav = [
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Recevicing Serial QC',
+    to: '/receiving/receivingSerialQc',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'Tracking',
   },
