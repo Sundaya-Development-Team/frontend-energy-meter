@@ -106,8 +106,14 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Non AQL Units',
-    to: '/production/nonaql-units',
+    name: 'AQL Non Barcode',
+    to: '/production/aqlNonBarcode',
+    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'AQL Units',
+    to: '/production/nonAqlUnits',
     icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   },
   {
