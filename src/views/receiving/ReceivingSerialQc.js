@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import {
   CRow,
   CCol,
@@ -21,6 +21,9 @@ import {
   CPaginationItem,
   CFormSwitch,
 } from '@coreui/react'
+
+import { backendQc, backendTracking } from '../../api/axios'
+import { toast } from 'react-toastify'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -46,26 +49,27 @@ const CounterCard = ({ title, value }) => (
 const ReceivingSerialQc = () => {
   const [partner_barcode, setPartnerBarcode] = useState('')
   const [inspected_by, setInspectedBy] = useState('')
+  const [productData, setProductData] = useState(null)
   const [answers, setAnswers] = useState({})
 
   // Dummy data untuk scanningItem
-  const [scanningItem] = useState({
-    itemName: 'Produk ABC',
-    expectedQuantity: 50,
-    remainingStage: 20,
-    totalStaged: 12,
-    serialNumbers: Array.from({ length: 12 }, (_, i) => ({
-      serial_number: `SN-${i + 1}`,
-      created_at: new Date().toISOString(),
-    })),
-  })
+  // const [scanningItem] = useState({
+  //   itemName: 'Produk ABC',
+  //   expectedQuantity: 50,
+  //   remainingStage: 20,
+  //   totalStaged: 12,
+  //   serialNumbers: Array.from({ length: 12 }, (_, i) => ({
+  //     serial_number: `SN-${i + 1}`,
+  //     created_at: new Date().toISOString(),
+  //   })),
+  // })
 
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  // const [currentPage, setCurrentPage] = useState(1)
+  // const itemsPerPage = 5
 
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -73,7 +77,66 @@ const ReceivingSerialQc = () => {
 
   const handleSerial = () => {
     console.log('Serial Number di-scan:', formData.serialNumber)
+
+    // Panggil fetch dulu baru reset input
+    fetchValidationSnumb(formData.serialNumber)
+
     setFormData({ ...formData, serialNumber: '' })
+  }
+  // Fetch validation serial number
+  const fetchValidationSnumb = async (serialNumber) => {
+    try {
+      const res = await backendQc.get('/validation', {
+        params: {
+          serial_number: serialNumber,
+          qc_id: 'QC-SPS001', // ini bisa diubah ke dynamic kalau perlu
+        },
+      })
+
+      if (res.data.valid == true) {
+        toast.success(res.data.message || 'Serial number valid')
+
+        fetchProduct(serialNumber)
+      } else {
+        toast.error(res.data.message || 'Serial number already scan')
+      }
+    } catch (error) {
+      toast.error(res.data.message || 'Serial Number Validation Failed')
+    }
+  }
+
+  const fetchProduct = async (serialNumber) => {
+    try {
+      const response = await backendTracking.get(`/serial/${serialNumber}`)
+
+      if (response.data.success == true) {
+        toast.success(response.data.message || 'Serial number valid')
+        setProductData(response.data.data)
+        const receivingItemId = response.data.data.receiving_item_id
+        console.log('receiving_item_id :', receivingItemId)
+
+        fetchTrackingProduct(receivingItemId)
+      } else {
+        toast.error(response.data.message || 'Serial number already scan')
+      }
+    } catch (error) {
+      toast.error(response.message || 'Serial Number Validation Failed')
+    }
+  }
+
+  const fetchTrackingProduct = async (receivingItemId) => {
+    try {
+      const response = await backendTracking.get('/sample-inspections/aql-summary', {
+        params: {
+          receiving_item_id: receivingItemId,
+          qc_id: 'QC001', //cek kembali ini nanti
+        },
+      })
+
+      toast.success(response.data.message || 'Receiving ID Valid')
+    } catch (error) {
+      toast.error(response.data.message || 'Failed Validation')
+    }
   }
 
   const [questionData] = useState([
@@ -133,12 +196,12 @@ const ReceivingSerialQc = () => {
     }
   }
 
-  const paginatedSerialNumbers = useMemo(() => {
-    if (!scanningItem?.serialNumbers) return []
-    const startIndex = (currentPage - 1) * itemsPerPage
-    const endIndex = startIndex + itemsPerPage
-    return scanningItem.serialNumbers.slice(startIndex, endIndex)
-  }, [scanningItem, currentPage])
+  // const paginatedSerialNumbers = useMemo(() => {
+  //   if (!scanningItem?.serialNumbers) return []
+  //   const startIndex = (currentPage - 1) * itemsPerPage
+  //   const endIndex = startIndex + itemsPerPage
+  //   return scanningItem.serialNumbers.slice(startIndex, endIndex)
+  // }, [scanningItem, currentPage])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -153,7 +216,7 @@ const ReceivingSerialQc = () => {
           <CCol md={6}>
             <CCard className="mb-4 h-100">
               <CCardHeader>
-                <strong>Scan Serial Number : {scanningItem.itemName || '-'}</strong>
+                <strong>Product Name : {productData?.product?.name || '-'}</strong>
               </CCardHeader>
               <CCardBody>
                 <FormRow label="Serial Number">
@@ -172,10 +235,10 @@ const ReceivingSerialQc = () => {
                 </FormRow>
                 <FormRow label="Counter"></FormRow>
                 <CRow className="mb-3">
-                  <CounterCard title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                  <CounterCard title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                  <CounterCard title="Remaining Quantity" value={scanningItem.remainingStage} />
-                  <CounterCard title="Remaining Quantity" value={scanningItem.remainingStage} />
+                  <CounterCard title="Expected Quantity" value={`-`} />
+                  <CounterCard title="Expected Quantity" value={`-`} />
+                  <CounterCard title="Remaining Quantity" value={`-`} />
+                  <CounterCard title="Remaining Quantity" value={`-`} />
                 </CRow>
               </CCardBody>
             </CCard>
