@@ -52,6 +52,7 @@ const ReceivingSerialQc = () => {
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
   const [answers, setAnswers] = useState({})
+  const [questionData, setQuestionData] = useState([])
 
   // Dummy data untuk scanningItem
   // const [scanningItem] = useState({
@@ -79,10 +80,16 @@ const ReceivingSerialQc = () => {
   const handleSerial = () => {
     console.log('Serial Number di-scan:', formData.serialNumber)
 
-    // Panggil fetch dulu baru reset input
+    // Bersihkan semua state dulu
+    setProductData(null)
+    setTrackingProduct(null)
+    setAnswers({})
+
+    // Panggil fetch validasi serial
     fetchValidationSnumb(formData.serialNumber)
 
-    setFormData({ ...formData })
+    // Reset input serial number
+    setFormData({ serialNumber: '' })
   }
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
@@ -90,19 +97,29 @@ const ReceivingSerialQc = () => {
       const res = await backendQc.get('/validation', {
         params: {
           serial_number: serialNumber,
-          qc_id: 'QC-SPS001', // ini bisa diubah ke dynamic kalau perlu
+          qc_id: 'QC-SPS001',
         },
       })
 
-      if (res.data.valid == true) {
-        toast.success(res.data.message || 'Serial number valid')
+      if (res.data.valid === true) {
+        toast.success(res.data.message ?? 'Serial number valid')
 
+        // Convert object questions → array
+        const convertedQuestions = Object.entries(res.data.questions).map(([id, text]) => ({
+          id: Number(id),
+          question: text,
+        }))
+
+        // Simpan ke state
+        setQuestionData(convertedQuestions)
+
+        // Ambil product
         fetchProduct(serialNumber)
       } else {
-        toast.error(res.data.message || 'Serial number already scan')
+        toast.error(res.data.message ?? 'Serial number already scan')
       }
     } catch (error) {
-      toast.error(res.data.message || 'Serial Number Validation Failed')
+      toast.error('Serial Number Validation Failed')
     }
   }
 
@@ -140,24 +157,24 @@ const ReceivingSerialQc = () => {
     }
   }
 
-  const [questionData] = useState([
-    {
-      id: 1,
-      title: 'Pemeriksaan Visual',
-      questions: [
-        { id: 101, question: 'Apakah ada goresan pada produk?' },
-        { id: 102, question: 'Apakah warna sesuai spesifikasi?' },
-      ],
-    },
-    {
-      id: 2,
-      title: 'Pemeriksaan Fungsional',
-      questions: [
-        { id: 201, question: 'Apakah semua tombol berfungsi?' },
-        { id: 202, question: 'Apakah produk menyala dengan benar?' },
-      ],
-    },
-  ])
+  // const [questionData] = useState([
+  //   {
+  //     id: 1,
+  //     title: 'Pemeriksaan Visual',
+  //     questions: [
+  //       { id: 101, question: 'Apakah ada goresan pada produk?' },
+  //       { id: 102, question: 'Apakah warna sesuai spesifikasi?' },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Pemeriksaan Fungsional',
+  //     questions: [
+  //       { id: 201, question: 'Apakah semua tombol berfungsi?' },
+  //       { id: 202, question: 'Apakah produk menyala dengan benar?' },
+  //     ],
+  //   },
+  // ])
 
   const data = {
     po_number: 'PO-2025-001',
@@ -204,9 +221,29 @@ const ReceivingSerialQc = () => {
   //   return scanningItem.serialNumbers.slice(startIndex, endIndex)
   // }, [scanningItem, currentPage])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log({ partner_barcode, inspected_by, answers })
+
+    const payload = {
+      inspector_by: 1,
+      inspector_name: inspected_by,
+      qc_name: 'qc_semi_product', //hardcode sementara
+      qc_id: 'QC-SPS001',
+      qc_place: 'Workshop A', //hardcode sementara
+      tracking_id: productData?.tracking_id,
+      notes: 'Semua komponen dalam kondisi baik',
+      partner_barcode,
+      answers,
+    }
+
+    console.log('Submit payload:', payload)
+
+    // try {
+    //   await backendQc.post('/submit-qc', payload)
+    //   toast.success('QC berhasil disubmit')
+    // } catch (error) {
+    //   toast.error('Gagal submit QC')
+    // }
   }
 
   return (
@@ -371,33 +408,23 @@ const ReceivingSerialQc = () => {
               {questionData.length === 0 ? (
                 <p className="text-muted">Pertanyaan belum tersedia...</p>
               ) : (
-                questionData.map((section) => (
-                  <div key={section.id}>
-                    <CFormLabel className="col-form-label mt-3">
-                      <strong>{section.title}</strong>
-                    </CFormLabel>
-                    {section.questions.map((q) => (
-                      <div
-                        key={q.id}
-                        className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
-                      >
-                        {/* Pertanyaan di kiri */}
-                        <CFormLabel className="mb-0">{q.question}</CFormLabel>
-
-                        {/* Switch di kanan */}
-                        <CFormSwitch
-                          name={`question-${q.id}`}
-                          label={answers[q.id] ? 'Ya' : 'Tidak'}
-                          checked={answers[q.id] === true}
-                          onChange={(e) =>
-                            setAnswers((prev) => ({
-                              ...prev,
-                              [q.id]: e.target.checked,
-                            }))
-                          }
-                        />
-                      </div>
-                    ))}
+                questionData.map((q) => (
+                  <div
+                    key={q.id}
+                    className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
+                  >
+                    <CFormLabel className="mb-0">{q.question}</CFormLabel>
+                    <CFormSwitch
+                      name={`question-${q.id}`}
+                      label={answers[q.id] ? 'Ya' : 'Tidak'}
+                      checked={answers[q.id] === true}
+                      onChange={(e) =>
+                        setAnswers((prev) => ({
+                          ...prev,
+                          [q.id]: e.target.checked,
+                        }))
+                      }
+                    />
                   </div>
                 ))
               )}
