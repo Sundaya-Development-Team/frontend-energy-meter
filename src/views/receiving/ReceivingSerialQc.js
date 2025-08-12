@@ -300,17 +300,6 @@ const ReceivingSerialQc = () => {
                     <div>{trackingProduct?.aql_configuration?.aql_critical ?? `-`}</div>
                   </CCol>
                 </CRow>
-
-                <CRow className="mb-3">
-                  <CCol md={6}>
-                    <div className="fw-semibold">Used Defects</div>
-                    <div>{data.used_defects}</div>
-                  </CCol>
-                  <CCol md={6}>
-                    <div className="fw-semibold">Sample Size</div>
-                    <div>{data.sample_size}</div>
-                  </CCol>
-                </CRow>
               </CCardBody>
             </CCard>
           </CCol>
