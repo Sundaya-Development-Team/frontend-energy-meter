@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import axios from 'axios'
 
 const QUALITY_SERVICE = import.meta.env.VITE_QUALITY_SERVICE
@@ -46,6 +45,12 @@ export const backendReceiving = axios.create({
 
 export const backendTracking = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/tracking`,
+})
+
+//QC
+
+export const backendQc = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v1/quality-service`,
 })
 
 // export const backendPartner = axios.create({

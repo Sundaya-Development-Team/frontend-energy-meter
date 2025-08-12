@@ -62,6 +62,12 @@ const _nav = [
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Recevicing Serial QC',
+    to: '/receiving/receivingSerialQc',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
     component: CNavTitle,
     name: 'Tracking',
   },
@@ -106,14 +112,14 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Non AQL Units',
-    to: '/production/nonAqlUnits',
+    name: 'AQL Non Barcode',
+    to: '/production/aqlNonBarcode',
     icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
-    name: 'AQL Non Barcode',
-    to: '/production/aqlNonBarcode',
+    name: 'AQL Units',
+    to: '/production/nonAqlUnits',
     icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   },
   {
