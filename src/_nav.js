@@ -321,6 +321,13 @@ const _nav = [
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
   {
+    component: CNavItem,
+    name: 'Warehouse Data Master',
+    to: '/warehouse/warehouseMaster',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+
+  {
     component: CNavTitle,
     name: 'Delivery',
   },

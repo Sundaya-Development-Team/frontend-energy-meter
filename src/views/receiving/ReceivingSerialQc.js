@@ -406,7 +406,7 @@ const ReceivingSerialQc = () => {
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
               {questionData.length === 0 ? (
-                <p className="text-muted">Pertanyaan belum tersedia...</p>
+                <p className="text-muted">Questions not yet available...</p>
               ) : (
                 questionData.map((q) => (
                   <div
