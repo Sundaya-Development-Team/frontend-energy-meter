@@ -50,6 +50,7 @@ const ReceivingSerialQc = () => {
   const [partner_barcode, setPartnerBarcode] = useState('')
   const [inspected_by, setInspectedBy] = useState('')
   const [productData, setProductData] = useState(null)
+  const [trackingProduct, setTrackingProduct] = useState(null)
   const [answers, setAnswers] = useState({})
 
   // Dummy data untuk scanningItem
@@ -81,7 +82,7 @@ const ReceivingSerialQc = () => {
     // Panggil fetch dulu baru reset input
     fetchValidationSnumb(formData.serialNumber)
 
-    setFormData({ ...formData, serialNumber: '' })
+    setFormData({ ...formData })
   }
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
@@ -132,7 +133,7 @@ const ReceivingSerialQc = () => {
           qc_id: 'QC001', //cek kembali ini nanti
         },
       })
-
+      setTrackingProduct(response.data.data)
       toast.success(response.data.message || 'Receiving ID Valid')
     } catch (error) {
       toast.error(response.data.message || 'Failed Validation')
@@ -216,7 +217,7 @@ const ReceivingSerialQc = () => {
           <CCol md={6}>
             <CCard className="mb-4 h-100">
               <CCardHeader>
-                <strong>Product Name : {productData?.product?.name || '-'}</strong>
+                <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
               </CCardHeader>
               <CCardBody>
                 <FormRow label="Serial Number">
@@ -235,10 +236,22 @@ const ReceivingSerialQc = () => {
                 </FormRow>
                 <FormRow label="Counter"></FormRow>
                 <CRow className="mb-3">
-                  <CounterCard title="Expected Quantity" value={`-`} />
-                  <CounterCard title="Expected Quantity" value={`-`} />
-                  <CounterCard title="Remaining Quantity" value={`-`} />
-                  <CounterCard title="Remaining Quantity" value={`-`} />
+                  <CounterCard
+                    title="Required Sample"
+                    value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
+                  />
+                  <CounterCard
+                    title="Remaining Samples"
+                    value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
+                  />
+                  <CounterCard
+                    title="Max Fail"
+                    value={trackingProduct?.aql_configuration?.aql_reject ?? `-`}
+                  />
+                  <CounterCard
+                    title="Fail Count"
+                    value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
+                  />
                 </CRow>
               </CCardBody>
             </CCard>
@@ -253,31 +266,38 @@ const ReceivingSerialQc = () => {
               <CCardBody>
                 <FormRow label="Product Detail :"></FormRow>
                 <CRow className="mb-3">
-                  <CCol md={6}>
-                    <div className="fw-semibold">PO Number</div>
-                    <div>{data.po_number}</div>
-                  </CCol>
-                  <CCol md={6}>
-                    <div className="fw-semibold">Batch</div>
-                    <div>{data.batch}</div>
+                  <CCol md={12}>
+                    <div className="fw-semibold">Item Code</div>
+                    <div> {productData?.code_item ?? '-'}</div>
                   </CCol>
                 </CRow>
 
                 <CRow className="mb-3">
                   <CCol md={6}>
-                    <div className="fw-semibold">Status</div>
-                    <div>{getStatusBadge(data.status)}</div>
+                    <div className="fw-semibold">Tracking</div>
+                    <div> {productData?.tracking_type ?? '-'}</div>
+                  </CCol>
+                  <CCol md={6}>
+                    <div className="fw-semibold">Batch</div>
+                    <div> {productData?.batch ?? '-'}</div>
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Type</div>
+                    <div>{productData?.product?.type?.name ?? '-'}</div>
                   </CCol>
                 </CRow>
                 <FormRow label="AQL Setting :"></FormRow>
                 <CRow className="mb-3">
                   <CCol md={6}>
                     <div className="fw-semibold">Inspection Level</div>
-                    <div>{data.inspection_level}</div>
+                    <div>{trackingProduct?.aql_configuration?.inspection_level ?? `-`}</div>
                   </CCol>
                   <CCol md={6}>
-                    <div className="fw-semibold">AQL Major</div>
-                    <div>{data.aql_major}</div>
+                    <div className="fw-semibold">AQL Critical</div>
+                    <div>{trackingProduct?.aql_configuration?.aql_critical ?? `-`}</div>
                   </CCol>
                 </CRow>
 
