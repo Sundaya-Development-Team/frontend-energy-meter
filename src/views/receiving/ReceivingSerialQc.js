@@ -78,7 +78,7 @@ const ReceivingSerialQc = () => {
       })
 
       if (response.data.valid === true) {
-        toast.success(response.data.message ?? 'Serial number valid')
+        // toast.success(response.data.message ?? 'Serial number valid')
 
         // Convert object questions → array
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
@@ -113,7 +113,7 @@ const ReceivingSerialQc = () => {
       const response = await backendTracking.get(`/serial/${serialNumber}`)
 
       if (response.data.success == true) {
-        toast.success(response.data.message || 'Serial number valid')
+        // toast.success(response.data.message || 'Serial number valid')
         setProductData(response.data.data)
 
         const receivingItemId = response.data.data.receiving_item_id
@@ -136,9 +136,32 @@ const ReceivingSerialQc = () => {
           qc_id: qcIdReceivingSerial, //cek kembali ini nanti
         },
       })
+      const remainingSample = response.data.data.inspection_summary.remaining_samples
+      console.log('remaining Sample : ', remainingSample)
+      if (remainingSample <= 0) {
+        toast.error(
+          <span>
+            <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
+          </span>,
+        )
+        //Besihkan page
+        setProductData(null)
+        setTrackingProduct(null)
+        setQuestionData([])
+        setAnswers({})
+        setFormData({ serialNumber: '', notes: '' })
+      } else {
+        console.log('LANJUT')
+        setTrackingProduct(response.data.data)
+        const baseMessage = response.data?.message ?? ''
 
-      setTrackingProduct(response.data.data)
-      toast.success(response.data.message || 'Receiving ID Valid')
+        toast.success(
+          <span>
+            {baseMessage || ''} -{' '}
+            <span style={{ color: 'green', fontWeight: 'bold' }}> LANJUT QC</span>
+          </span>,
+        )
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed Validation')
     }
@@ -192,6 +215,32 @@ const ReceivingSerialQc = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    // Validasi field wajib
+    if (!productData?.serial_number) {
+      toast.error('Serial number wajib diisi!')
+      return
+    }
+    if (!inspected_by) {
+      toast.error('Inspector name wajib diisi!')
+      return
+    }
+    if (!qcName) {
+      toast.error('QC Name wajib diisi!')
+      return
+    }
+    if (!qcIdReceivingSerial) {
+      toast.error('QC ID wajib diisi!')
+      return
+    }
+    if (!formData.notes) {
+      toast.error('Notes wajib diisi!')
+      return
+    }
+    if (Object.keys(answers).length === 0) {
+      toast.error('Jawaban pertanyaan QC wajib diisi!')
+      return
+    }
+
     const payload = {
       serial_number: productData.serial_number,
       inspector_by: 1,
@@ -208,8 +257,6 @@ const ReceivingSerialQc = () => {
 
     try {
       const res = await backendQc.post('/submit', payload)
-      // const messageShow = `${res.data?.message ?? ''} QC Status : ${res.data?.data?.qcStatus ?? ''}`
-      // toast.success(messageShow || 'QC berhasil disubmit')
 
       const qcStatus = res.data?.data?.qcStatus ?? ''
       const messageShow = (
@@ -227,7 +274,7 @@ const ReceivingSerialQc = () => {
       toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
     }
 
-    //bersihkan semua state
+    // Bersihkan semua state
     setProductData(null)
     setTrackingProduct(null)
     setQuestionData([])
