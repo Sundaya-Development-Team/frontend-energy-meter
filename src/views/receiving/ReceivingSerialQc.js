@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState } from 'react'
 import {
   CRow,
   CCol,
@@ -8,18 +8,9 @@ import {
   CBadge,
   CFormLabel,
   CFormInput,
-  CFormCheck,
   CButton,
   CForm,
   CFormTextarea,
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-  CPagination,
-  CPaginationItem,
   CFormSwitch,
 } from '@coreui/react'
 
@@ -53,28 +44,10 @@ const ReceivingSerialQc = () => {
   const [answers, setAnswers] = useState({})
   const [questionData, setQuestionData] = useState([])
   const [qcName, setQcName] = useState([])
-
   const qcIdReceivingSerial = 'QC-SPS002'
   const inspected_by = 'ADMIN_RECEIVING'
-
-  // Dummy data untuk scanningItem
-  // const [scanningItem] = useState({
-  //   itemName: 'Produk ABC',
-  //   expectedQuantity: 50,
-  //   remainingStage: 20,
-  //   totalStaged: 12,
-  //   serialNumbers: Array.from({ length: 12 }, (_, i) => ({
-  //     serial_number: `SN-${i + 1}`,
-  //     created_at: new Date().toISOString(),
-  //   })),
-  // })
-
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
-
-  // Pagination state
-  // const [currentPage, setCurrentPage] = useState(1)
-  // const itemsPerPage = 5
 
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -216,13 +189,6 @@ const ReceivingSerialQc = () => {
     }
   }
 
-  // const paginatedSerialNumbers = useMemo(() => {
-  //   if (!scanningItem?.serialNumbers) return []
-  //   const startIndex = (currentPage - 1) * itemsPerPage
-  //   const endIndex = startIndex + itemsPerPage
-  //   return scanningItem.serialNumbers.slice(startIndex, endIndex)
-  // }, [scanningItem, currentPage])
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -264,8 +230,9 @@ const ReceivingSerialQc = () => {
     //bersihkan semua state
     setProductData(null)
     setTrackingProduct(null)
+    setQuestionData([])
     setAnswers({})
-    setFormData({ serialNumber: '' })
+    setFormData({ serialNumber: '', notes: '' })
   }
 
   return (
