@@ -46,7 +46,7 @@ const ExpandedComponent = ({ data }) => (
           {data.image_url ? (
             <img
               src={data.image_url}
-              alt="Product"
+              alt="Warehouse"
               style={{
                 width: '100%',
                 maxWidth: '300px',
@@ -74,13 +74,9 @@ const WarehouseList = () => {
   const [editData, setEditData] = useState(null)
   const [form, setForm] = useState({
     name: '',
-    sap_code: '',
-    product_type_id: '',
-    supplier_id: '',
-    is_active: true,
-    image: null,
+    location: '',
+    code: '',
   })
-
   const fetchWarehouses = useCallback(
     async (page = currentPage, limit = perPage, search = searchKeyword) => {
       setLoading(true)
@@ -92,6 +88,7 @@ const WarehouseList = () => {
         setData(warehouses || [])
         setTotalRows(pagination?.total || 0)
       } catch (error) {
+        console.error(error)
         toast.error('Failed to fetch warehouses')
       } finally {
         setLoading(false)
@@ -126,71 +123,76 @@ const WarehouseList = () => {
   const resetForm = () => {
     setForm({
       name: '',
-      sap_code: '',
-      product_type_id: '',
-      supplier_id: '',
-      is_active: true,
-      image: null,
+      location: '',
+      code: '',
     })
-
     setEditData(null)
   }
 
   const handleEdit = (row) => {
     setEditData(row)
     setForm({
-      name: row.name,
-      sap_code: row.sap_code,
-      product_type_id: row.product_type_id,
-      supplier_id: row.supplier_id,
-      is_active: row.is_active,
-      image: null,
+      name: row.name || '',
+      location: row.location || '',
+      code: row.code || '',
     })
-    setImagePreview(row.image_url || null)
     setModalVisible(true)
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return
+    if (!window.confirm('Are you sure you want to delete this warehouse?')) return
+
     try {
-      await backendProduct.delete(`/${id}`)
-      toast.success('Product deleted')
-      if (products.length === 1 && page > 1) setPage((prev) => prev - 1)
-      else fetchProducts()
+      const res = await backendWh.delete(`/${id}`)
+      toast.success(res.data?.message || 'Warehouse deleted')
+
+      if (res.data.length === 1 && page > 1) {
+        setPage((prev) => prev - 1)
+      } else {
+        fetchWarehouses()
+      }
+
       resetForm()
-    } catch {
-      toast.error('Failed to delete product')
+    } catch (error) {
+      console.error(error)
+      toast.error(error.response?.data?.message || 'Failed to delete warehouse')
     }
   }
 
   const handleInputChange = (e) => {
-    const { name, location, code } = e.target
-    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
-    console.log('handle input')
+    const { name, value, type, checked } = e.target
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     const payload = {
       ...form,
-      is_active: form.is_active === true || form.is_active === 'true',
+      code: form.code?.toUpperCase() || '', // ubah ke uppercase
     }
 
-    // try {
-    //   let res
-    //   if (editData) {
-    //     res = await backendProduct.put(`/${editData.id}`, payload)
-    //     toast.success(res.data?.message || 'Product updated')
-    //   } else {
-    //     res = await backendProduct.post('/', payload)
-    //     toast.success(res.data?.message || 'Product created')
-    //   }
-    //   setModalVisible(false)
-    //   resetForm()
-    //   fetchProducts()
-    // } catch {
-    //   toast.error('Failed to save product')
-    // }
+    try {
+      let res
+      if (editData) {
+        // UPDATE
+        res = await backendWh.put(`/${editData.id}`, payload)
+        toast.success(res.data?.message || 'Warehouse updated')
+      } else {
+        // CREATE
+        res = await backendWh.post('/', payload)
+        toast.success(res.data?.message || 'Warehouse created')
+      }
+
+      setModalVisible(false)
+      resetForm()
+      fetchWarehouses()
+    } catch (error) {
+      console.error(error)
+      toast.error(error.response?.data?.message || 'Failed to save warehouse')
+    }
   }
 
   const columns = [
@@ -198,13 +200,26 @@ const WarehouseList = () => {
     { name: 'Name', selector: (row) => row.name, sortable: true },
     { name: 'Location', selector: (row) => row.location || '-', sortable: true },
     { name: 'Created', selector: (row) => row.created_at || '-', sortable: true },
+    {
+      name: 'Actions',
+      cell: (row) => (
+        <div className="d-flex gap-2">
+          <CButton size="sm" color="warning" onClick={() => handleEdit(row)}>
+            Edit
+          </CButton>
+          <CButton size="sm" color="danger" onClick={() => handleDelete(row.id)}>
+            Delete
+          </CButton>
+        </div>
+      ),
+    },
   ]
 
   return (
     <CRow>
       <CCol xs={12}>
         <CCard>
-          <CCardHeader>
+          <CCardHeader className="d-flex justify-content-between align-items-center">
             <strong>Warehouses</strong>
             <CButton onClick={() => setModalVisible(true)}>+ Add Warehouse</CButton>
           </CCardHeader>
@@ -248,7 +263,7 @@ const WarehouseList = () => {
         }}
       >
         <CModalHeader>
-          <CModalTitle>{editData ? 'Edit Product' : 'Add Product'}</CModalTitle>
+          <CModalTitle>{editData ? 'Edit Warehouse' : 'Add Warehouse'}</CModalTitle>
         </CModalHeader>
         <CForm onSubmit={handleSubmit}>
           <CModalBody>
@@ -256,7 +271,12 @@ const WarehouseList = () => {
             <CFormInput name="name" value={form.name} onChange={handleInputChange} required />
 
             <CFormLabel className="mt-2">Location</CFormLabel>
-            <CFormInput name="code" value={form.location} onChange={handleInputChange} required />
+            <CFormInput
+              name="location"
+              value={form.location}
+              onChange={handleInputChange}
+              required
+            />
 
             <CFormLabel className="mt-2">Warehouse Code</CFormLabel>
             <CFormInput name="code" value={form.code} onChange={handleInputChange} required />
