@@ -61,6 +61,7 @@ const QcSerialNoAql = () => {
 
   useEffect(() => {
     resetStates()
+    console.clear()
   }, [qcIdParams])
 
   const handleInput = (e) => {
