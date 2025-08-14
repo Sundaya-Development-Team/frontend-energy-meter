@@ -280,20 +280,25 @@ const _nav = [
     to: '/production/clearzero',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan Before',
+      //   to: '/production/clearzero/before',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Quality Control',
+      //   to: '/production/clearzero/qc',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan After',
+      //   to: '/production/clearzero/after',
+      // },
       {
         component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/clearzero/before',
-      },
-      {
-        component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/clearzero/qc',
-      },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/clearzero/after',
+        name: 'QC Clear Zero 1',
+        to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
       },
     ],
   },

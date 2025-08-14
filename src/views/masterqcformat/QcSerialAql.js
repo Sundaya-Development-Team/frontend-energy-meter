@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CRow,
@@ -51,6 +51,19 @@ const QcAqlSerial = () => {
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
 
+  const resetStates = () => {
+    setProductData(null)
+    setTrackingProduct(null)
+    setQuestionData([])
+    setAnswers({})
+    setFormData({ serialNumber: '', notes: '' })
+  }
+
+  useEffect(() => {
+    resetStates()
+    console.clear()
+  }, [qcIdParams])
+
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
@@ -59,10 +72,7 @@ const QcAqlSerial = () => {
     console.log('Serial Number di-scan:', formData.serialNumber)
 
     // Bersihkan semua state dulu
-    setProductData(null)
-    setTrackingProduct(null)
-    setAnswers({})
-
+    resetStates()
     // Panggil fetch validasi serial
     fetchValidationSnumb(formData.serialNumber)
 
@@ -119,6 +129,12 @@ const QcAqlSerial = () => {
         // toast.success(response.data.message || 'Serial number valid')
         setProductData(response.data.data)
 
+        // isi kembali serial number di form
+        setFormData((prev) => ({
+          ...prev,
+          serialNumber: serialNumber,
+        }))
+
         const receivingItemId = response.data.data.receiving_item_id
         console.log('receiving_item_id :', receivingItemId)
 
@@ -148,11 +164,7 @@ const QcAqlSerial = () => {
           </span>,
         )
         //Besihkan page
-        setProductData(null)
-        setTrackingProduct(null)
-        setQuestionData([])
-        setAnswers({})
-        setFormData({ serialNumber: '', notes: '' })
+        resetStates()
       } else {
         console.log('LANJUT')
         setTrackingProduct(response.data.data)
@@ -278,11 +290,7 @@ const QcAqlSerial = () => {
     }
 
     // Bersihkan semua state
-    setProductData(null)
-    setTrackingProduct(null)
-    setQuestionData([])
-    setAnswers({})
-    setFormData({ serialNumber: '', notes: '' })
+    resetStates()
   }
 
   return (
