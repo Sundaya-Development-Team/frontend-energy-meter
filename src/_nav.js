@@ -139,11 +139,11 @@ const _nav = [
       //   name: 'Scan Before',
       //   to: '/production/assemble/before',
       // },
-      {
-        component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/assemble/qc',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Quality Control',
+      //   to: '/production/assemble/qc',
+      // },
       {
         component: CNavItem,
         name: 'QC Assembly',
@@ -167,10 +167,15 @@ const _nav = [
       //   name: 'Scan Before',
       //   to: '/production/on/before',
       // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Quality Control',
+      //   to: '/production/on/qc',
+      // },
       {
         component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/on/qc',
+        name: 'QC Test ON',
+        to: '/production/serialnoaql/QC-OT004/Test ON',
       },
 
       // {
@@ -191,15 +196,15 @@ const _nav = [
       //   name: 'Scan Before',
       //   to: '/production/hipot/before',
       // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Quality Control',
+      //   to: '/production/hipot/qc',
+      // },
       {
         component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/hipot/qc',
-      },
-      {
-        component: CNavItem,
-        name: 'QC AQL Serial John Doe',
-        to: '/production/serialaql/QC-HT005/Hippot',
+        name: 'QC Hipot Test',
+        to: '/production/serialnoaql/QC-HT005/Hipot Test',
       },
       // {
       //   component: CNavItem,
@@ -219,16 +224,21 @@ const _nav = [
       //   name: 'Scan Before',
       //   to: '/production/calibration/before',
       // },
-      {
-        component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/calibration/qc',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Quality Control',
+      //   to: '/production/calibration/qc',
+      // },
       // {
       //   component: CNavItem,
       //   name: 'Scan After',
       //   to: '/production/calibration/after',
       // },
+      {
+        component: CNavItem,
+        name: 'QC Hipot Test',
+        to: '/production/serialnoaql/QC-CT006/Calibration Test',
+      },
     ],
   },
   {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CRow,
@@ -51,15 +51,24 @@ const QcSerialNoAql = () => {
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
 
+  const resetStates = () => {
+    setProductData(null)
+    setTrackingProduct(null)
+    setQuestionData([])
+    setAnswers({})
+    setFormData({ serialNumber: '', notes: '' })
+  }
+
+  useEffect(() => {
+    resetStates()
+  }, [qcIdParams])
+
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const handleSerial = () => {
-    // Bersihkan semua state dulu
-    setProductData(null)
-    setTrackingProduct(null)
-    setAnswers({})
+    resetStates()
 
     // Panggil fetch validasi serial
     fetchValidationSnumb(formData.serialNumber)
@@ -67,6 +76,7 @@ const QcSerialNoAql = () => {
     // Reset input serial number
     // setFormData({ serialNumber: '' })
   }
+
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
     try {
@@ -116,6 +126,12 @@ const QcSerialNoAql = () => {
         // toast.success(response.data.message || 'Serial number valid')
         setProductData(response.data.data)
 
+        // isi kembali serial number di form
+        setFormData((prev) => ({
+          ...prev,
+          serialNumber: serialNumber,
+        }))
+
         const receivingItemId = response.data.data.receiving_item_id
 
         fetchTrackingProduct(receivingItemId)
@@ -145,11 +161,7 @@ const QcSerialNoAql = () => {
           </span>,
         )
         //Besihkan page
-        setProductData(null)
-        setTrackingProduct(null)
-        setQuestionData([])
-        setAnswers({})
-        setFormData({ serialNumber: '', notes: '' })
+        resetStates()
       } else {
         setTrackingProduct(response.data.data)
         const baseMessage = response.data?.message ?? ''
@@ -185,32 +197,6 @@ const QcSerialNoAql = () => {
   //     ],
   //   },
   // ])
-
-  const data = {
-    po_number: 'PO-2025-001',
-    batch: 'BATCH-01',
-    status: 'pending',
-    inspection_level: 'Level II',
-    aql_critical: 0.65,
-    aql_major: 1.5,
-    aql_minor: 2.5,
-    total_quantity: 1200,
-    used_defects: 5,
-    sample_size: 80,
-  }
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'pending':
-        return <CBadge color="warning">Pending</CBadge>
-      case 'complete':
-        return <CBadge color="success">Complete</CBadge>
-      case 'reject':
-        return <CBadge color="danger">Reject</CBadge>
-      default:
-        return <CBadge color="secondary">{status}</CBadge>
-    }
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -275,11 +261,7 @@ const QcSerialNoAql = () => {
     }
 
     // Bersihkan semua state
-    setProductData(null)
-    setTrackingProduct(null)
-    setQuestionData([])
-    setAnswers({})
-    setFormData({ serialNumber: '', notes: '' })
+    resetStates()
   }
 
   return (
