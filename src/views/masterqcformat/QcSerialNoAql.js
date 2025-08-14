@@ -1,0 +1,453 @@
+import React, { useState } from 'react'
+import { useParams } from 'react-router-dom'
+import {
+  CRow,
+  CCol,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CBadge,
+  CFormLabel,
+  CFormInput,
+  CButton,
+  CForm,
+  CFormTextarea,
+  CFormSwitch,
+} from '@coreui/react'
+
+import { backendQc, backendTracking } from '../../api/axios'
+import { toast } from 'react-toastify'
+
+const FormRow = ({ label, children }) => (
+  <CRow className="mb-3 align-items-center">
+    <CCol md={4}>
+      <CFormLabel className="fw-semibold">{label}</CFormLabel>
+    </CCol>
+    <CCol md={8}>{children}</CCol>
+  </CRow>
+)
+
+const CounterCard = ({ title, value }) => (
+  <CCol md={6}>
+    {' '}
+    <CCard className="mb-3">
+      <CCardBody>
+        <h6 className="text-muted">{title}</h6>
+        <h4>{value}</h4>
+      </CCardBody>
+    </CCard>
+  </CCol>
+)
+
+const QcSerialNoAql = () => {
+  const { qcIdParams } = useParams()
+  const [productData, setProductData] = useState(null)
+  const [trackingProduct, setTrackingProduct] = useState(null)
+  const [answers, setAnswers] = useState({})
+  const [questionData, setQuestionData] = useState([])
+  const [qcName, setQcName] = useState([])
+  const qcCodeSerial = qcIdParams
+  const inspected_by = 'ADMIN_RECEIVING'
+  const [formData, setFormData] = useState({ serialNumber: '' })
+  const [isFormLocked] = useState(false)
+
+  const handleInput = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSerial = () => {
+    console.log('Serial Number di-scan:', formData.serialNumber)
+
+    // Bersihkan semua state dulu
+    setProductData(null)
+    setTrackingProduct(null)
+    setAnswers({})
+
+    // Panggil fetch validasi serial
+    fetchValidationSnumb(formData.serialNumber)
+
+    // Reset input serial number
+    // setFormData({ serialNumber: '' })
+  }
+  // Fetch validation serial number
+  const fetchValidationSnumb = async (serialNumber) => {
+    console.log('qcCodeSerial :', qcCodeSerial)
+    try {
+      const response = await backendQc.get('/validation', {
+        params: {
+          serial_number: serialNumber,
+          qc_id: qcCodeSerial,
+        },
+      })
+
+      if (response.data.valid === true) {
+        // toast.success(response.data.message ?? 'Serial number valid')
+
+        // Convert object questions → array
+        const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
+          id: Number(id),
+          question: text,
+        }))
+
+        // Simpan ke state
+        setQcName(response.data.category)
+        setQuestionData(convertedQuestions)
+
+        // inisialisasi semua jawaban default ke false
+        const initialAnswers = {}
+        convertedQuestions.forEach((q) => {
+          initialAnswers[q.id] = false
+        })
+        setAnswers(initialAnswers)
+
+        // Ambil product
+        fetchProduct(serialNumber)
+      } else {
+        toast.error(response.data.message ?? 'Serial number already scan')
+      }
+    } catch (error) {
+      console.log('ERROR')
+      toast.error(error.response?.data?.message || 'Serial Number Validation Failed')
+    }
+  }
+
+  const fetchProduct = async (serialNumber) => {
+    try {
+      const response = await backendTracking.get(`/serial/${serialNumber}`)
+
+      if (response.data.success == true) {
+        // toast.success(response.data.message || 'Serial number valid')
+        setProductData(response.data.data)
+
+        const receivingItemId = response.data.data.receiving_item_id
+        console.log('receiving_item_id :', receivingItemId)
+
+        fetchTrackingProduct(receivingItemId)
+      } else {
+        toast.error(response.data.message || 'Failed get product data')
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'ERROR get data product')
+    }
+  }
+
+  const fetchTrackingProduct = async (receivingItemId) => {
+    try {
+      const response = await backendTracking.get('/sample-inspections/quantity-summary', {
+        params: {
+          receiving_item_id: receivingItemId,
+          qc_id: qcCodeSerial, //cek kembali ini nanti
+        },
+      })
+      const remainingSample = response.data.data.quantity_summary.remaining_quantity
+      console.log('remaining Sample : ', remainingSample)
+      if (remainingSample <= 0) {
+        toast.error(
+          <span>
+            <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
+          </span>,
+        )
+        //Besihkan page
+        setProductData(null)
+        setTrackingProduct(null)
+        setQuestionData([])
+        setAnswers({})
+        setFormData({ serialNumber: '', notes: '' })
+      } else {
+        console.log('LANJUT')
+        setTrackingProduct(response.data.data)
+        const baseMessage = response.data?.message ?? ''
+
+        toast.success(
+          <span>
+            {baseMessage || ''} -{' '}
+            <span style={{ color: 'green', fontWeight: 'bold' }}> LANJUT QC</span>
+          </span>,
+        )
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response?.data?.message || 'Failed Validation')
+    }
+  }
+
+  // const [questionData] = useState([
+  //   {
+  //     id: 1,
+  //     title: 'Pemeriksaan Visual',
+  //     questions: [
+  //       { id: 101, question: 'Apakah ada goresan pada produk?' },
+  //       { id: 102, question: 'Apakah warna sesuai spesifikasi?' },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Pemeriksaan Fungsional',
+  //     questions: [
+  //       { id: 201, question: 'Apakah semua tombol berfungsi?' },
+  //       { id: 202, question: 'Apakah produk menyala dengan benar?' },
+  //     ],
+  //   },
+  // ])
+
+  const data = {
+    po_number: 'PO-2025-001',
+    batch: 'BATCH-01',
+    status: 'pending',
+    inspection_level: 'Level II',
+    aql_critical: 0.65,
+    aql_major: 1.5,
+    aql_minor: 2.5,
+    total_quantity: 1200,
+    used_defects: 5,
+    sample_size: 80,
+  }
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'pending':
+        return <CBadge color="warning">Pending</CBadge>
+      case 'complete':
+        return <CBadge color="success">Complete</CBadge>
+      case 'reject':
+        return <CBadge color="danger">Reject</CBadge>
+      default:
+        return <CBadge color="secondary">{status}</CBadge>
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    // Validasi field wajib
+    if (!productData?.serial_number) {
+      toast.error('Serial number wajib diisi!')
+      return
+    }
+    if (!inspected_by) {
+      toast.error('Inspector name wajib diisi!')
+      return
+    }
+    if (!qcName) {
+      toast.error('QC Name wajib diisi!')
+      return
+    }
+    if (!qcCodeSerial) {
+      toast.error('QC ID wajib diisi!')
+      return
+    }
+    if (!formData.notes) {
+      toast.error('Notes wajib diisi!')
+      return
+    }
+    if (Object.keys(answers).length === 0) {
+      toast.error('Jawaban pertanyaan QC wajib diisi!')
+      return
+    }
+
+    const payload = {
+      serial_number: productData.serial_number,
+      inspector_by: 1,
+      inspector_name: inspected_by,
+      qc_name: qcName, // sementara hardcode
+      qc_id: qcCodeSerial,
+      qc_place: 'Workshop A', // sementara hardcode
+      tracking_id: productData.id,
+      notes: formData.notes,
+      answers,
+    }
+
+    console.log('Submit payload:', payload)
+
+    try {
+      const res = await backendQc.post('/submit', payload)
+
+      const qcStatus = res.data?.data?.qcStatus ?? ''
+      const messageShow = (
+        <span>
+          {res.data?.message ?? ''}. QC Status :{' '}
+          <span style={{ color: qcStatus.toUpperCase() === 'FAIL' ? 'red' : 'green' }}>
+            {qcStatus}
+          </span>
+        </span>
+      )
+
+      toast.success(messageShow)
+    } catch (error) {
+      console.error('QC submit error:', error)
+      toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
+    }
+
+    // Bersihkan semua state
+    setProductData(null)
+    setTrackingProduct(null)
+    setQuestionData([])
+    setAnswers({})
+    setFormData({ serialNumber: '', notes: '' })
+  }
+
+  return (
+    <CRow>
+      <CCol xs={12}>
+        <CRow className="g-4 mb-4">
+          {/* Scan Serial Number */}
+          <CCol md={6}>
+            <CCard className="mb-4 h-100">
+              <CCardHeader>
+                <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
+              </CCardHeader>
+              <CCardBody>
+                <FormRow label="Serial Number">
+                  <CFormInput
+                    name="serialNumber"
+                    value={formData.serialNumber}
+                    onChange={handleInput}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleSerial()
+                      }
+                    }}
+                    disabled={isFormLocked}
+                  />
+                </FormRow>
+                <FormRow label="Notes">
+                  <CFormTextarea
+                    rows={3}
+                    name="notes"
+                    value={formData.notes}
+                    onChange={handleInput}
+                  />
+                </FormRow>
+                <FormRow label="Counter"></FormRow>
+                <CRow className="mb-3">
+                  <CounterCard
+                    title="Required Quantity"
+                    value={trackingProduct?.quantity_summary?.total_quantity ?? `-`}
+                  />
+                  <CounterCard
+                    title="Remaining Quantity"
+                    value={trackingProduct?.quantity_summary?.remaining_quantity ?? `-`}
+                  />
+                  <CounterCard
+                    title="Pass Quantity"
+                    value={trackingProduct?.quantity_summary?.pass_quantity ?? `-`}
+                  />
+                  <CounterCard
+                    title="Fail Quantity"
+                    value={trackingProduct?.quantity_summary?.fail_quantity ?? `-`}
+                  />
+                </CRow>
+              </CCardBody>
+            </CCard>
+          </CCol>
+
+          {/* Detail */}
+          <CCol md={6}>
+            <CCard className="mb-4 h-100">
+              <CCardHeader>
+                <strong>Detail</strong>
+              </CCardHeader>
+              <CCardBody>
+                <FormRow label="Product Detail :"></FormRow>
+                <CRow className="mb-3">
+                  <CCol md={12}>
+                    <div className="fw-semibold">Item Code</div>
+                    <div> {productData?.code_item ?? '-'}</div>
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Tracking</div>
+                    <div> {productData?.tracking_type ?? '-'}</div>
+                  </CCol>
+                  <CCol md={6}>
+                    <div className="fw-semibold">Batch</div>
+                    <div> {productData?.batch ?? '-'}</div>
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Type</div>
+                    <div> {productData?.product?.type?.name ?? '-'}</div>
+                  </CCol>
+                  <CCol md={6}>
+                    <div className="fw-semibold">Supplier</div>
+                    <div> {productData?.product?.supplier?.name ?? '-'}</div>
+                  </CCol>
+                </CRow>
+
+                {/* <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Type</div>
+                    <div>{productData?.product?.type?.name ?? '-'}</div>
+                  </CCol>
+                </CRow>
+                <FormRow label="AQL Setting :"></FormRow>
+                <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Inspection Level</div>
+                    <div>{trackingProduct?.aql_configuration?.inspection_level ?? `-`}</div>
+                  </CCol>
+                  <CCol md={6}>
+                    <div className="fw-semibold">AQL Critical</div>
+                    <div>{trackingProduct?.aql_configuration?.aql_critical ?? `-`}</div>
+                  </CCol>
+                </CRow> */}
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
+      </CCol>
+
+      {/* Quality Control Assembly */}
+      <CCol xs={12}>
+        <CCard className="mb-4">
+          <CCardHeader>
+            <strong>Quality Control</strong>
+          </CCardHeader>
+          <CCardBody>
+            <CForm onSubmit={handleSubmit}>
+              {questionData.length === 0 ? (
+                <p className="text-muted">Questions not yet available...</p>
+              ) : (
+                questionData.map((q) => {
+                  const isYes = answers[q.id] === true // memastikan boolean
+
+                  return (
+                    <div
+                      key={q.id}
+                      className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
+                    >
+                      <CFormLabel className="mb-0">{q.question}</CFormLabel>
+                      <CFormSwitch
+                        name={`question-${q.id}`}
+                        label={answers[q.id] ? 'Ya' : 'Tidak'}
+                        checked={!!answers[q.id]}
+                        onChange={(e) =>
+                          setAnswers((prev) => ({
+                            ...prev,
+                            [q.id]: e.target.checked, // true kalau on, false kalau off
+                          }))
+                        }
+                      />
+                    </div>
+                  )
+                })
+              )}
+              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                <CButton color="primary" type="submit">
+                  Submit
+                </CButton>
+              </div>
+            </CForm>
+          </CCardBody>
+        </CCard>
+      </CCol>
+    </CRow>
+  )
+}
+
+export default QcSerialNoAql

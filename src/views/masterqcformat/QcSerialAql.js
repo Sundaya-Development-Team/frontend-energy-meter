@@ -41,19 +41,16 @@ const CounterCard = ({ title, value }) => (
 
 const QcAqlSerial = () => {
   const { qcIdParams } = useParams()
-  const { qcNameParams } = useParams()
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
   const [answers, setAnswers] = useState({})
   const [questionData, setQuestionData] = useState([])
   const [qcName, setQcName] = useState([])
-  const qcIdReceivingSerial = 'QC-SPS002'
+  const qcCodeSerial = qcIdParams
   const inspected_by = 'ADMIN_RECEIVING'
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
 
-  console.log('qcIdParams :', qcIdParams)
-  console.log('qcNameParams :', qcNameParams)
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
@@ -74,11 +71,12 @@ const QcAqlSerial = () => {
   }
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
+    console.log('qcCodeSerial :', qcCodeSerial)
     try {
       const response = await backendQc.get('/validation', {
         params: {
           serial_number: serialNumber,
-          qc_id: qcIdReceivingSerial,
+          qc_id: qcCodeSerial,
         },
       })
 
@@ -138,7 +136,7 @@ const QcAqlSerial = () => {
       const response = await backendTracking.get('/sample-inspections/aql-summary', {
         params: {
           receiving_item_id: receivingItemId,
-          qc_id: qcIdReceivingSerial, //cek kembali ini nanti
+          qc_id: qcCodeSerial, //cek kembali ini nanti
         },
       })
       const remainingSample = response.data.data.inspection_summary.remaining_samples
@@ -233,7 +231,7 @@ const QcAqlSerial = () => {
       toast.error('QC Name wajib diisi!')
       return
     }
-    if (!qcIdReceivingSerial) {
+    if (!qcCodeSerial) {
       toast.error('QC ID wajib diisi!')
       return
     }
@@ -251,7 +249,7 @@ const QcAqlSerial = () => {
       inspector_by: 1,
       inspector_name: inspected_by,
       qc_name: qcName, // sementara hardcode
-      qc_id: qcIdReceivingSerial,
+      qc_id: qcCodeSerial,
       qc_place: 'Workshop A', // sementara hardcode
       tracking_id: productData.id,
       notes: formData.notes,
