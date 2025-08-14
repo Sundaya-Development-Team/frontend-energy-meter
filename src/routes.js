@@ -35,8 +35,9 @@ const QCUnits = React.lazy(() => import('./views/semiproduction/QCUnits'))
 const ReportQCUnit = React.lazy(() => import('./views/semiproduction/ReportQCUnit'))
 
 //MasterForm QC
-const NonAqlUnits = React.lazy(() => import('./views/production/masterqcformat/NonAqlUnits'))
-const AqlNonBarcode = React.lazy(() => import('./views/production/masterqcformat/AqlNonBarcode'))
+const NonAqlUnits = React.lazy(() => import('./views/masterqcformat/NonAqlUnits.js'))
+const AqlNonBarcode = React.lazy(() => import('./views/masterqcformat/AqlNonBarcode.js'))
+const QcAqlSerial = React.lazy(() => import('./views/masterqcformat/QcAqlSerial.js'))
 
 //Production
 const BatchingProduction = React.lazy(() => import('./views/production/BatchingProduction'))
@@ -217,6 +218,7 @@ const routes = [
   // { path: '/notifications/badges', name: 'Badges', element: Badges },
   // { path: '/notifications/modals', name: 'Modals', element: Modals },
   // { path: '/notifications/toasts', name: 'Toasts', element: Toasts },NonAqlUnits
+  //Production : Master QC
   { path: '/production/nonAqlUnits', name: 'Non Aql Units', element: NonAqlUnits, exact: true },
   {
     path: '/production/aqlNonBarcode',
@@ -224,6 +226,7 @@ const routes = [
     element: AqlNonBarcode,
     exact: true,
   },
+
   { path: '/production', name: 'Production', element: IncomingUnit, exact: true },
   { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
   {
@@ -378,7 +381,15 @@ const routes = [
     name: 'Quality Control On',
     element: QCOn,
   },
+  //Production Aql Serial
+  { path: '/production/aqlserial', name: 'QC AQL Serial' },
+  {
+    path: '/production/aqlserial/:qcIdParams/:qcNameParams',
+    name: '',
+    element: QcAqlSerial,
+  },
   //Receiving
+  { path: '/receiving', name: 'Receiving' },
   { path: '/receiving/receivingList', name: 'Receving List', element: ReceivingList },
   {
     path: '/receiving/receivingDetail/:receivingHeaderId',
@@ -389,6 +400,7 @@ const routes = [
   { path: '/receiving/purchaseOrder', name: 'Purchase Order', element: PurchaseOrder },
   { path: '/receiving/receivingSerialQc', name: 'Reciving Serial QC', element: ReceivingSerialQc },
   //Tracking
+  { path: '/tracking', name: 'Tracking' },
   { path: '/tracking/list', name: 'Tracking List', element: TrackingList },
   { path: '/tracking/detail/:trackingId', name: 'Tracking Detail', element: TrackingDetail },
 

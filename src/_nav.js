@@ -167,6 +167,7 @@ const _nav = [
         name: 'Quality Control',
         to: '/production/on/qc',
       },
+
       // {
       //   component: CNavItem,
       //   name: 'Scan After',
@@ -189,6 +190,11 @@ const _nav = [
         component: CNavItem,
         name: 'Quality Control',
         to: '/production/hipot/qc',
+      },
+      {
+        component: CNavItem,
+        name: 'QC AQL Serial John Doe',
+        to: '/production/aqlserial/QC-HT005/Hippot',
       },
       // {
       //   component: CNavItem,
@@ -236,10 +242,15 @@ const _nav = [
         name: 'Scan Before',
         to: '/production/aging/before',
       },
+      // {
+      //   component: CNavItem,
+      //   name: 'Quality Control',
+      //   to: '/production/aging/qc',
+      // },
       {
         component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/aging/qc',
+        name: 'QC Aging',
+        to: '/production/aqlserial/QC-AT007/Test Aging',
       },
       {
         component: CNavItem,
