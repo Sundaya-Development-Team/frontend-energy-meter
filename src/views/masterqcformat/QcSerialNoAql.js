@@ -56,8 +56,6 @@ const QcSerialNoAql = () => {
   }
 
   const handleSerial = () => {
-    console.log('Serial Number di-scan:', formData.serialNumber)
-
     // Bersihkan semua state dulu
     setProductData(null)
     setTrackingProduct(null)
@@ -71,7 +69,6 @@ const QcSerialNoAql = () => {
   }
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
-    console.log('qcCodeSerial :', qcCodeSerial)
     try {
       const response = await backendQc.get('/validation', {
         params: {
@@ -106,7 +103,7 @@ const QcSerialNoAql = () => {
         toast.error(response.data.message ?? 'Serial number already scan')
       }
     } catch (error) {
-      console.log('ERROR')
+      console.log(error)
       toast.error(error.response?.data?.message || 'Serial Number Validation Failed')
     }
   }
@@ -120,13 +117,13 @@ const QcSerialNoAql = () => {
         setProductData(response.data.data)
 
         const receivingItemId = response.data.data.receiving_item_id
-        console.log('receiving_item_id :', receivingItemId)
 
         fetchTrackingProduct(receivingItemId)
       } else {
         toast.error(response.data.message || 'Failed get product data')
       }
     } catch (error) {
+      console.log(error)
       toast.error(error.response?.data?.message || 'ERROR get data product')
     }
   }
@@ -140,7 +137,7 @@ const QcSerialNoAql = () => {
         },
       })
       const remainingSample = response.data.data.quantity_summary.remaining_quantity
-      console.log('remaining Sample : ', remainingSample)
+
       if (remainingSample <= 0) {
         toast.error(
           <span>
@@ -154,7 +151,6 @@ const QcSerialNoAql = () => {
         setAnswers({})
         setFormData({ serialNumber: '', notes: '' })
       } else {
-        console.log('LANJUT')
         setTrackingProduct(response.data.data)
         const baseMessage = response.data?.message ?? ''
 
@@ -352,11 +348,16 @@ const QcSerialNoAql = () => {
                 <FormRow label="Product Detail :"></FormRow>
                 <CRow className="mb-3">
                   <CCol md={12}>
+                    <div className="fw-semibold">Assembly Code</div>
+                    <div> {productData?.assembly_id ?? '-'}</div>
+                  </CCol>
+                </CRow>
+                <CRow className="mb-3">
+                  <CCol md={12}>
                     <div className="fw-semibold">Item Code</div>
                     <div> {productData?.code_item ?? '-'}</div>
                   </CCol>
                 </CRow>
-
                 <CRow className="mb-3">
                   <CCol md={6}>
                     <div className="fw-semibold">Tracking</div>
