@@ -236,7 +236,7 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Hipot Test',
+        name: 'QC Calibration Test',
         to: '/production/serialnoaql/QC-CT006/Calibration Test',
       },
     ],
@@ -252,11 +252,11 @@ const _nav = [
         name: 'Batching',
         to: '/production/aging/batching',
       },
-      {
-        component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/aging/before',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan Before',
+      //   to: '/production/aging/before',
+      // },
       // {
       //   component: CNavItem,
       //   name: 'Quality Control',
@@ -264,14 +264,14 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Aging',
-        to: '/production/serialaql/QC-AT007/Test Aging',
+        name: 'QC Aging Test',
+        to: '/production/serialaql/QC-AT007/Aging Test',
       },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/aging/after',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan After',
+      //   to: '/production/aging/after',
+      // },
     ],
   },
   {
