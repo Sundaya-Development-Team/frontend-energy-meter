@@ -37,12 +37,11 @@ const ReportQCUnit = React.lazy(() => import('./views/semiproduction/ReportQCUni
 //MasterForm QC
 const NonAqlUnits = React.lazy(() => import('./views/masterqcformat/NonAqlUnits.js'))
 const AqlNonBarcode = React.lazy(() => import('./views/masterqcformat/AqlNonBarcode.js'))
-const QcSerialAql = React.lazy(() => import('./views/masterqcformat/QcSerialAql.js'))
-
-const QcSerialNoAql = React.lazy(() => import('./views/masterqcformat/QcSerialNoAql.js'))
 
 //Production
 const BatchingProduction = React.lazy(() => import('./views/production/BatchingProduction'))
+const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql.js'))
+const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql.js'))
 
 // Assemble
 const ScanBeforeAssemble = React.lazy(
@@ -388,13 +387,13 @@ const routes = [
   {
     path: '/production/serialaql/:qcIdParams/:qcNameParams',
     name: '',
-    element: QcSerialAql,
+    element: ProdQcSerialAql,
   },
   { path: '/production/serialnoaql', name: 'QC Serial No AQL' },
   {
     path: '/production/serialnoaql/:qcIdParams/:qcNameParams',
     name: '',
-    element: QcSerialNoAql,
+    element: ProdQcSerialNoAql,
   },
   //Receiving
   { path: '/receiving', name: 'Receiving' },

@@ -77,51 +77,50 @@ const _nav = [
     to: '/tracking/list',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
-  {
-    component: CNavTitle,
-    name: 'Semi Production',
-  },
-
+  // {
+  //   component: CNavTitle,
+  //   name: 'Semi Production',
+  // },
   // {
   //   component: CNavItem,
   //   name: 'Incoming Unit',
   //   to: '/semiproduction/incoming',
   //   icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   // },
-  {
-    component: CNavItem,
-    name: 'Incoming Unit',
-    to: '/semiproduction/praqc',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'QC Units',
-    to: '/semiproduction/qcunits',
-    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Report QC Units',
-    to: '/semiproduction/reportqcunit',
-    icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Incoming Unit',
+  //   to: '/semiproduction/praqc',
+  //   icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'QC Units',
+  //   to: '/semiproduction/qcunits',
+  //   icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Report QC Units',
+  //   to: '/semiproduction/reportqcunit',
+  //   icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
+  // },
   {
     component: CNavTitle,
     name: 'Production',
   },
-  {
-    component: CNavItem,
-    name: 'AQL Non Barcode',
-    to: '/production/aqlNonBarcode',
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'AQL Units',
-    to: '/production/nonAqlUnits',
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'AQL Non Barcode',
+  //   to: '/production/aqlNonBarcode',
+  //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'AQL Units',
+  //   to: '/production/nonAqlUnits',
+  //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
     name: 'Batch Production',
