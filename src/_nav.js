@@ -251,11 +251,11 @@ const _nav = [
         name: 'Batching',
         to: '/production/aging/batching',
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/aging/before',
-      // },
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/aging/before',
+      },
       // {
       //   component: CNavItem,
       //   name: 'Quality Control',
