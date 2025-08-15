@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CRow,
-  CCol,
   CCard,
+  CCol,
   CCardBody,
   CCardHeader,
   CBadge,
@@ -17,6 +17,7 @@ import {
 
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
+import { CounterCard6 } from '../../components/CounterCard'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -25,18 +26,6 @@ const FormRow = ({ label, children }) => (
     </CCol>
     <CCol md={8}>{children}</CCol>
   </CRow>
-)
-
-const CounterCard = ({ title, value }) => (
-  <CCol md={6}>
-    {' '}
-    <CCard className="mb-3">
-      <CCardBody>
-        <h6 className="text-muted">{title}</h6>
-        <h4>{value}</h4>
-      </CCardBody>
-    </CCard>
-  </CCol>
 )
 
 const QcAqlSerial = () => {
@@ -328,19 +317,19 @@ const QcAqlSerial = () => {
                 </FormRow>
                 <FormRow label="Counter"></FormRow>
                 <CRow className="mb-3">
-                  <CounterCard
+                  <CounterCard6
                     title="Required Sample"
                     value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
                   />
-                  <CounterCard
+                  <CounterCard6
                     title="Remaining Samples"
                     value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
                   />
-                  <CounterCard
+                  <CounterCard6
                     title="Max Fail"
                     value={trackingProduct?.aql_configuration?.aql_reject ?? `-`}
                   />
-                  <CounterCard
+                  <CounterCard6
                     title="Fail Count"
                     value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
                   />

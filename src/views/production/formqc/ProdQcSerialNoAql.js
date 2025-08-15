@@ -17,6 +17,7 @@ import {
 
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
+import { CounterCard6 } from '../../components/CounterCard'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -25,18 +26,6 @@ const FormRow = ({ label, children }) => (
     </CCol>
     <CCol md={8}>{children}</CCol>
   </CRow>
-)
-
-const CounterCard = ({ title, value }) => (
-  <CCol md={6}>
-    {' '}
-    <CCard className="mb-3">
-      <CCardBody>
-        <h6 className="text-muted">{title}</h6>
-        <h4>{value}</h4>
-      </CCardBody>
-    </CCard>
-  </CCol>
 )
 
 const QcSerialNoAql = () => {
@@ -300,19 +289,19 @@ const QcSerialNoAql = () => {
                 </FormRow>
                 <FormRow label="Counter"></FormRow>
                 <CRow className="mb-3">
-                  <CounterCard
+                  <CounterCard6
                     title="Required Quantity"
                     value={trackingProduct?.quantity_summary?.total_quantity ?? `-`}
                   />
-                  <CounterCard
+                  <CounterCard6
                     title="Remaining Quantity"
                     value={trackingProduct?.quantity_summary?.remaining_quantity ?? `-`}
                   />
-                  <CounterCard
+                  <CounterCard6
                     title="Pass Quantity"
                     value={trackingProduct?.quantity_summary?.pass_quantity ?? `-`}
                   />
-                  <CounterCard
+                  <CounterCard6
                     title="Fail Quantity"
                     value={trackingProduct?.quantity_summary?.fail_quantity ?? `-`}
                   />

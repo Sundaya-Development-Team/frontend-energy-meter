@@ -19,16 +19,7 @@ import {
   CPagination,
   CPaginationItem,
 } from '@coreui/react'
-import CounterCard from '../../components/CounterCard'
-// Komponen CounterCard
-// const CounterCard = ({ title, value }) => (
-//   <CCard className="mb-3">
-//     <CCardBody>
-//       <h6 className="text-muted">{title}</h6>
-//       <h4>{value}</h4>
-//     </CCardBody>
-//   </CCard>
-// )
+import { CounterCard6 } from '../../components/CounterCard'
 
 const ScanBeforeAging = () => {
   const [formData, setFormData] = useState({
@@ -164,8 +155,8 @@ const ScanBeforeAging = () => {
               }}
             />
             <div className="mt-3">
-              <CounterCard title="Expected Quantity" value={scanningItem.expectedQuantity} />
-              <CounterCard title="Remaining Quantity" value={scanningItem.remainingStage} />
+              <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
+              <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
             </div>
           </CCardBody>
         </CCard>

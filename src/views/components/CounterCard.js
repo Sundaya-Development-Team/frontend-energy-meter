@@ -1,13 +1,24 @@
 import React from 'react'
-import { CCard, CCardBody } from '@coreui/react'
+import { CCard, CCardBody, CCol } from '@coreui/react'
 
-const CounterCard = ({ title, value }) => (
-  <CCard className="mb-3">
-    <CCardBody>
-      <h6 className="text-muted">{title}</h6>
-      <h4>{value}</h4>
-    </CCardBody>
-  </CCard>
+export const CounterCard6 = ({ title, value }) => (
+  <CCol md={6}>
+    <CCard className="mb-3">
+      <CCardBody>
+        <h6 className="text-muted">{title}</h6>
+        <h4>{value}</h4>
+      </CCardBody>
+    </CCard>
+  </CCol>
 )
 
-export default CounterCard
+export const CounterCard12 = ({ title, value }) => (
+  <CCol md={12}>
+    <CCard className="mb-3">
+      <CCardBody>
+        <h6 className="text-muted">{title}</h6>
+        <h4>{value}</h4>
+      </CCardBody>
+    </CCard>
+  </CCol>
+)
