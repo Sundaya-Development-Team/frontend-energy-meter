@@ -51,13 +51,13 @@ const ScanBeforeAssemble = () => {
           <CCardBody>
             <CForm>
               <CRow className="mb-3">
-                <CCol sm={12}>
+                <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
                     src={`/src/assets/images/assembly/pcb_serial_number.jpeg`}
                     alt="PCB Preview"
                     fluid
                     className="mt-2"
-                    style={{ width: '100%' }}
+                    style={{ width: '60%' }}
                   />
                 </CCol>
               </CRow>
@@ -66,7 +66,7 @@ const ScanBeforeAssemble = () => {
                 <div className="text-center">
                   <strong>PCB SERIAL NUMBER</strong>
                 </div>
-                <CCol sm={12}>
+                <CCol sm={12} className="d-flex justify-content-center">
                   <CFormInput
                     type="text"
                     id="pcbSnumb"
@@ -99,13 +99,13 @@ const ScanBeforeAssemble = () => {
           <CCardBody>
             <CForm>
               <CRow className="mb-3">
-                <CCol sm={12}>
+                <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
                     src={`/src/assets/images/assembly/side_cover_serial_number.jpeg`}
                     alt="Side Cover Preview"
                     fluid
                     className="mt-2"
-                    style={{ width: '100%' }}
+                    style={{ width: '60%' }}
                   />
                 </CCol>
               </CRow>
@@ -114,7 +114,7 @@ const ScanBeforeAssemble = () => {
                 <div className="text-center">
                   <strong>SCAN SERIAL NUMBER</strong>
                 </div>
-                <CCol sm={12}>
+                <CCol sm={12} className="d-flex justify-content-center">
                   <CFormInput
                     type="text"
                     id="sideCoverSnumb"
