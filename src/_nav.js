@@ -77,51 +77,50 @@ const _nav = [
     to: '/tracking/list',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
-  {
-    component: CNavTitle,
-    name: 'Semi Production',
-  },
-
+  // {
+  //   component: CNavTitle,
+  //   name: 'Semi Production',
+  // },
   // {
   //   component: CNavItem,
   //   name: 'Incoming Unit',
   //   to: '/semiproduction/incoming',
   //   icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   // },
-  {
-    component: CNavItem,
-    name: 'Incoming Unit',
-    to: '/semiproduction/praqc',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'QC Units',
-    to: '/semiproduction/qcunits',
-    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Report QC Units',
-    to: '/semiproduction/reportqcunit',
-    icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Incoming Unit',
+  //   to: '/semiproduction/praqc',
+  //   icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'QC Units',
+  //   to: '/semiproduction/qcunits',
+  //   icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Report QC Units',
+  //   to: '/semiproduction/reportqcunit',
+  //   icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
+  // },
   {
     component: CNavTitle,
     name: 'Production',
   },
-  {
-    component: CNavItem,
-    name: 'AQL Non Barcode',
-    to: '/production/aqlNonBarcode',
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'AQL Units',
-    to: '/production/nonAqlUnits',
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'AQL Non Barcode',
+  //   to: '/production/aqlNonBarcode',
+  //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'AQL Units',
+  //   to: '/production/nonAqlUnits',
+  //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
     name: 'Batch Production',
@@ -131,18 +130,18 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Assembly',
-    to: '/production/assemble',
+    to: '/production/assembly',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/assemble/before',
-      // },
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/assembly/before',
+      },
       // {
       //   component: CNavItem,
       //   name: 'Quality Control',
-      //   to: '/production/assemble/qc',
+      //   to: '/production/assembly/qc',
       // },
       {
         component: CNavItem,
@@ -152,7 +151,7 @@ const _nav = [
       // {
       //   component: CNavItem,
       //   name: 'Scan After',
-      //   to: '/production/assemble/after',
+      //   to: '/production/assembly/after',
       // },
     ],
   },
@@ -252,11 +251,11 @@ const _nav = [
         name: 'Batching',
         to: '/production/aging/batching',
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/aging/before',
-      // },
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/aging/before',
+      },
       // {
       //   component: CNavItem,
       //   name: 'Quality Control',
@@ -280,20 +279,25 @@ const _nav = [
     to: '/production/clearzero',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan Before',
+      //   to: '/production/clearzero/before',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Quality Control',
+      //   to: '/production/clearzero/qc',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Scan After',
+      //   to: '/production/clearzero/after',
+      // },
       {
         component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/clearzero/before',
-      },
-      {
-        component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/clearzero/qc',
-      },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/clearzero/after',
+        name: 'QC Clear Zero 1',
+        to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
       },
     ],
   },

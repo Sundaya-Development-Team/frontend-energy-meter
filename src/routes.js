@@ -37,19 +37,20 @@ const ReportQCUnit = React.lazy(() => import('./views/semiproduction/ReportQCUni
 //MasterForm QC
 const NonAqlUnits = React.lazy(() => import('./views/masterqcformat/NonAqlUnits.js'))
 const AqlNonBarcode = React.lazy(() => import('./views/masterqcformat/AqlNonBarcode.js'))
-const QcSerialAql = React.lazy(() => import('./views/masterqcformat/QcSerialAql.js'))
-
-const QcSerialNoAql = React.lazy(() => import('./views/masterqcformat/QcSerialNoAql.js'))
 
 //Production
 const BatchingProduction = React.lazy(() => import('./views/production/BatchingProduction'))
+const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql.js'))
+const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql.js'))
 
-// Assemble
-const ScanBeforeAssemble = React.lazy(
-  () => import('./views/production/assemble/ScanBeforeAssemble'),
+// Assembly
+const ScanBeforeAssembly = React.lazy(
+  () => import('./views/production/assembly/ScanBeforeAssembly.js'),
 )
-const QCAssemble = React.lazy(() => import('./views/production/assemble/QCAssemble'))
-const ScanAfterAssemble = React.lazy(() => import('./views/production/assemble/ScanAfterAssemble'))
+const QCAssembly = React.lazy(() => import('./views/production/assembly/QCAssembly.js'))
+const ScanAfterAssembly = React.lazy(
+  () => import('./views/production/assembly/ScanAfterAssembly.js'),
+)
 
 // On
 const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
@@ -232,25 +233,25 @@ const routes = [
   { path: '/production', name: 'Production', element: IncomingUnit, exact: true },
   { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
   {
-    path: '/production/assemble',
-    name: 'Assemble Production',
-    element: ScanBeforeAssemble,
+    path: '/production/assembly',
+    name: 'Assembly Production',
+    element: ScanBeforeAssembly,
     exact: true,
   },
   {
-    path: '/production/assemble/after',
-    name: 'Scan After Assemble',
-    element: ScanAfterAssemble,
+    path: '/production/assembly/after',
+    name: 'Scan After Assembly',
+    element: ScanAfterAssembly,
   },
   {
-    path: '/production/assemble/before',
-    name: 'Scan Before Assemble',
-    element: ScanBeforeAssemble,
+    path: '/production/assembly/before',
+    name: 'Scan Before Assembly',
+    element: ScanBeforeAssembly,
   },
   {
-    path: '/production/assemble/qc',
-    name: 'Quality Control Assemble',
-    element: QCAssemble,
+    path: '/production/assembly/qc',
+    name: 'Quality Control Assembly',
+    element: QCAssembly,
   },
   {
     path: '/production/aging',
@@ -388,13 +389,13 @@ const routes = [
   {
     path: '/production/serialaql/:qcIdParams/:qcNameParams',
     name: '',
-    element: QcSerialAql,
+    element: ProdQcSerialAql,
   },
   { path: '/production/serialnoaql', name: 'QC Serial No AQL' },
   {
     path: '/production/serialnoaql/:qcIdParams/:qcNameParams',
     name: '',
-    element: QcSerialNoAql,
+    element: ProdQcSerialNoAql,
   },
   //Receiving
   { path: '/receiving', name: 'Receiving' },

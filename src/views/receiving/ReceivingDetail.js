@@ -22,16 +22,7 @@ import {
 } from '@coreui/react'
 import { backendReceiving } from '../../api/axios'
 import { toast } from 'react-toastify'
-
-// Komponen CounterCard
-const CounterCard = ({ title, value }) => (
-  <CCard className="mb-3">
-    <CCardBody>
-      <h6 className="text-muted">{title}</h6>
-      <h4>{value}</h4>
-    </CCardBody>
-  </CCard>
-)
+import { CounterCard12 } from '../components/CounterCard'
 
 // Komponen FormRow
 const FormRow = ({ label, labelCols = '2', children }) => (
@@ -414,8 +405,8 @@ const ReceivingDetail = () => {
                       disabled={isFormLocked}
                     />
                   </FormRow>
-                  <CounterCard title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                  <CounterCard title="Remaining Quantity" value={scanningItem.remainingStage} />
+                  <CounterCard12 title="Expected Quantity" value={scanningItem.expectedQuantity} />
+                  <CounterCard12 title="Remaining Quantity" value={scanningItem.remainingStage} />
                 </CCardBody>
               </CCard>
             </CCol>
