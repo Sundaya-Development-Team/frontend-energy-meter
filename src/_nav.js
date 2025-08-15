@@ -130,28 +130,28 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Assembly',
-    to: '/production/assemble',
+    to: '/production/assembly',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/assemble/before',
-      // },
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/assembly/before',
+      },
       // {
       //   component: CNavItem,
       //   name: 'Quality Control',
-      //   to: '/production/assemble/qc',
+      //   to: '/production/assembly/qc',
       // },
       {
         component: CNavItem,
-        name: 'QC Assembly',
+        name: 'QC Assembly213',
         to: '/production/serialnoaql/QC-AT003/Assembly',
       },
       // {
       //   component: CNavItem,
       //   name: 'Scan After',
-      //   to: '/production/assemble/after',
+      //   to: '/production/assembly/after',
       // },
     ],
   },
