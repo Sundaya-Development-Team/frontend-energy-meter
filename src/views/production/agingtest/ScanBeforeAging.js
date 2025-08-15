@@ -21,6 +21,15 @@ import {
 } from '@coreui/react'
 import { CounterCard6 } from '../../components/CounterCard'
 
+const FormRow = ({ label, children }) => (
+  <CRow className="mb-3 align-items-center">
+    <CCol md={4}>
+      <CFormLabel className="fw-semibold">{label}</CFormLabel>
+    </CCol>
+    <CCol md={8}>{children}</CCol>
+  </CRow>
+)
+
 const ScanBeforeAging = () => {
   const [formData, setFormData] = useState({
     barcode: '',
@@ -79,7 +88,7 @@ const ScanBeforeAging = () => {
   return (
     <CRow>
       {/* Form Barcode */}
-      <CCol xs={12}>
+      {/* <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
             <strong>Scan Before Aging Test</strong>
@@ -133,16 +142,28 @@ const ScanBeforeAging = () => {
             </CForm>
           </CCardBody>
         </CCard>
-      </CCol>
+      </CCol> */}
 
       {/* Scan Serial Number */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Scan Serial Number : {scanningItem.itemName}</strong>
+            <strong>Product Name : {scanningItem.itemName}</strong>
           </CCardHeader>
           <CCardBody>
-            <CFormLabel>Serial Number</CFormLabel>
+            <FormRow label="Serial Number">
+              <CFormInput
+                name="serialNumber"
+                onChange={handleChange}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleSerial()
+                  }
+                }}
+              />
+            </FormRow>
+            {/* <CFormLabel>Production Serial Number</CFormLabel>
             <CFormInput
               name="serialNumber"
               value={formData.serialNumber}
@@ -153,10 +174,17 @@ const ScanBeforeAging = () => {
                   handleSerial()
                 }
               }}
-            />
+            /> */}
+
             <div className="mt-3">
-              <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
-              <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
+              {' '}
+              <FormRow label="Counter"></FormRow>
+              <CRow className="mb-3">
+                <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
+                <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
+                <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
+                <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
+              </CRow>
             </div>
           </CCardBody>
         </CCard>

@@ -145,7 +145,7 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Assembly213',
+        name: 'QC Assembly',
         to: '/production/serialnoaql/QC-AT003/Assembly',
       },
       // {
