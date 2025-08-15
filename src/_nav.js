@@ -352,8 +352,14 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Warehouse Data Master',
+    name: 'WH Data Master',
     to: '/warehouse/warehouseMaster',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Req. Receiving to WH',
+    to: '/warehouse/receivingwhrequest',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
 

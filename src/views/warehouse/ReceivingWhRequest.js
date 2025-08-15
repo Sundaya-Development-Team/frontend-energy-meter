@@ -13,7 +13,7 @@ import DataTable from 'react-data-table-component'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useNavigate } from 'react-router-dom'
-import { backendReceiving } from '../../api/axios'
+import { backendTracking } from '../../api/axios'
 
 const SearchBar = ({ value, onChange }) => (
   <CRow className="mb-3 align-items-center">
@@ -28,7 +28,7 @@ const SearchBar = ({ value, onChange }) => (
   </CRow>
 )
 
-const ReceivingList = () => {
+const ReceivingWhReq = () => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -43,22 +43,25 @@ const ReceivingList = () => {
   }
 
   // Fetch receiving data
+  // Fetch receiving data
   const fetchReceiving = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await backendReceiving.get('/receiving-headers', {
+      const res = await backendTracking.get('/sample-inspections/receiving-items-summary', {
         params: {
+          qc_id: 'QC-SPS002',
           page,
           limit,
-          search: searchKeyword,
-          status: '',
+          search: searchKeyword || undefined,
         },
       })
 
-      setData(res.data.data || [])
-      setTotalRows(res.data.pagination?.totalCount || 0)
+      // Sesuaikan dengan struktur API baru
+      const items = res.data.data?.receiving_items || []
+      setData(items)
+      setTotalRows(res.data.data?.pagination?.total || 0)
     } catch (error) {
-      toast.error('Failed to fetch receiving headers')
+      toast.error('Failed to fetch receiving items summary')
     } finally {
       setLoading(false)
     }
@@ -110,7 +113,7 @@ const ReceivingList = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader className="d-flex justify-content-between align-items-center">
-            <strong>Receiving List</strong>
+            <strong>Receiving-WH : Request List</strong>
           </CCardHeader>
           <CCardBody>
             <SearchBar
@@ -152,4 +155,4 @@ const ReceivingList = () => {
   )
 }
 
-export default ReceivingList
+export default ReceivingWhReq
