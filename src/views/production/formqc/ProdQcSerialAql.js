@@ -304,7 +304,7 @@ const QcAqlSerial = () => {
                 <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
               </CCardHeader>
               <CCardBody>
-                <FormRow label="Serial Number">
+                <FormRow label="Production Serial Number">
                   <CFormInput
                     name="serialNumber"
                     value={formData.serialNumber}
