@@ -41,7 +41,7 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'Recevicing Products',
+    name: 'Receiving Products',
   },
   {
     component: CNavItem,
@@ -51,19 +51,19 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Recevicing List',
-    to: '/receiving/receivingList',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Recevicing Products',
+    name: 'Receiving Products',
     to: '/receiving/receivingHeader',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
-    name: 'Recevicing Serial QC',
+    name: 'Receiving List',
+    to: '/receiving/receivingList',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Receiving Serial QC',
     to: '/receiving/receivingSerialQc',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
