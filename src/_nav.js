@@ -64,7 +64,13 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Receiving Serial QC',
-    to: '/receiving/receivingSerialQc',
+    to: '/receiving/receivingserialqc',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Non Serial QC List',
+    to: '/receiving/receivingnonseriallist',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {

@@ -23,6 +23,9 @@ const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHead
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
 const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDetail'))
 const ReceivingSerialQc = React.lazy(() => import('./views/receiving/ReceivingSerialQc'))
+const ReceivingNonSerialList = React.lazy(
+  () => import('./views/receiving/ReceivingNonSerialList.js'),
+)
 
 //Tracking
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
@@ -409,7 +412,12 @@ const routes = [
   },
   { path: '/receiving/receivingHeader', name: 'Receving Header', element: ReceivingHeader },
   { path: '/receiving/purchaseOrder', name: 'Purchase Order', element: PurchaseOrder },
-  { path: '/receiving/receivingSerialQc', name: 'Reciving Serial QC', element: ReceivingSerialQc },
+  { path: '/receiving/receivingserialqc', name: 'Reciving Serial QC', element: ReceivingSerialQc },
+  {
+    path: '/receiving/receivingnonseriallist',
+    name: 'Reciving Serial List',
+    element: ReceivingNonSerialList,
+  },
   //Tracking
   { path: '/tracking', name: 'Tracking' },
   { path: '/tracking/list', name: 'Tracking List', element: TrackingList },
