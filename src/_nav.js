@@ -362,6 +362,12 @@ const _nav = [
     to: '/warehouse/receivingwhrequest',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'Serial Stock Confirm',
+    to: '/warehouse/serialstockconfirm',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
 
   {
     component: CNavTitle,

@@ -103,6 +103,7 @@ const IncomingWarehouse = React.lazy(() => import('./views/warehouse/IncomingWar
 const OutcomingWarehouse = React.lazy(() => import('./views/warehouse/OutcomingWarehouse'))
 const WarehouseMaster = React.lazy(() => import('./views/warehouse/WarehouseMaster'))
 const ReceivingWhRequest = React.lazy(() => import('./views/warehouse/ReceivingWhRequest'))
+const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStockConfirm'))
 
 // Delivery
 const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
@@ -439,6 +440,11 @@ const routes = [
     path: '/warehouse/receivingwhrequest',
     name: 'Receiving WH Request',
     element: ReceivingWhRequest,
+  },
+  {
+    path: '/warehouse/serialstockconfirm',
+    name: 'Serial Stock Confirm',
+    element: SerialStockConfirm,
   },
   { path: '/widgets', name: 'Widgets', element: Widgets },
 ]
