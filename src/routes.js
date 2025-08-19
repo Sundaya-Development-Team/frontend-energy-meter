@@ -26,6 +26,7 @@ const ReceivingSerialQc = React.lazy(() => import('./views/receiving/ReceivingSe
 const ReceivingNonSerialList = React.lazy(
   () => import('./views/receiving/ReceivingNonSerialList.js'),
 )
+const DetailNonSerialQc = React.lazy(() => import('./views/receiving/DetailNonSerialQc.js'))
 
 //Tracking
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
@@ -417,6 +418,11 @@ const routes = [
     path: '/receiving/receivingnonseriallist',
     name: 'Reciving Serial List',
     element: ReceivingNonSerialList,
+  },
+  {
+    path: '/receiving/detailnonserialqc/:trackingId',
+    name: 'Reciving Serial List',
+    element: DetailNonSerialQc,
   },
   //Tracking
   { path: '/tracking', name: 'Tracking' },

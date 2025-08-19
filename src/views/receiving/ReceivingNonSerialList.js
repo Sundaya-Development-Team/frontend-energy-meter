@@ -59,9 +59,9 @@ const ReceivingNonSerialQc = () => {
     setPage(1)
   }
 
-  const handleDetailClick = (id) => {
+  const handleSelectDetail = (id) => {
     const trackingId = id
-    navigate(`/ /detail/${trackingId}`)
+    navigate(`/receiving/detailnonserialqc/${trackingId}`)
   }
 
   const columns = [
@@ -74,7 +74,7 @@ const ReceivingNonSerialQc = () => {
     {
       name: 'Actions',
       cell: (row) => (
-        <CButton size="sm" color="primary" onClick={() => handleDetailClick(row.id)}>
+        <CButton size="sm" color="primary" onClick={() => handleSelectDetail(row.id)}>
           Select Product
         </CButton>
       ),
