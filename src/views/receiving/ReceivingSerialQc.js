@@ -232,10 +232,10 @@ const ReceivingSerialQc = () => {
       toast.error('QC ID wajib diisi!')
       return
     }
-    if (!formData.notes) {
-      toast.error('Notes wajib diisi!')
-      return
-    }
+    // if (!formData.notes) {
+    //   toast.error('Notes wajib diisi!')
+    //   return
+    // }
     if (Object.keys(answers).length === 0) {
       toast.error('Jawaban pertanyaan QC wajib diisi!')
       return
