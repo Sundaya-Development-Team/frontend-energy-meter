@@ -252,11 +252,11 @@ const _nav = [
     to: '/production/aging',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Batching',
-        to: '/production/aging/batching',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Batching',
+      //   to: '/production/aging/batching',
+      // },
       {
         component: CNavItem,
         name: 'Scan Before',
@@ -281,8 +281,8 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Clear Zero',
-    to: '/production/clearzero',
+    name: 'Finishing',
+    to: '/production/finishing/clearzero',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       // {
@@ -303,6 +303,12 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Clear Zero 1',
+        to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
+      },
+
+      {
+        component: CNavItem,
+        name: 'Closing Cover',
         to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
       },
     ],

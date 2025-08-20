@@ -83,11 +83,11 @@ const ScanAfterAging = React.lazy(() => import('./views/production/agingtest/Sca
 
 // Clear Zero
 const ScanBeforeClearZero = React.lazy(
-  () => import('./views/production/clearzero/ScanBeforeClearZero'),
+  () => import('./views/production/finishing/ScanBeforeClearZero.js'),
 )
-const QCClearZero = React.lazy(() => import('./views/production/clearzero/QCClearZero'))
+const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero.js'))
 const ScanAfterZeroClear = React.lazy(
-  () => import('./views/production/clearzero/ScanAfterClearZero'),
+  () => import('./views/production/finishing/ScanAfterClearZero.js'),
 )
 
 // Closing Cover
