@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { CCard, CCardBody, CFormCheck, CSpinner, CButton } from '@coreui/react'
+import { CCard, CCardBody, CFormCheck, CSpinner, CButton, CRow, CCol } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { toast } from 'react-toastify'
 import { backendTracking } from '../../api/axios'
@@ -93,16 +93,20 @@ const TrackingList = () => {
   return (
     <CCard>
       <CCardBody>
-        <div className="d-flex justify-content-between mb-3">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchKeyword}
-            onChange={handleSearchChange}
-            className="form-control w-25"
-          />
+        <CRow className="mb-3 align-items-center">
+          {/* Search */}
+          <CCol md={4}>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchKeyword}
+              onChange={handleSearchChange}
+              className="form-control form-control-sm"
+            />
+          </CCol>
 
-          <div className="d-flex gap-3">
+          {/* Checkbox Filter */}
+          <CCol md={8} className="d-flex justify-content-md-end gap-3 mt-2 mt-md-0">
             <CFormCheck
               label="Serialized"
               checked={filterSerialized}
@@ -119,8 +123,8 @@ const TrackingList = () => {
                 setPage(1)
               }}
             />
-          </div>
-        </div>
+          </CCol>
+        </CRow>
 
         <DataTable
           columns={columns}
