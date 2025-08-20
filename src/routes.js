@@ -23,10 +23,15 @@ const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHead
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
 const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDetail'))
 const ReceivingSerialQc = React.lazy(() => import('./views/receiving/ReceivingSerialQc'))
+const ReceivingNonSerialList = React.lazy(
+  () => import('./views/receiving/ReceivingNonSerialList.js'),
+)
+const DetailNonSerialQc = React.lazy(() => import('./views/receiving/DetailNonSerialQc.js'))
 
 //Tracking
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
 const TrackingDetail = React.lazy(() => import('./views/tracking/TrackingDetail'))
+const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingFinalProduct'))
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
@@ -77,18 +82,19 @@ const ScanBeforeAging = React.lazy(() => import('./views/production/agingtest/Sc
 const QCAging = React.lazy(() => import('./views/production/agingtest/QCAging'))
 const ScanAfterAging = React.lazy(() => import('./views/production/agingtest/ScanAfterAging'))
 
-// Clear Zero
+// Finishing
 const ScanBeforeClearZero = React.lazy(
-  () => import('./views/production/clearzero/ScanBeforeClearZero'),
+  () => import('./views/production/finishing/ScanBeforeClearZero'),
 )
-const QCClearZero = React.lazy(() => import('./views/production/clearzero/QCClearZero'))
-const ScanAfterZeroClear = React.lazy(
-  () => import('./views/production/clearzero/ScanAfterClearZero'),
-)
+const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
+const ClosingCover = React.lazy(() => import('./views/production/finishing/ClosingCover'))
 
-// Closing Cover
+// Closing Cover (tidak terpakai)
 const ScanBeforeClosingCover = React.lazy(
   () => import('./views/production/closingcover/ScanBeforeClosingCover'),
+)
+const ScanAfterZeroClear = React.lazy(
+  () => import('./views/production/finishing/ScanAfterClearZero.js'),
 )
 const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
 const ScanAfterClosingCover = React.lazy(
@@ -103,6 +109,7 @@ const IncomingWarehouse = React.lazy(() => import('./views/warehouse/IncomingWar
 const OutcomingWarehouse = React.lazy(() => import('./views/warehouse/OutcomingWarehouse'))
 const WarehouseMaster = React.lazy(() => import('./views/warehouse/WarehouseMaster'))
 const ReceivingWhRequest = React.lazy(() => import('./views/warehouse/ReceivingWhRequest'))
+const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStockConfirm'))
 
 // Delivery
 const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
@@ -302,47 +309,53 @@ const routes = [
     element: QCCalibration,
   },
   {
-    path: '/production/clearzero',
+    path: '/production/finishing/clearzero',
     name: 'Clear Zero',
     element: ScanBeforeClearZero,
     exact: true,
   },
   {
-    path: '/production/clearzero/after',
+    path: '/production/finishing/closingcover',
+    name: 'Quality Control Clear Zero',
+    element: ClosingCover,
+  },
+  {
+    path: '/production/finishing/clearzero/after',
     name: 'Scan After Clear Zero',
     element: ScanAfterZeroClear,
   },
   {
-    path: '/production/clearzero/before',
+    path: '/production/finishing/clearzero/before',
     name: 'Scan Before Clear Zero',
     element: ScanBeforeClearZero,
   },
   {
-    path: '/production/clearzero/qc',
+    path: '/production/finishing/clearzero/qc',
     name: 'Quality Control Clear Zero',
     element: QCClearZero,
   },
-  {
-    path: '/production/closingcover',
-    name: 'Closing Cover',
-    element: ScanBeforeClosingCover,
-    exact: true,
-  },
-  {
-    path: '/production/closingcover/after',
-    name: 'Scan After Closing Cover',
-    element: ScanAfterClosingCover,
-  },
-  {
-    path: '/production/closingcover/before',
-    name: 'Scan Before Closing Cover',
-    element: ScanBeforeClosingCover,
-  },
-  {
-    path: '/production/closingcover/qc',
-    name: 'Quality Control Closing Cover',
-    element: QCClosingCover,
-  },
+
+  // {
+  //   path: '/production/closingcover',
+  //   name: 'Closing Cover',
+  //   element: ScanBeforeClosingCover,
+  //   exact: true,
+  // },
+  // {
+  //   path: '/production/closingcover/after',
+  //   name: 'Scan After Closing Cover',
+  //   element: ScanAfterClosingCover,
+  // },
+  // {
+  //   path: '/production/closingcover/before',
+  //   name: 'Scan Before Closing Cover',
+  //   element: ScanBeforeClosingCover,
+  // },
+  // {
+  //   path: '/production/closingcover/qc',
+  //   name: 'Quality Control Closing Cover',
+  //   element: QCClosingCover,
+  // },
   {
     path: '/production/hipot',
     name: 'Hipot Testing',
@@ -408,11 +421,22 @@ const routes = [
   },
   { path: '/receiving/receivingHeader', name: 'Receving Header', element: ReceivingHeader },
   { path: '/receiving/purchaseOrder', name: 'Purchase Order', element: PurchaseOrder },
-  { path: '/receiving/receivingSerialQc', name: 'Reciving Serial QC', element: ReceivingSerialQc },
+  { path: '/receiving/receivingserialqc', name: 'Reciving Serial QC', element: ReceivingSerialQc },
+  {
+    path: '/receiving/receivingnonseriallist',
+    name: 'Reciving Serial List',
+    element: ReceivingNonSerialList,
+  },
+  {
+    path: '/receiving/detailnonserialqc/:trackingId',
+    name: 'Reciving Serial List',
+    element: DetailNonSerialQc,
+  },
   //Tracking
   { path: '/tracking', name: 'Tracking' },
   { path: '/tracking/list', name: 'Tracking List', element: TrackingList },
   { path: '/tracking/detail/:trackingId', name: 'Tracking Detail', element: TrackingDetail },
+  { path: '/tracking/finalproduct', name: 'Tracking Final Product', element: TrackingFinalProduct },
 
   //Semi Production
   { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
@@ -439,6 +463,11 @@ const routes = [
     path: '/warehouse/receivingwhrequest',
     name: 'Receiving WH Request',
     element: ReceivingWhRequest,
+  },
+  {
+    path: '/warehouse/serialstockconfirm',
+    name: 'Serial Stock Confirm',
+    element: SerialStockConfirm,
   },
   { path: '/widgets', name: 'Widgets', element: Widgets },
 ]

@@ -41,7 +41,7 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'Recevicing Products',
+    name: 'Receiving Products',
   },
   {
     component: CNavItem,
@@ -51,20 +51,26 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Recevicing List',
-    to: '/receiving/receivingList',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Recevicing Products',
+    name: 'Receiving Products',
     to: '/receiving/receivingHeader',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
-    name: 'Recevicing Serial QC',
-    to: '/receiving/receivingSerialQc',
+    name: 'Receiving List',
+    to: '/receiving/receivingList',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Receiving Serial QC',
+    to: '/receiving/receivingserialqc',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Non Serial QC List',
+    to: '/receiving/receivingnonseriallist',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   {
@@ -73,8 +79,14 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Tracking List',
+    name: 'Tracking Production List',
     to: '/tracking/list',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Tracking Final Product',
+    to: '/tracking/finalproduct',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   // {
@@ -246,11 +258,11 @@ const _nav = [
     to: '/production/aging',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Batching',
-        to: '/production/aging/batching',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Batching',
+      //   to: '/production/aging/batching',
+      // },
       {
         component: CNavItem,
         name: 'Scan Before',
@@ -275,8 +287,8 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Clear Zero',
-    to: '/production/clearzero',
+    name: 'Finishing',
+    to: '/production/finishing/clearzero',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       // {
@@ -299,31 +311,41 @@ const _nav = [
         name: 'QC Clear Zero 1',
         to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
       },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Closing Cover',
-    to: '/production/closingcover',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
       {
         component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/closingcover/before',
+        name: 'Closing Cover',
+        to: '/production/finishing/closingcover',
       },
       {
         component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/closingcover/qc',
-      },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/closingcover/after',
+        name: 'QC Clear Zero 2',
+        to: '/production/serialnoaql/QC-CZ2010/Clear Zero 2',
       },
     ],
   },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Closing Cover',
+  //   to: '/production/closingcover',
+  //   icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Scan Before',
+  //       to: '/production/closingcover/before',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Quality Control',
+  //       to: '/production/closingcover/qc',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Scan After',
+  //       to: '/production/closingcover/after',
+  //     },
+  //   ],
+  // },
   {
     component: CNavTitle,
     name: 'Inventory',
@@ -360,6 +382,12 @@ const _nav = [
     component: CNavItem,
     name: 'Req. Receiving to WH',
     to: '/warehouse/receivingwhrequest',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Serial Stock Confirm',
+    to: '/warehouse/serialstockconfirm',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
 

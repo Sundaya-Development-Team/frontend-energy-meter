@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { CCard, CCardBody, CFormCheck, CSpinner, CButton, CRow, CCol } from '@coreui/react'
+import { CCard, CCardBody, CSpinner, CButton } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { toast } from 'react-toastify'
 import { backendTracking } from '../../api/axios'
 import { useNavigate } from 'react-router-dom'
 
-const TrackingList = () => {
+const ReceivingNonSerialQc = () => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [totalRows, setTotalRows] = useState(0)
   const [searchKeyword, setSearchKeyword] = useState('')
-  const [filterSerialized, setFilterSerialized] = useState(true)
-  const [filterNonSerialized, setFilterNonSerialized] = useState(true)
 
   const navigate = useNavigate()
 
@@ -25,17 +23,11 @@ const TrackingList = () => {
         limit,
         sort_by: 'created_at',
         sort_order: 'desc',
+        is_serialize: false, // 🔑 hanya ambil non-serial
       }
 
       if (searchKeyword.trim() !== '') {
         params.search = searchKeyword.trim()
-      }
-
-      // Handle serialize filter
-      if (filterSerialized && !filterNonSerialized) {
-        params.is_serialize = true
-      } else if (!filterSerialized && filterNonSerialized) {
-        params.is_serialize = false
       }
 
       const res = await backendTracking.get('/', { params })
@@ -47,7 +39,7 @@ const TrackingList = () => {
     } finally {
       setLoading(false)
     }
-  }, [page, limit, searchKeyword, filterSerialized, filterNonSerialized])
+  }, [page, limit, searchKeyword])
 
   useEffect(() => {
     fetchTracking()
@@ -67,9 +59,9 @@ const TrackingList = () => {
     setPage(1)
   }
 
-  const handleDetailClick = (id) => {
+  const handleSelectDetail = (id) => {
     const trackingId = id
-    navigate(`/tracking/detail/${trackingId}`)
+    navigate(`/receiving/detailnonserialqc/${trackingId}`)
   }
 
   const columns = [
@@ -82,8 +74,8 @@ const TrackingList = () => {
     {
       name: 'Actions',
       cell: (row) => (
-        <CButton size="sm" color="primary" onClick={() => handleDetailClick(row.id)}>
-          Detail
+        <CButton size="sm" color="primary" onClick={() => handleSelectDetail(row.id)}>
+          Select Product
         </CButton>
       ),
       ignoreRowClick: true,
@@ -93,38 +85,15 @@ const TrackingList = () => {
   return (
     <CCard>
       <CCardBody>
-        <CRow className="mb-3 align-items-center">
-          {/* Search */}
-          <CCol md={4} sm={6}>
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchKeyword}
-              onChange={handleSearchChange}
-              className="form-control form-control-sm"
-            />
-          </CCol>
-
-          {/* Checkbox Filter */}
-          <CCol md={8} sm={6} className="d-flex justify-content-md-end gap-3 mt-2 mt-md-0">
-            <CFormCheck
-              label="Serialized"
-              checked={filterSerialized}
-              onChange={(e) => {
-                setFilterSerialized(e.target.checked)
-                setPage(1)
-              }}
-            />
-            <CFormCheck
-              label="Non-Serialized"
-              checked={filterNonSerialized}
-              onChange={(e) => {
-                setFilterNonSerialized(e.target.checked)
-                setPage(1)
-              }}
-            />
-          </CCol>
-        </CRow>
+        <div className="d-flex justify-content-between mb-3">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchKeyword}
+            onChange={handleSearchChange}
+            className="form-control w-25"
+          />
+        </div>
 
         <DataTable
           columns={columns}
@@ -144,4 +113,4 @@ const TrackingList = () => {
   )
 }
 
-export default TrackingList
+export default ReceivingNonSerialQc

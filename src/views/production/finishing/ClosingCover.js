@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CImage } from '@coreui/react'
-import { backendTracking } from '../../../api/axios'
-import { toast } from 'react-toastify'
 
-const ScanBeforeAssembly = () => {
+const ClosingCover = () => {
   const [formData, setFormData] = useState({
-    pcbSnumb: '',
-    sideCoverSnumb: '',
+    sideCoverSnum: '',
+    productionBatch: '10',
+    closingCoverSnumb: '',
   })
 
   const [pcbDisabled, setPcbDisabled] = useState(false)
@@ -22,8 +21,8 @@ const ScanBeforeAssembly = () => {
     }
   }, [sideCoverDisabled])
 
-  const handlePcbSnumb = () => {
-    console.log('PCB Barcode scanned:', formData.pcbSnumb)
+  const handlesideCoverSnum = () => {
+    console.log('Side Cover scanned:', formData.sideCoverSnum)
     setPcbDisabled(true)
     setSideCoverDisabled(false) // setelah ini, useEffect di atas akan fokus otomatis
   }
@@ -36,38 +35,8 @@ const ScanBeforeAssembly = () => {
     }))
   }
 
-  const handleSideCover = async () => {
-    if (!formData.pcbSnumb || !formData.sideCoverSnumb) {
-      toast.warning('Serial number belum lengkap!')
-      return
-    }
-
-    try {
-      const payload = {
-        parent_serial_number: formData.sideCoverSnumb, // SN berikutnya
-        component_serial_number: formData.pcbSnumb, // SN sebelumnya
-        quantity: 1,
-      }
-
-      const res = await backendTracking.post('/assembly-components/by-serial', payload)
-
-      toast.success(res.data?.message || 'Data berhasil dikirim!')
-
-      // reset state agar siap scan lagi
-      setFormData({
-        pcbSnumb: '',
-        sideCoverSnumb: '',
-      })
-      setPcbDisabled(false)
-      setSideCoverDisabled(true)
-
-      // balikin fokus ke PCB input
-      setTimeout(() => {
-        pcbInputRef.current?.focus()
-      }, 100)
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Gagal submit data!')
-    }
+  const handleSideCover = () => {
+    console.log('Closing Cover scanned:', formData.closingCoverSnumb)
   }
 
   return (
@@ -76,15 +45,15 @@ const ScanBeforeAssembly = () => {
       <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>PCB Serial Number</strong>
+            <strong>Side Cover Serial Number</strong>
           </CCardHeader>
           <CCardBody>
             <CForm>
               <CRow className="mb-3">
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
-                    src={`/src/assets/images/assembly/pcb_serial_number.jpeg`}
-                    alt="PCB Preview"
+                    src={`/src/assets/images/assembly/side_cover_serial_number.jpeg`}
+                    alt="Side Cover Serial Number"
                     fluid
                     className="mt-2"
                     style={{ width: '60%' }}
@@ -94,19 +63,19 @@ const ScanBeforeAssembly = () => {
 
               <CRow className="mb-3">
                 <div className="text-center">
-                  <strong>PCB SERIAL NUMBER</strong>
+                  <strong>SIDE COVER SERIAL NUMBER</strong>
                 </div>
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CFormInput
                     type="text"
-                    id="pcbSnumb"
-                    name="pcbSnumb"
-                    value={formData.pcbSnumb}
+                    id="sideCoverSnum"
+                    name="sideCoverSnum"
+                    value={formData.sideCoverSnum}
                     onChange={handleChange}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault()
-                        handlePcbSnumb()
+                        handlesideCoverSnum()
                       }
                     }}
                     ref={pcbInputRef}
@@ -124,15 +93,15 @@ const ScanBeforeAssembly = () => {
       <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Side Cover Serial Number</strong>
+            <strong>Closing Cover Serial Number</strong>
           </CCardHeader>
           <CCardBody>
             <CForm>
               <CRow className="mb-3">
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
-                    src={`/src/assets/images/assembly/side_cover_serial_number.jpeg`}
-                    alt="Side Cover Preview"
+                    src={`/src/assets/images/assembly/tutup_cover.jpeg`}
+                    alt="Closing Cover Serial Number"
                     fluid
                     className="mt-2"
                     style={{ width: '60%' }}
@@ -142,14 +111,14 @@ const ScanBeforeAssembly = () => {
 
               <CRow className="mb-3">
                 <div className="text-center">
-                  <strong>SCAN SERIAL NUMBER</strong>
+                  <strong>CLOSING COVER SERIAL NUMBER</strong>
                 </div>
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CFormInput
                     type="text"
-                    id="sideCoverSnumb"
-                    name="sideCoverSnumb"
-                    value={formData.sideCoverSnumb}
+                    id="closingCoverSnumb"
+                    name="closingCoverSnumb"
+                    value={formData.closingCoverSnumb}
                     onChange={handleChange}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -171,4 +140,4 @@ const ScanBeforeAssembly = () => {
   )
 }
 
-export default ScanBeforeAssembly
+export default ClosingCover
