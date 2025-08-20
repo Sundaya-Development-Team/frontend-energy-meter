@@ -1,11 +1,11 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useEffect, useRef } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CImage } from '@coreui/react'
+import { backendTracking } from '../../../api/axios'
+import { toast } from 'react-toastify'
 
-const ScanBeforeAssemble = () => {
+const ScanBeforeAssembly = () => {
   const [formData, setFormData] = useState({
     pcbSnumb: '',
-    productionBatch: '10',
     sideCoverSnumb: '',
   })
 
@@ -36,8 +36,38 @@ const ScanBeforeAssemble = () => {
     }))
   }
 
-  const handleSideCover = () => {
-    console.log('Side Cover scanned:', formData.sideCoverSnumb)
+  const handleSideCover = async () => {
+    if (!formData.pcbSnumb || !formData.sideCoverSnumb) {
+      toast.warning('Serial number belum lengkap!')
+      return
+    }
+
+    try {
+      const payload = {
+        parent_serial_number: formData.sideCoverSnumb, // SN berikutnya
+        component_serial_number: formData.pcbSnumb, // SN sebelumnya
+        quantity: 1,
+      }
+
+      const res = await backendTracking.post('/assembly-components/by-serial', payload)
+
+      toast.success(res.data?.message || 'Data berhasil dikirim!')
+
+      // reset state agar siap scan lagi
+      setFormData({
+        pcbSnumb: '',
+        sideCoverSnumb: '',
+      })
+      setPcbDisabled(false)
+      setSideCoverDisabled(true)
+
+      // balikin fokus ke PCB input
+      setTimeout(() => {
+        pcbInputRef.current?.focus()
+      }, 100)
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal submit data!')
+    }
   }
 
   return (
@@ -141,4 +171,4 @@ const ScanBeforeAssemble = () => {
   )
 }
 
-export default ScanBeforeAssemble
+export default ScanBeforeAssembly
