@@ -95,7 +95,7 @@ const TrackingList = () => {
       <CCardBody>
         <CRow className="mb-3 align-items-center">
           {/* Search */}
-          <CCol md={4}>
+          <CCol md={4} sm={6}>
             <input
               type="text"
               placeholder="Search..."
@@ -106,7 +106,7 @@ const TrackingList = () => {
           </CCol>
 
           {/* Checkbox Filter */}
-          <CCol md={8} className="d-flex justify-content-md-end gap-3 mt-2 mt-md-0">
+          <CCol md={8} sm={6} className="d-flex justify-content-md-end gap-3 mt-2 mt-md-0">
             <CFormCheck
               label="Serialized"
               checked={filterSerialized}

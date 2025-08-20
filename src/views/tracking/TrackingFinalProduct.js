@@ -1,18 +1,27 @@
 import React, { useState, useMemo } from 'react'
-import { CCard, CCardBody, CSpinner, CFormSelect } from '@coreui/react'
+import {
+  CCard,
+  CCardBody,
+  CSpinner,
+  CFormSelect,
+  CFormInput,
+  CRow,
+  CCol,
+  CFormCheck,
+  CButton,
+} from '@coreui/react'
 import DataTable from 'react-data-table-component'
-import { CButton } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 
 const TrackingFinalProduct = () => {
   const [loading, setLoading] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState('')
+  const [filterSerialized, setFilterSerialized] = useState(false)
+  const [filterNonSerialized, setFilterNonSerialized] = useState(false)
 
-  // di dalam komponen
   const navigate = useNavigate()
 
   const handleDetail = (row) => {
-    // misalnya navigate ke halaman detail pakai id
     navigate(`/tracking/final-product/${row.id}`)
   }
 
@@ -67,15 +76,17 @@ const TrackingFinalProduct = () => {
   // === FILTER LOGIC ===
   const filteredData = useMemo(() => {
     return data.filter((row) => {
-      // search global (cek semua kolom string)
       const keyword = searchKeyword.toLowerCase()
       const matchesSearch =
         keyword === '' ||
-        Object.values(row).some((val) => String(val).toLowerCase().includes(keyword))
+        Object.values(row).some((val) =>
+          String(val || '')
+            .toLowerCase()
+            .includes(keyword),
+        )
 
-      // filter per kolom
       const matchesFilters = Object.entries(filters).every(([key, value]) => {
-        if (value === '') return true // no filter
+        if (value === '') return true
         return row[key] === value
       })
 
@@ -95,15 +106,16 @@ const TrackingFinalProduct = () => {
     {
       name: 'Actions',
       cell: (row) => (
-        <CButton size="sm" color="primary" onClick={() => handleDetail(row.id)}>
+        <CButton size="sm" color="primary" onClick={() => handleDetail(row)}>
           Detail
         </CButton>
       ),
       ignoreRowClick: true,
     },
   ]
+
   const renderFilterSelect = (colKey, label) => (
-    <div className="me-2">
+    <div>
       <small>{label}</small>
       <CFormSelect
         size="sm"
@@ -120,49 +132,53 @@ const TrackingFinalProduct = () => {
   return (
     <CCard>
       <CCardBody>
-        {/* <div className="d-flex justify-content-between mb-3">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-            className="form-control form-control-sm w-25"
-          />
-        </div> */}
-
-        <div className="row mb-3">
-          <div className="col-md-4 col-sm-6">
-            <input
+        {/* Search & Checkbox */}
+        <CRow className="mb-3">
+          <CCol md={4} sm={6}>
+            <CFormInput
               type="text"
               placeholder="Search..."
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
-              className="form-control form-control-sm"
+              size="sm"
             />
-          </div>
-        </div>
+          </CCol>
 
-        <div className="row mb-3">
-          {/* Kolom kiri */}
-          <div className="col-md-6">
-            <div className="row g-2">
-              <div className="col-6">{renderFilterSelect('receiving_test', 'Receiving')}</div>
-              <div className="col-6">{renderFilterSelect('assembly_test', 'Assembly')}</div>
-              <div className="col-6">{renderFilterSelect('on_test', 'ON Test')}</div>
-              <div className="col-6">{renderFilterSelect('hippot_test', 'Hippot')}</div>
-            </div>
-          </div>
+          {/* <CCol md={8} sm={6} className="d-flex align-items-center gap-3 mt-2 mt-sm-0">
+            <CFormCheck
+              label="Serialized"
+              checked={filterSerialized}
+              onChange={(e) => setFilterSerialized(e.target.checked)}
+            />
+            <CFormCheck
+              label="Non-Serialized"
+              checked={filterNonSerialized}
+              onChange={(e) => setFilterNonSerialized(e.target.checked)}
+            />
+          </CCol> */}
+        </CRow>
 
-          {/* Kolom kanan */}
-          <div className="col-md-6">
-            <div className="row g-2">
-              <div className="col-6">{renderFilterSelect('aging_test', 'Aging')}</div>
-              <div className="col-6">{renderFilterSelect('clear_zero1', 'Clear Zero1')}</div>
-              <div className="col-6">{renderFilterSelect('clear_zero2', 'Clear Zero2')}</div>
-            </div>
-          </div>
-        </div>
+        {/* Filter Dropdowns */}
+        <CRow className="mb-3">
+          <CCol md={6}>
+            <CRow className="g-2">
+              <CCol xs={6}>{renderFilterSelect('receiving_test', 'Receiving')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('assembly_test', 'Assembly')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('on_test', 'ON Test')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('hippot_test', 'Hippot')}</CCol>
+            </CRow>
+          </CCol>
 
+          <CCol md={6}>
+            <CRow className="g-2">
+              <CCol xs={6}>{renderFilterSelect('aging_test', 'Aging')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('clear_zero1', 'Clear Zero1')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('clear_zero2', 'Clear Zero2')}</CCol>
+            </CRow>
+          </CCol>
+        </CRow>
+
+        {/* Data Table */}
         <DataTable
           columns={columns}
           data={filteredData}
