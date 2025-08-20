@@ -309,33 +309,33 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Closing Cover',
-        to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
+        to: '/production/finishing/closingcover',
       },
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Closing Cover',
-    to: '/production/closingcover',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/closingcover/before',
-      },
-      {
-        component: CNavItem,
-        name: 'Quality Control',
-        to: '/production/closingcover/qc',
-      },
-      {
-        component: CNavItem,
-        name: 'Scan After',
-        to: '/production/closingcover/after',
-      },
-    ],
-  },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Closing Cover',
+  //   to: '/production/closingcover',
+  //   icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Scan Before',
+  //       to: '/production/closingcover/before',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Quality Control',
+  //       to: '/production/closingcover/qc',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Scan After',
+  //       to: '/production/closingcover/after',
+  //     },
+  //   ],
+  // },
   {
     component: CNavTitle,
     name: 'Inventory',

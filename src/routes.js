@@ -81,18 +81,19 @@ const ScanBeforeAging = React.lazy(() => import('./views/production/agingtest/Sc
 const QCAging = React.lazy(() => import('./views/production/agingtest/QCAging'))
 const ScanAfterAging = React.lazy(() => import('./views/production/agingtest/ScanAfterAging'))
 
-// Clear Zero
+// Finishing
 const ScanBeforeClearZero = React.lazy(
-  () => import('./views/production/finishing/ScanBeforeClearZero.js'),
+  () => import('./views/production/finishing/ScanBeforeClearZero'),
 )
-const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero.js'))
-const ScanAfterZeroClear = React.lazy(
-  () => import('./views/production/finishing/ScanAfterClearZero.js'),
-)
+const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
+const ClosingCover = React.lazy(() => import('./views/production/finishing/ClosingCover'))
 
-// Closing Cover
+// Closing Cover (tidak terpakai)
 const ScanBeforeClosingCover = React.lazy(
   () => import('./views/production/closingcover/ScanBeforeClosingCover'),
+)
+const ScanAfterZeroClear = React.lazy(
+  () => import('./views/production/finishing/ScanAfterClearZero.js'),
 )
 const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
 const ScanAfterClosingCover = React.lazy(
@@ -307,47 +308,53 @@ const routes = [
     element: QCCalibration,
   },
   {
-    path: '/production/clearzero',
+    path: '/production/finishing/clearzero',
     name: 'Clear Zero',
     element: ScanBeforeClearZero,
     exact: true,
   },
   {
-    path: '/production/clearzero/after',
+    path: '/production/finishing/closingcover',
+    name: 'Quality Control Clear Zero',
+    element: ClosingCover,
+  },
+  {
+    path: '/production/finishing/clearzero/after',
     name: 'Scan After Clear Zero',
     element: ScanAfterZeroClear,
   },
   {
-    path: '/production/clearzero/before',
+    path: '/production/finishing/clearzero/before',
     name: 'Scan Before Clear Zero',
     element: ScanBeforeClearZero,
   },
   {
-    path: '/production/clearzero/qc',
+    path: '/production/finishing/clearzero/qc',
     name: 'Quality Control Clear Zero',
     element: QCClearZero,
   },
-  {
-    path: '/production/closingcover',
-    name: 'Closing Cover',
-    element: ScanBeforeClosingCover,
-    exact: true,
-  },
-  {
-    path: '/production/closingcover/after',
-    name: 'Scan After Closing Cover',
-    element: ScanAfterClosingCover,
-  },
-  {
-    path: '/production/closingcover/before',
-    name: 'Scan Before Closing Cover',
-    element: ScanBeforeClosingCover,
-  },
-  {
-    path: '/production/closingcover/qc',
-    name: 'Quality Control Closing Cover',
-    element: QCClosingCover,
-  },
+
+  // {
+  //   path: '/production/closingcover',
+  //   name: 'Closing Cover',
+  //   element: ScanBeforeClosingCover,
+  //   exact: true,
+  // },
+  // {
+  //   path: '/production/closingcover/after',
+  //   name: 'Scan After Closing Cover',
+  //   element: ScanAfterClosingCover,
+  // },
+  // {
+  //   path: '/production/closingcover/before',
+  //   name: 'Scan Before Closing Cover',
+  //   element: ScanBeforeClosingCover,
+  // },
+  // {
+  //   path: '/production/closingcover/qc',
+  //   name: 'Quality Control Closing Cover',
+  //   element: QCClosingCover,
+  // },
   {
     path: '/production/hipot',
     name: 'Hipot Testing',
