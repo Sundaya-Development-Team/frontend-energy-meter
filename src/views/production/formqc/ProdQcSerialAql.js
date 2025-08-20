@@ -111,6 +111,7 @@ const QcAqlSerial = () => {
   }
 
   const fetchProduct = async (serialNumber) => {
+    console.log('masuk fetch product')
     try {
       const response = await backendTracking.get(`/serial/${serialNumber}`)
 
@@ -124,10 +125,10 @@ const QcAqlSerial = () => {
           serialNumber: serialNumber,
         }))
 
-        const receivingItemId = response.data.data.receiving_item_id
-        console.log('receiving_item_id :', receivingItemId)
+        const assemblyId = response.data.data.assembly_id
+        console.log('assemblyId :', assemblyId)
 
-        fetchTrackingProduct(receivingItemId)
+        fetchTrackingProduct(assemblyId)
       } else {
         toast.error(response.data.message || 'Failed get product data')
       }
@@ -136,11 +137,11 @@ const QcAqlSerial = () => {
     }
   }
 
-  const fetchTrackingProduct = async (receivingItemId) => {
+  const fetchTrackingProduct = async (assemblyId) => {
     try {
       const response = await backendTracking.get('/sample-inspections/aql-summary', {
         params: {
-          receiving_item_id: receivingItemId,
+          assembly_id: assemblyId,
           qc_id: qcCodeSerial, //cek kembali ini nanti
         },
       })

@@ -122,9 +122,9 @@ const QcSerialNoAql = () => {
           serialNumber: serialNumber,
         }))
 
-        const receivingItemId = response.data.data.receiving_item_id
+        const assemblyId = response.data.data.assembly_id
 
-        fetchTrackingProduct(receivingItemId)
+        fetchTrackingProduct(assemblyId)
       } else {
         toast.error(response.data.message || 'Failed get product data')
       }
@@ -134,11 +134,11 @@ const QcSerialNoAql = () => {
     }
   }
 
-  const fetchTrackingProduct = async (receivingItemId) => {
+  const fetchTrackingProduct = async (assemblyId) => {
     try {
       const response = await backendTracking.get('/sample-inspections/quantity-summary', {
         params: {
-          receiving_item_id: receivingItemId,
+          assembly_id: assemblyId,
           qc_id: qcCodeSerial, //cek kembali ini nanti
         },
       })
