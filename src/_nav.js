@@ -79,8 +79,14 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Tracking List',
+    name: 'Tracking Production List',
     to: '/tracking/list',
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Tracking Final Product',
+    to: '/tracking/finalproduct',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
   },
   // {

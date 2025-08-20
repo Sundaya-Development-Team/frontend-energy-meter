@@ -31,6 +31,7 @@ const DetailNonSerialQc = React.lazy(() => import('./views/receiving/DetailNonSe
 //Tracking
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
 const TrackingDetail = React.lazy(() => import('./views/tracking/TrackingDetail'))
+const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingFinalProduct'))
 
 // Semi Production
 const IncomingUnit = React.lazy(() => import('./views/semiproduction/IncomingUnit'))
@@ -435,6 +436,7 @@ const routes = [
   { path: '/tracking', name: 'Tracking' },
   { path: '/tracking/list', name: 'Tracking List', element: TrackingList },
   { path: '/tracking/detail/:trackingId', name: 'Tracking Detail', element: TrackingDetail },
+  { path: '/tracking/finalproduct', name: 'Tracking Final Product', element: TrackingFinalProduct },
 
   //Semi Production
   { path: '/semiproduction', name: 'Semi Production', element: BatchingProduction, exact: true },
