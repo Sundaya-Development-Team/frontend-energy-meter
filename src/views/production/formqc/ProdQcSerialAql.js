@@ -310,6 +310,7 @@ const QcAqlSerial = () => {
                         handleSerial()
                       }
                     }}
+                    ref={serialNumberInputRef}
                     disabled={isFormLocked}
                   />
                 </FormRow>
