@@ -17,6 +17,9 @@ const WarehousesPage = React.lazy(() => import('./views/admins/warehouses/Wareho
 const BalancesPage = React.lazy(() => import('./views/admins/warehouses/BalancesPage'))
 const MovementsPage = React.lazy(() => import('./views/admins/warehouses/MovementsPage'))
 const GeneratePlnSerial = React.lazy(() => import('./views/admins/generate/GeneratePlnSerial'))
+const ConfirmSerialLassered = React.lazy(
+  () => import('./views/admins/generate/ConfirmSerialLassered'),
+)
 
 //Receiving
 const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder'))
@@ -169,6 +172,11 @@ const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/admin', name: 'Admin', element: DynamicQuestionForm, exact: true },
   { path: '/admin/generate/plnserial', name: 'Geneare PLN Serial', element: GeneratePlnSerial },
+  {
+    path: '/admin/generate/confirmlassered',
+    name: 'Geneare PLN Serial',
+    element: ConfirmSerialLassered,
+  },
   { path: '/admin/aql', name: 'Admin', element: AqlPage },
   { path: '/admin/delivery', name: 'Delivery', element: DeliveryPage },
   { path: '/admin/dynamicquestion', name: 'Dynamic Question', element: DynamicQuestionForm },

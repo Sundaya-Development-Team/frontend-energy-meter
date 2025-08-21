@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   CButton,
   CCard,
@@ -20,6 +19,11 @@ import { backendGenerate } from '../../../api/axios'
 const ConfirmSerialPrint = () => {
   const [serialInput, setSerialInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const plnSerialNumber = useRef(null)
+
+  useEffect(() => {
+    plnSerialNumber.current?.focus()
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -43,7 +47,7 @@ const ConfirmSerialPrint = () => {
 
     try {
       setLoading(true)
-      const res = await backendGenerate.post('/confirm-print', payload)
+      const res = await backendGenerate.patch('/status', payload)
       toast.success(res.data?.message || 'Konfirmasi berhasil!')
       setSerialInput('')
     } catch (err) {
@@ -55,21 +59,21 @@ const ConfirmSerialPrint = () => {
 
   return (
     <CRow>
-      <CCol md={8} className="mx-auto">
+      <CCol md={12} className="mx-auto">
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Konfirmasi Serial Number Dicetak</strong>
+            <strong>Update Status Lassered Serial </strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
               <CRow className="mb-3">
-                <CFormLabel className="col-sm-3 col-form-label">Serial Numbers</CFormLabel>
+                <CFormLabel className="col-sm-3 col-form-label">PLN Serial Numbers</CFormLabel>
                 <CCol sm={9}>
                   <CFormInput
                     as="textarea"
                     rows={5}
-                    placeholder="Masukkan serial number, pisahkan dengan koma atau baris baru"
                     value={serialInput}
+                    ref={plnSerialNumber}
                     onChange={(e) => setSerialInput(e.target.value)}
                   />
                 </CCol>

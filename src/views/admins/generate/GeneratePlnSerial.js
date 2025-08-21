@@ -60,7 +60,7 @@ const GeneratePlnSerial = () => {
     }
 
     // header
-    const headers = ['ID', 'Serial Number', 'PLN Raw', 'STS ID', 'Batch', 'Status']
+    const headers = ['No', 'Serial Number', 'PLN Raw', 'STS ID', 'Batch', 'Status']
     const rows = serialNumbers.map((row) => [
       row.id,
       row.serialCode,
@@ -84,7 +84,12 @@ const GeneratePlnSerial = () => {
 
   // definisi kolom untuk DataTable
   const columns = [
-    { name: 'ID', selector: (row) => row.id, sortable: true },
+    {
+      name: 'No',
+      selector: (row, index) => index + 1, // nomor urut
+      sortable: false,
+      width: '70px',
+    },
     { name: 'Serial Number', selector: (row) => row.serialCode, sortable: true },
     { name: 'PLN Raw', selector: (row) => row.plnRaw, sortable: true },
     { name: 'STS ID', selector: (row) => row.stsId, sortable: true },

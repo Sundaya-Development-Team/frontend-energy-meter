@@ -439,6 +439,12 @@ const _nav = [
     to: '/admin/generate/plnserial',
     icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'Confirm Lassered Serial',
+    to: '/admin/generate/confirmlassered',
+    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  },
   // {
   //   component: CNavItem,
   //   name: 'AQL Setting',
