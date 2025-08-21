@@ -78,18 +78,6 @@ const ConfirmSerialPrint = () => {
                   />
                 </CCol>
               </CRow>
-
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="success" type="submit" disabled={loading} className="text-white">
-                  {loading ? (
-                    <>
-                      <CSpinner size="sm" /> Mengirim...
-                    </>
-                  ) : (
-                    'Konfirmasi'
-                  )}
-                </CButton>
-              </div>
             </CForm>
           </CCardBody>
         </CCard>
