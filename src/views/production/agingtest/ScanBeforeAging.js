@@ -57,8 +57,9 @@ const ScanBeforeAging = () => {
     }))
   }
 
-  // scan serial number → push ke list
+  // scan Product Serial Number → push ke list
   const handleSerial = () => {
+    console.log('scan brow')
     if (!formData.serialNumber.trim()) return
     setScanningItem((prev) => {
       const newSerial = {
@@ -143,14 +144,14 @@ const ScanBeforeAging = () => {
         </CCard>
       </CCol> */}
 
-      {/* Scan Serial Number */}
+      {/* Scan Product Serial Number */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
             <strong>Product Name : {scanningItem.itemName}</strong>
           </CCardHeader>
           <CCardBody>
-            <FormRow label="Serial Number">
+            <FormRow label="Product Serial Number">
               <CFormInput
                 name="serialNumber"
                 onChange={handleChange}
@@ -162,7 +163,7 @@ const ScanBeforeAging = () => {
                 }}
               />
             </FormRow>
-            {/* <CFormLabel>Production Serial Number</CFormLabel>
+            {/* <CFormLabel>Production Product Serial Number</CFormLabel>
             <CFormInput
               name="serialNumber"
               value={formData.serialNumber}
@@ -189,11 +190,11 @@ const ScanBeforeAging = () => {
         </CCard>
       </CCol>
 
-      {/* Tabel Serial Numbers */}
+      {/* Tabel Product Serial Numbers */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Staged Serial Numbers || Total: {scanningItem.totalStaged}</strong>
+            <strong>Staged Product Serial Numbers || Total: {scanningItem.totalStaged}</strong>
           </CCardHeader>
           <CCardBody className="d-flex flex-column">
             <div className="flex-grow-1 overflow-auto">
@@ -201,7 +202,7 @@ const ScanBeforeAging = () => {
                 <CTableHead>
                   <CTableRow>
                     <CTableHeaderCell>No</CTableHeaderCell>
-                    <CTableHeaderCell>Serial Number</CTableHeaderCell>
+                    <CTableHeaderCell>Product Serial Number</CTableHeaderCell>
                     <CTableHeaderCell>Staged At</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>

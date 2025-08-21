@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CRow,
@@ -39,7 +39,7 @@ const QcSerialNoAql = () => {
   const inspected_by = 'ADMIN_RECEIVING'
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
-
+  const serialNumberInputRef = useRef(null)
   const resetStates = () => {
     setProductData(null)
     setTrackingProduct(null)
@@ -50,6 +50,7 @@ const QcSerialNoAql = () => {
 
   useEffect(() => {
     resetStates()
+    serialNumberInputRef.current.focus()
     console.clear()
   }, [qcIdParams])
 
@@ -245,6 +246,8 @@ const QcSerialNoAql = () => {
       )
 
       toast.success(messageShow)
+
+      serialNumberInputRef.current.focus()
     } catch (error) {
       console.error('QC submit error:', error)
       toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
@@ -276,6 +279,7 @@ const QcSerialNoAql = () => {
                         handleSerial()
                       }
                     }}
+                    ref={serialNumberInputRef}
                     disabled={isFormLocked}
                   />
                 </FormRow>
