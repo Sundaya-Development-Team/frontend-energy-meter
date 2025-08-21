@@ -113,63 +113,6 @@ const SerialStockConfirm = () => {
 
   return (
     <CRow>
-      {/* Form Barcode */}
-      {/* <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Scan Before Aging Test</strong>
-          </CCardHeader>
-          <CCardBody>
-            <CForm>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
-                  Barcode
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="text"
-                    id="FormBarcodeInput"
-                    name="barcode"
-                    value={formData.barcode}
-                    onChange={handleChange}
-                    required
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
-                  Production Batch
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="text"
-                    id="FormBatchProductionInput"
-                    name="productionBatch"
-                    value={formData.productionBatch}
-                    readOnly
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBatchAgingInput" className="col-sm-2 col-form-label">
-                  Aging Batch
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="number"
-                    id="FormBatchAgingInput"
-                    name="agingBatch"
-                    value={formData.agingBatch}
-                    onChange={handleChange}
-                    required
-                  />
-                </CCol>
-              </CRow>
-            </CForm>
-          </CCardBody>
-        </CCard>
-      </CCol> */}
-
       {/* Scan Serial Number */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
@@ -177,7 +120,7 @@ const SerialStockConfirm = () => {
             <strong>Product Name : {scanningItem.itemName}</strong>
           </CCardHeader>
           <CCardBody>
-            <FormRow label="Reference PO">
+            {/* <FormRow label="Reference PO">
               <Select
                 options={poOptions}
                 value={poOptions.find((opt) => opt.value === formData.reference_po) || null}
@@ -187,7 +130,7 @@ const SerialStockConfirm = () => {
                 isClearable
                 placeholder="Select PO"
               />
-            </FormRow>
+            </FormRow> */}
             <FormRow label="Serial Number">
               <CFormInput
                 name="serialNumber"
@@ -200,18 +143,6 @@ const SerialStockConfirm = () => {
                 }}
               />
             </FormRow>
-            {/* <CFormLabel>Production Serial Number</CFormLabel>
-            <CFormInput
-              name="serialNumber"
-              value={formData.serialNumber}
-              onChange={handleChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  handleSerial()
-                }
-              }}
-            /> */}
 
             <div className="mt-3">
               {' '}

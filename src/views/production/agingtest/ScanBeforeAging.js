@@ -49,16 +49,9 @@ const ScanBeforeAging = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-
-  // scan serial number → push ke list
+  // scan Product Serial Number → push ke list
   const handleSerial = () => {
+    console.log('scan brow')
     if (!formData.serialNumber.trim()) return
     setScanningItem((prev) => {
       const newSerial = {
@@ -86,74 +79,16 @@ const ScanBeforeAging = () => {
 
   return (
     <CRow>
-      {/* Form Barcode */}
-      {/* <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Scan Before Aging Test</strong>
-          </CCardHeader>
-          <CCardBody>
-            <CForm>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBarcodeInput" className="col-sm-2 col-form-label">
-                  Barcode
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="text"
-                    id="FormBarcodeInput"
-                    name="barcode"
-                    value={formData.barcode}
-                    onChange={handleChange}
-                    required
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBatchProductionInput" className="col-sm-2 col-form-label">
-                  Production Batch
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="text"
-                    id="FormBatchProductionInput"
-                    name="productionBatch"
-                    value={formData.productionBatch}
-                    readOnly
-                  />
-                </CCol>
-              </CRow>
-              <CRow className="mb-3">
-                <CFormLabel htmlFor="FormBatchAgingInput" className="col-sm-2 col-form-label">
-                  Aging Batch
-                </CFormLabel>
-                <CCol sm={10}>
-                  <CFormInput
-                    type="number"
-                    id="FormBatchAgingInput"
-                    name="agingBatch"
-                    value={formData.agingBatch}
-                    onChange={handleChange}
-                    required
-                  />
-                </CCol>
-              </CRow>
-            </CForm>
-          </CCardBody>
-        </CCard>
-      </CCol> */}
-
-      {/* Scan Serial Number */}
+      {/* Scan Product Serial Number */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
             <strong>Product Name : {scanningItem.itemName}</strong>
           </CCardHeader>
           <CCardBody>
-            <FormRow label="Serial Number">
+            <FormRow label="Product Serial Number">
               <CFormInput
                 name="serialNumber"
-                onChange={handleChange}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
@@ -162,7 +97,7 @@ const ScanBeforeAging = () => {
                 }}
               />
             </FormRow>
-            {/* <CFormLabel>Production Serial Number</CFormLabel>
+            {/* <CFormLabel>Production Product Serial Number</CFormLabel>
             <CFormInput
               name="serialNumber"
               value={formData.serialNumber}
@@ -189,11 +124,11 @@ const ScanBeforeAging = () => {
         </CCard>
       </CCol>
 
-      {/* Tabel Serial Numbers */}
+      {/* Tabel Product Serial Numbers */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Staged Serial Numbers || Total: {scanningItem.totalStaged}</strong>
+            <strong>Staged Product Serial Numbers || Total: {scanningItem.totalStaged}</strong>
           </CCardHeader>
           <CCardBody className="d-flex flex-column">
             <div className="flex-grow-1 overflow-auto">
@@ -201,7 +136,7 @@ const ScanBeforeAging = () => {
                 <CTableHead>
                   <CTableRow>
                     <CTableHeaderCell>No</CTableHeaderCell>
-                    <CTableHeaderCell>Serial Number</CTableHeaderCell>
+                    <CTableHeaderCell>Product Serial Number</CTableHeaderCell>
                     <CTableHeaderCell>Staged At</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>

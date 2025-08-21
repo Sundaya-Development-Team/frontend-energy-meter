@@ -58,6 +58,11 @@ export const backendWh = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/warehouse`,
 })
 
+//Generate Serial number
+export const backendGenerate = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/serial-numbers`,
+})
+
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,
 // })
