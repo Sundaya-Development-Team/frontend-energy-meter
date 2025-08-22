@@ -15,6 +15,8 @@ import {
   CModal,
   CModalBody,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilX } from '@coreui/icons'
 import Select from 'react-select'
 import { backendProduct, backendReceiving } from '../../api/axios'
 
@@ -107,6 +109,17 @@ const ReceivingHeader = () => {
         },
       ],
     }))
+  }
+
+  const handleDeleteRow = (index) => {
+    setFormData((prev) => {
+      if (prev.details.length <= 1) {
+        toast.warn('Minimal 1 product harus ada.')
+        return prev
+      }
+      const updated = prev.details.filter((_, i) => i !== index)
+      return { ...prev, details: updated }
+    })
   }
 
   const handleDetailChange = (index, field, value) => {
@@ -278,6 +291,7 @@ const ReceivingHeader = () => {
                       <th>Product Type</th>
                       <th>Serialize</th>
                       <th>Order Qty</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -322,6 +336,24 @@ const ReceivingHeader = () => {
                             }}
                           />
                         </td>
+                        <td className="text-center align-middle">
+                          <div className="d-flex justify-content-center align-items-center">
+                            <CButton
+                              color="danger"
+                              size="sm"
+                              onClick={() => handleDeleteRow(index)}
+                              className="d-flex align-items-center justify-content-center p-0"
+                              style={{ width: '28px', height: '28px' }} // kotak kecil, bukan bulat
+                            >
+                              <CIcon
+                                icon={cilX}
+                                size="sm"
+                                className="text-white"
+                                style={{ strokeWidth: 5 }}
+                              />
+                            </CButton>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -331,7 +363,23 @@ const ReceivingHeader = () => {
                 <div className="d-flex flex-column gap-3">
                   {formData.details.map((item, index) => (
                     <CCard key={index} className="p-2 shadow-sm">
-                      <p className="fw-bold mb-1">Product #{index + 1}</p>
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <p className="fw-bold mb-0">Product #{index + 1}</p>
+                        <CButton
+                          color="danger"
+                          size="sm"
+                          onClick={() => handleDeleteRow(index)}
+                          className="d-flex align-items-center justify-content-center p-0"
+                          style={{ width: '28px', height: '28px' }} // biar kecil dan kotak
+                        >
+                          <CIcon
+                            icon={cilX}
+                            size="sm"
+                            className="text-white"
+                            style={{ strokeWidth: 5 }}
+                          />
+                        </CButton>
+                      </div>
                       <CButton
                         color="light"
                         className="w-100 text-start mb-2"
