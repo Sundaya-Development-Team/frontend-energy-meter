@@ -12,6 +12,8 @@ import {
   CFormLabel,
   CFormTextarea,
   CRow,
+  CModal,
+  CModalBody,
 } from '@coreui/react'
 import Select from 'react-select'
 import { backendProduct, backendReceiving } from '../../api/axios'
@@ -51,6 +53,18 @@ const ReceivingHeader = () => {
     receiving_batch: '',
     details: [],
   })
+
+  // modal handler
+  const [showModal, setShowModal] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(null)
+
+  // responsive flag
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 500)
+  useEffect(() => {
+    const handleResize = () => setIsSmallScreen(window.innerWidth < 500)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     const todayJakarta = new Date().toLocaleDateString('en-CA', {
@@ -106,6 +120,7 @@ const ReceivingHeader = () => {
         item.name = selected?.name || ''
         item.product_id = selected?.id || ''
         item.product_type = selected?.type?.name || ''
+        item.serialize = selected?.is_serialize ?? false
       } else if (field === 'ref_quantity') {
         item[field] = Number(value)
       } else {
@@ -145,21 +160,18 @@ const ReceivingHeader = () => {
         purchase_orders_id: formData.reference_po,
         gr_number: formData.reference_gr,
         notes: formData.notes,
-        received_date: formData.receiving_date, // sesuai Postman kamu
-        received_by: 5, // atau ambil dari user login jika perlu
-        batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`, // pastikan string
-        location: 'Receiving Area', // bisa kamu ubah sesuai lokasi default
+        received_date: formData.receiving_date,
+        received_by: 5,
+        batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`,
+        location: 'Receiving Area',
         receiving_items: formData.details.map((d) => ({
           product_id: d.product_id,
           is_serialized: d.serialize,
           quantity: Number(d.ref_quantity),
           item_type: d.product_type,
-          notes: d.notes || '', // jika kamu mau tambahkan catatan per item
+          notes: d.notes || '',
         })),
       }
-
-      console.log('Payload:', payload)
-      console.log('PayloadDetails:', payload.details)
 
       const response = await backendReceiving.post('/receiving-headers', payload)
 
@@ -167,7 +179,6 @@ const ReceivingHeader = () => {
         response?.data?.message || 'Failed to submit Receiving. See console for details.'
 
       toast.success(message)
-      // Reset form
 
       const todayJakarta = new Date().toLocaleDateString('en-CA', {
         timeZone: 'Asia/Jakarta',
@@ -235,7 +246,7 @@ const ReceivingHeader = () => {
                   name="receiving_batch"
                   value={formData.receiving_batch}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '') // hanya angka, tetap string
+                    const value = e.target.value.replace(/\D/g, '')
                     setFormData((prev) => ({ ...prev, receiving_batch: value }))
                   }}
                   required
@@ -257,70 +268,134 @@ const ReceivingHeader = () => {
                 + Add Product
               </CButton>
 
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>SAP Code</th>
-                    <th>Product Name</th>
-                    <th>Product Type</th>
-                    <th>Serialize</th>
-                    <th>Order Qty</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {formData.details.map((item, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        <Select
-                          options={productsData.map((p) => ({
-                            value: p.sap_code,
-                            label: p.sap_code,
-                          }))}
-                          value={
-                            item.sap_code ? { value: item.sap_code, label: item.sap_code } : null
-                          }
-                          onChange={(opt) =>
-                            handleDetailChange(index, 'sap_code', opt ? opt.value : '')
-                          }
-                          isClearable
-                        />
-                      </td>
-                      <td>
-                        <CFormInput value={item.name} readOnly />
-                      </td>
-                      <td>
-                        <CFormInput value={item.product_type ?? ''} readOnly />
-                      </td>
-                      <td>
-                        <Select
-                          options={[
-                            { value: true, label: 'True' },
-                            { value: false, label: 'False' },
-                          ]}
-                          value={{
-                            value: item.serialize,
-                            label: item.serialize ? 'True' : 'False',
-                          }}
-                          onChange={(opt) => handleDetailChange(index, 'serialize', opt.value)}
-                        />
-                      </td>
-                      <td>
-                        <CFormInput
-                          type="number"
-                          min={0}
-                          value={item.ref_quantity ?? ''}
-                          onChange={(e) => {
-                            const val = Math.max(0, Number(e.target.value))
-                            handleDetailChange(index, 'ref_quantity', val)
-                          }}
-                        />
-                      </td>
+              {!isSmallScreen ? (
+                // TABLE VIEW for Desktop / Tablet
+                <table className="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>SAP Code</th>
+                      <th>Product Type</th>
+                      <th>Serialize</th>
+                      <th>Order Qty</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {formData.details.map((item, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td style={{ minWidth: '180px' }}>
+                          <Select
+                            options={productsData.map((p) => ({
+                              value: p.sap_code,
+                              label: `${p.sap_code} - ${p.name}`,
+                            }))}
+                            value={
+                              item.sap_code
+                                ? { value: item.sap_code, label: `${item.sap_code} - ${item.name}` }
+                                : null
+                            }
+                            onChange={(opt) =>
+                              handleDetailChange(index, 'sap_code', opt ? opt.value : '')
+                            }
+                            isClearable
+                            styles={{
+                              container: (base) => ({ ...base, width: '100%' }),
+                              menu: (base) => ({ ...base, zIndex: 9999 }),
+                            }}
+                          />
+                        </td>
+                        <td>
+                          <CFormInput value={item.product_type ?? ''} readOnly />
+                        </td>
+                        <td>
+                          <CFormInput value={item.serialize ? 'True' : 'False'} readOnly />
+                        </td>
+                        <td>
+                          <CFormInput
+                            type="number"
+                            min={0}
+                            value={item.ref_quantity ?? ''}
+                            onChange={(e) => {
+                              const val = Math.max(0, Number(e.target.value))
+                              handleDetailChange(index, 'ref_quantity', val)
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                // CARD VIEW for Mobile
+                <div className="d-flex flex-column gap-3">
+                  {formData.details.map((item, index) => (
+                    <CCard key={index} className="p-2 shadow-sm">
+                      <p className="fw-bold mb-1">Product #{index + 1}</p>
+                      <CButton
+                        color="light"
+                        className="w-100 text-start mb-2"
+                        onClick={() => {
+                          setActiveIndex(index)
+                          setShowModal(true)
+                        }}
+                      >
+                        {item.sap_code ? `${item.sap_code} - ${item.name}` : 'Select Product'}
+                      </CButton>
+                      <CFormInput
+                        className="mb-2"
+                        value={item.product_type ?? ''}
+                        readOnly
+                        placeholder="Product Type"
+                      />
+                      <CFormInput
+                        className="mb-2"
+                        value={item.serialize ? 'True' : 'False'}
+                        readOnly
+                        placeholder="Serialize"
+                      />
+                      <CFormInput
+                        type="number"
+                        min={0}
+                        value={item.ref_quantity ?? ''}
+                        onChange={(e) => {
+                          const val = Math.max(0, Number(e.target.value))
+                          handleDetailChange(index, 'ref_quantity', val)
+                        }}
+                        placeholder="Order Qty"
+                      />
+                    </CCard>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              )}
+
+              {/* Modal khusus mobile */}
+              <CModal visible={showModal} onClose={() => setShowModal(false)} alignment="center">
+                <CModalBody>
+                  <Select
+                    autoFocus
+                    options={productsData.map((p) => ({
+                      value: p.sap_code,
+                      label: `${p.sap_code} - ${p.name}`,
+                    }))}
+                    value={
+                      activeIndex !== null && formData.details[activeIndex]?.sap_code
+                        ? {
+                            value: formData.details[activeIndex].sap_code,
+                            label: `${formData.details[activeIndex].sap_code} - ${formData.details[activeIndex].name}`,
+                          }
+                        : null
+                    }
+                    onChange={(opt) => {
+                      if (activeIndex !== null) {
+                        handleDetailChange(activeIndex, 'sap_code', opt ? opt.value : '')
+                      }
+                      setShowModal(false)
+                    }}
+                    isClearable
+                  />
+                </CModalBody>
+              </CModal>
 
               <div className="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                 <CButton color="primary" type="submit" disabled={loading}>
