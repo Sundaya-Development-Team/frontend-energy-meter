@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CImage } from '@coreui/react'
+import { toast } from 'react-toastify'
+import { backendGenerate, backendTracking } from '../../../api/axios'
 
 const ClosingCover = () => {
   const [formData, setFormData] = useState({
-    sideCoverSnum: '',
-    productionBatch: '10',
+    sideCoverSnumb: '',
     closingCoverSnumb: '',
   })
 
   const [pcbDisabled, setPcbDisabled] = useState(false)
-  const [sideCoverDisabled, setSideCoverDisabled] = useState(true)
+  const [closingCoverDisable, setclosingCoverDisable] = useState(true)
 
-  const pcbInputRef = useRef(null)
   const sideCoverInputRef = useRef(null)
+  const closingCoverRef = useRef(null)
 
   useEffect(() => {
-    pcbInputRef.current.focus()
-    if (!sideCoverDisabled && sideCoverInputRef.current) {
-      sideCoverInputRef.current.focus()
+    sideCoverInputRef.current.focus()
+    if (!closingCoverDisable && closingCoverRef.current) {
+      closingCoverRef.current.focus()
     }
-  }, [sideCoverDisabled])
+  }, [closingCoverDisable])
 
-  const handlesideCoverSnum = () => {
-    console.log('Side Cover scanned:', formData.sideCoverSnum)
+  const handlesideCoverSnumb = () => {
     setPcbDisabled(true)
-    setSideCoverDisabled(false) // setelah ini, useEffect di atas akan fokus otomatis
+    setclosingCoverDisable(false) // setelah ini, useEffect di atas akan fokus otomatis
   }
 
   const handleChange = (e) => {
@@ -35,13 +35,73 @@ const ClosingCover = () => {
     }))
   }
 
-  const handleSideCover = () => {
-    console.log('Closing Cover scanned:', formData.closingCoverSnumb)
+  // Fungsi untuk update PLN Code ke backendTracking
+  const updatePlnCode = async (sideCoverSnumb, closingCoverSnumb) => {
+    try {
+      const payloadUpdate = {
+        serial_number: sideCoverSnumb, // SIDE COVER SN
+        pln_code: closingCoverSnumb, // CLOSING COVER SN
+      }
+
+      const updateRes = await backendTracking.post('/update-pln-code', payloadUpdate)
+      toast.success(updateRes.data?.message || 'PLN Code berhasil diupdate!')
+
+      // Reset form
+      setFormData({ sideCoverSnumb: '', closingCoverSnumb: '' })
+
+      // Setelah sukses:
+      setclosingCoverDisable(true) // Closing Cover disable
+      setPcbDisabled(false) // Side Cover enable lagi
+
+      // Fokus ke Side Cover input
+      setTimeout(() => {
+        sideCoverInputRef.current?.focus()
+      }, 100)
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Gagal update PLN Code!')
+    }
+  }
+
+  // Fungsi utama untuk handle Closing Cover
+  const handleClosingCover = async () => {
+    const { closingCoverSnumb, sideCoverSnumb } = formData
+
+    if (!closingCoverSnumb || !sideCoverSnumb) {
+      toast.warning('Serial number Closing Cover & Side Cover harus diisi!')
+      return
+    }
+
+    console.log('Closing Cover SN :', closingCoverSnumb)
+    console.log('Side Cover SN    :', sideCoverSnumb)
+
+    try {
+      const payloadValidate = { serialCode: closingCoverSnumb }
+      const response = await backendGenerate.post('/validate', payloadValidate)
+      const validation = response.data?.data?.isValid
+
+      if (!validation) {
+        console.log('Closing Cover tidak valid')
+        setFormData({ sideCoverSnumb: '', closingCoverSnumb: '' })
+
+        setTimeout(() => {
+          sideCoverInputRef.current?.focus()
+        }, 100)
+
+        toast.error(response.data?.data?.message || 'Closing Cover tidak valid!')
+        return
+      }
+
+      console.log('Closing Cover valid')
+
+      await updatePlnCode(sideCoverSnumb, closingCoverSnumb)
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Terjadi kesalahan saat validasi!')
+    }
   }
 
   return (
     <CRow>
-      {/* PCB Serial Number */}
+      {/* Side Cover Number */}
       <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>
@@ -68,17 +128,17 @@ const ClosingCover = () => {
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CFormInput
                     type="text"
-                    id="sideCoverSnum"
-                    name="sideCoverSnum"
-                    value={formData.sideCoverSnum}
+                    id="sideCoverSnumb"
+                    name="sideCoverSnumb"
+                    value={formData.sideCoverSnumb}
                     onChange={handleChange}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault()
-                        handlesideCoverSnum()
+                        handlesideCoverSnumb()
                       }
                     }}
-                    ref={pcbInputRef}
+                    ref={sideCoverInputRef}
                     required
                     disabled={pcbDisabled}
                   />
@@ -89,7 +149,7 @@ const ClosingCover = () => {
         </CCard>
       </CCol>
 
-      {/* Side Cover Serial Number */}
+      {/* Closing Cover  Serial Number */}
       <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>
@@ -123,12 +183,12 @@ const ClosingCover = () => {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault()
-                        handleSideCover()
+                        handleClosingCover()
                       }
                     }}
-                    ref={sideCoverInputRef}
+                    ref={closingCoverRef}
                     required
-                    disabled={sideCoverDisabled}
+                    disabled={closingCoverDisable}
                   />
                 </CCol>
               </CRow>

@@ -5,7 +5,6 @@ import {
   CCardBody,
   CCardHeader,
   CCol,
-  CForm,
   CFormInput,
   CFormLabel,
   CRow,
@@ -19,6 +18,8 @@ import {
   CPaginationItem,
 } from '@coreui/react'
 import { CounterCard6 } from '../../components/CounterCard'
+import { backendQc } from '../../../api/axios'
+import { toast } from 'react-toastify'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -30,49 +31,64 @@ const FormRow = ({ label, children }) => (
 )
 
 const ScanBeforeAging = () => {
-  const [formData, setFormData] = useState({
-    barcode: '',
-    productionBatch: '10',
-    agingBatch: '',
-    serialNumber: '',
-  })
+  const [serialNumber, setSerialNumber] = useState('')
 
-  // scanningItem langsung dummy
-  const [scanningItem, setScanningItem] = useState({
-    itemName: 'Product ABC',
-    expectedQuantity: 10,
-    remainingStage: 10,
-    totalStaged: 0,
-    serialNumbers: [],
+  const [inspectionSummary, setInspectionSummary] = useState({
+    total_items: '-',
+    required_sample: '-',
+    total_inspected: '-',
+    remaining_samples: '-',
+    pass_count: '-',
+    fail_count: '-',
+    completion_percentage: '-',
+    defect_rate: '-',
   })
+  const [inspectionDetails, setInspectionDetails] = useState([])
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
-  // scan Product Serial Number → push ke list
-  const handleSerial = () => {
-    console.log('scan brow')
-    if (!formData.serialNumber.trim()) return
-    setScanningItem((prev) => {
-      const newSerial = {
-        serial_number: formData.serialNumber,
-        created_at: new Date(),
+  const handleSerial = async () => {
+    if (!serialNumber.trim()) return
+
+    try {
+      const payload = {
+        inspector_by: 4,
+        serial_number: serialNumber,
+        qc_id: 'QC-ATS011',
       }
-      const updatedList = [...prev.serialNumbers, newSerial]
-      return {
-        ...prev,
-        serialNumbers: updatedList,
-        totalStaged: updatedList.length,
-        remainingStage: prev.expectedQuantity - updatedList.length,
+
+      const response = await backendQc.post('/validation', payload)
+      const data = response.data
+
+      if (data.valid === true) {
+        toast.success(data?.message || 'Scan berhasil!')
+
+        setInspectionSummary(data.inspection_summary)
+        setInspectionDetails((prev) => {
+          const newDetails = data.inspection_details || []
+
+          // buat map lama
+          const map = new Map(prev.map((item) => [item.serial_number, item]))
+
+          // update/replace dengan data baru
+          newDetails.forEach((item) => {
+            map.set(item.serial_number, item)
+          })
+
+          return Array.from(map.values())
+        })
+      } else if (data.valid === false) {
+        toast.error(data?.message || 'Scan gagal!')
       }
-    })
-    setFormData((prev) => ({
-      ...prev,
-      serialNumber: '',
-    }))
+      // reset input serial number
+      setSerialNumber('')
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Gagal validasi serial number!')
+    }
   }
 
-  const paginatedSerialNumbers = scanningItem.serialNumbers.slice(
+  const paginatedDetails = inspectionDetails.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   )
@@ -83,12 +99,13 @@ const ScanBeforeAging = () => {
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Product Name : {scanningItem.itemName}</strong>
+            <strong>QC Aging Test Sample</strong>
           </CCardHeader>
           <CCardBody>
             <FormRow label="Product Serial Number">
               <CFormInput
-                name="serialNumber"
+                value={serialNumber}
+                onChange={(e) => setSerialNumber(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
@@ -97,38 +114,35 @@ const ScanBeforeAging = () => {
                 }}
               />
             </FormRow>
-            {/* <CFormLabel>Production Product Serial Number</CFormLabel>
-            <CFormInput
-              name="serialNumber"
-              value={formData.serialNumber}
-              onChange={handleChange}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  handleSerial()
-                }
-              }}
-            /> */}
 
-            <div className="mt-3">
-              {' '}
-              <FormRow label="Counter"></FormRow>
-              <CRow className="mb-3">
-                <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
-                <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
-              </CRow>
-            </div>
+            {/* Counter dari inspection_summary */}
+            {inspectionSummary && (
+              <div className="mt-3">
+                <FormRow label="Inspection Summary" />
+                <CRow className="mb-3">
+                  <CounterCard6 title="Total Items" value={inspectionSummary.total_items} />
+                  <CounterCard6 title="Required Sample" value={inspectionSummary.required_sample} />
+                  <CounterCard6 title="Inspected" value={inspectionSummary.total_inspected} />
+                  <CounterCard6 title="Remaining" value={inspectionSummary.remaining_samples} />
+                  <CounterCard6 title="Pass Count" value={inspectionSummary.pass_count} />
+                  <CounterCard6 title="Fail Count" value={inspectionSummary.fail_count} />
+                  <CounterCard6
+                    title="Completion %"
+                    value={inspectionSummary.completion_percentage + '%'}
+                  />
+                  <CounterCard6 title="Defect Rate" value={inspectionSummary.defect_rate + '%'} />
+                </CRow>
+              </div>
+            )}
           </CCardBody>
         </CCard>
       </CCol>
 
-      {/* Tabel Product Serial Numbers */}
+      {/* Tabel Inspection Details */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Staged Product Serial Numbers || Total: {scanningItem.totalStaged}</strong>
+            <strong>Inspection Details || Total: {inspectionDetails.length}</strong>
           </CCardHeader>
           <CCardBody className="d-flex flex-column">
             <div className="flex-grow-1 overflow-auto">
@@ -136,18 +150,22 @@ const ScanBeforeAging = () => {
                 <CTableHead>
                   <CTableRow>
                     <CTableHeaderCell>No</CTableHeaderCell>
-                    <CTableHeaderCell>Product Serial Number</CTableHeaderCell>
-                    <CTableHeaderCell>Staged At</CTableHeaderCell>
+                    <CTableHeaderCell>Serial Number</CTableHeaderCell>
+                    <CTableHeaderCell>Code Item</CTableHeaderCell>
+                    <CTableHeaderCell>Inspection Count</CTableHeaderCell>
+                    <CTableHeaderCell>Result</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {paginatedSerialNumbers.map((sn, index) => (
+                  {paginatedDetails.map((item, index) => (
                     <CTableRow key={index}>
                       <CTableDataCell>
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </CTableDataCell>
-                      <CTableDataCell>{sn.serial_number}</CTableDataCell>
-                      <CTableDataCell>{new Date(sn.created_at).toLocaleString()}</CTableDataCell>
+                      <CTableDataCell>{item.serial_number}</CTableDataCell>
+                      <CTableDataCell>{item.code_item}</CTableDataCell>
+                      <CTableDataCell>{item.inspection_count}</CTableDataCell>
+                      <CTableDataCell>{item.qc_results?.[0]?.result || '-'}</CTableDataCell>
                     </CTableRow>
                   ))}
                 </CTableBody>
@@ -162,7 +180,7 @@ const ScanBeforeAging = () => {
                   Previous
                 </CPaginationItem>
                 {Array.from({
-                  length: Math.ceil(scanningItem.serialNumbers.length / itemsPerPage),
+                  length: Math.ceil(inspectionDetails.length / itemsPerPage),
                 }).map((_, i) => (
                   <CPaginationItem
                     key={i}
@@ -173,9 +191,7 @@ const ScanBeforeAging = () => {
                   </CPaginationItem>
                 ))}
                 <CPaginationItem
-                  disabled={
-                    currentPage === Math.ceil(scanningItem.serialNumbers.length / itemsPerPage)
-                  }
+                  disabled={currentPage === Math.ceil(inspectionDetails.length / itemsPerPage)}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
                 >
                   Next
