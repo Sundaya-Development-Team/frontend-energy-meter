@@ -136,17 +136,18 @@ const ReceivingSerialQc = () => {
           qc_id: qcIdReceivingSerial, //cek kembali ini nanti
         },
       })
-      const remainingSample = response.data.data.inspection_summary.remaining_samples
-      console.log('remaining Sample : ', remainingSample)
-      if (remainingSample <= 0) {
+      const canContinue = response.data.data.aql_status.can_continue
+      console.log('canContinue : ', canContinue)
+      if (canContinue === false) {
         toast.error(
           <span>
-            <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
+            <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLING SUDAH CUKUP !!</span>
           </span>,
         )
         //Besihkan page
         setProductData(null)
-        setTrackingProduct(null)
+        // setTrackingProduct(null)
+        setTrackingProduct(response.data.data)
         setQuestionData([])
         setAnswers({})
         setFormData({ serialNumber: '', notes: '' })
