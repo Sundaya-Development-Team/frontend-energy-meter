@@ -61,9 +61,9 @@ const ReceivingHeader = () => {
   const [activeIndex, setActiveIndex] = useState(null)
 
   // responsive flag
-  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 500)
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 650)
   useEffect(() => {
-    const handleResize = () => setIsSmallScreen(window.innerWidth < 500)
+    const handleResize = () => setIsSmallScreen(window.innerWidth < 650)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
