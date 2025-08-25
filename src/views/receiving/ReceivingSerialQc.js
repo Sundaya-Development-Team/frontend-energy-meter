@@ -145,7 +145,7 @@ const ReceivingSerialQc = () => {
           </span>,
         )
         //Besihkan page
-        setProductData(null)
+        // setProductData(null)
         // setTrackingProduct(null)
         setTrackingProduct(response.data.data)
         setQuestionData([])

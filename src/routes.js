@@ -440,7 +440,7 @@ const routes = [
   },
   {
     path: '/receiving/detailnonserialqc/:trackingId',
-    name: 'Reciving Serial List',
+    name: 'Reciving Non Serial Detail',
     element: DetailNonSerialQc,
   },
   //Tracking
