@@ -148,7 +148,7 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Assembly Order',
+        name: 'Req. Assembly Order',
         to: '/production/assembly/assemblyorder',
       },
       {
@@ -378,16 +378,23 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Incoming',
-    to: '/warehouse/incoming',
+    name: 'Acc. Assembly Order',
+    to: '/warehouse/outgoing/assemblyorder',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
-  {
-    component: CNavItem,
-    name: 'Outcoming',
-    to: '/warehouse/outcoming',
-    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Incoming',
+  //   to: '/warehouse/incoming',
+  //   icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  // },
+
+  // {
+  //   component: CNavItem,
+  //   name: 'Outcoming',
+  //   to: '/warehouse/outcoming',
+  //   icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
     name: 'WH Data Master',
