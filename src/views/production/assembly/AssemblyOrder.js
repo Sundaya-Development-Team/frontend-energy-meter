@@ -21,7 +21,7 @@ import {
 } from '@coreui/react'
 import Select from 'react-select'
 import { toast } from 'react-toastify'
-import { backendProduct } from '../../../api/axios'
+import { backendProduct, backendAssembly } from '../../../api/axios'
 
 const OrderForm = () => {
   const [productsData, setProductsData] = useState([])
@@ -70,6 +70,13 @@ const OrderForm = () => {
       }
     })
   }
+  const handleInput = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -95,31 +102,29 @@ const OrderForm = () => {
       }
 
       // Build items payload dari parentOf + perkalian qty utama
-      const itemsPayload = (selectedParent.parentOf || [])
-        .filter((p) => formData.items.includes(p.component.id))
-        .map((p) => ({
-          component_id: p.component.id,
-          sap_code: p.component.sap_code,
-          name: p.component.name,
-          base_qty: Number(p.quantity) || 0, // qty per 1 produk utama (BOM)
-          multiplier: Number(formData.qty),
-          total_qty: (Number(p.quantity) || 0) * Number(formData.qty),
+      const itemsPayload = (selectedParent.components || [])
+        .filter((c) => formData.items.includes(c.component.id))
+        .map((c) => ({
+          product_id: c.component.id,
+          qty_request: (Number(c.quantity) || 0) * Number(formData.qty),
         }))
 
       const payload = {
-        product_id: formData.product_id,
-        request_by: 1,
-        qty: Number(formData.qty),
         order_number: formData.order_number,
+        product_id: formData.product_id,
+
+        qty: Number(formData.qty),
+
         status: 'pending',
-        notes: formData.notes,
-        items: itemsPayload,
+        request_by: 1,
+        notes: formData.notes || '', // biar gak undefined
+        assembly_order_items: itemsPayload,
       }
 
       console.log('Payload:', payload)
 
       // contoh call API
-      const res = await backendProduct.post('/orders123', payload)
+      const res = await backendAssembly.post('/assembly-orders/with-items', payload)
 
       // toast.success(res.data.message || 'Order submitted successfully!')
     } catch (err) {
@@ -186,6 +191,7 @@ const OrderForm = () => {
                 <CFormTextarea
                   rows={3}
                   name="notes"
+                  onChange={handleInput}
                   value={formData.notes}
                   placeholder="Write any additional notes"
                 />
@@ -193,7 +199,7 @@ const OrderForm = () => {
 
               {/* Items - tabel dari parentOf (BOM) */}
               {/* Items - tabel dari parentOf (BOM) */}
-              {selectedParent && selectedParent.parentOf?.length > 0 && (
+              {selectedParent && selectedParent.components?.length > 0 && (
                 <CRow className="mb-3">
                   <CCol md={12}>
                     <h5 className="mb-3">Items</h5>
@@ -209,22 +215,22 @@ const OrderForm = () => {
                         </CTableRow>
                       </CTableHead>
                       <CTableBody>
-                        {selectedParent.parentOf.map((p, idx) => {
-                          const checked = formData.items.includes(p.component.id)
-                          const baseQty = Number(p.quantity) || 0
+                        {selectedParent.components.map((c, idx) => {
+                          const checked = formData.items.includes(c.component.id)
+                          const baseQty = Number(c.quantity) || 0
                           const totalQty = baseQty * Number(formData.qty || 0)
                           return (
-                            <CTableRow key={p.id}>
+                            <CTableRow key={c.component.id}>
                               <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                              <CTableDataCell>{p.component.sap_code}</CTableDataCell>
-                              <CTableDataCell>{p.component.name}</CTableDataCell>
+                              <CTableDataCell>{c.component.sap_code}</CTableDataCell>
+                              <CTableDataCell>{c.component.name}</CTableDataCell>
                               <CTableDataCell>{baseQty}</CTableDataCell>
                               <CTableDataCell>{totalQty}</CTableDataCell>
                               <CTableDataCell>
                                 <input
                                   type="checkbox"
                                   checked={checked}
-                                  onChange={() => toggleItem(p.component.id)}
+                                  onChange={() => toggleItem(c.component.id)}
                                 />
                               </CTableDataCell>
                             </CTableRow>

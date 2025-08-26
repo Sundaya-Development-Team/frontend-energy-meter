@@ -104,7 +104,7 @@ const GeneratePlnSerial = () => {
         <CCol md={12}>
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>Incoming Warehouse</strong>
+              <strong>Generate PLN Serial</strong>
             </CCardHeader>
 
             <CCardBody>
