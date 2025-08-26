@@ -63,6 +63,11 @@ export const backendGenerate = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/serial-numbers`,
 })
 
+//Warehouse
+export const backendAssembly = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/assembly`,
+})
+
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,
 // })

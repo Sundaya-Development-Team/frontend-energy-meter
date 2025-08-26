@@ -60,6 +60,7 @@ const QCAssembly = React.lazy(() => import('./views/production/assembly/QCAssemb
 const ScanAfterAssembly = React.lazy(
   () => import('./views/production/assembly/ScanAfterAssembly.js'),
 )
+const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder.js'))
 
 // On
 const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
@@ -114,6 +115,7 @@ const OutcomingWarehouse = React.lazy(() => import('./views/warehouse/OutcomingW
 const WarehouseMaster = React.lazy(() => import('./views/warehouse/WarehouseMaster'))
 const ReceivingWhRequest = React.lazy(() => import('./views/warehouse/ReceivingWhRequest'))
 const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStockConfirm'))
+const AssemblyOrderList = React.lazy(() => import('./views/warehouse/AssemblyOrderConfirmation'))
 
 // Delivery
 const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
@@ -250,7 +252,12 @@ const routes = [
   },
 
   { path: '/production', name: 'Production', element: IncomingUnit, exact: true },
-  { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
+  // { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
+  {
+    path: '/production/assembly/assemblyorder',
+    name: 'Assembly Order',
+    element: AssemblyOrder,
+  },
   {
     path: '/production/assembly',
     name: 'Assembly Production',
@@ -440,7 +447,7 @@ const routes = [
   },
   {
     path: '/receiving/detailnonserialqc/:trackingId',
-    name: 'Reciving Serial List',
+    name: 'Reciving Non Serial Detail',
     element: DetailNonSerialQc,
   },
   //Tracking
@@ -458,6 +465,12 @@ const routes = [
 
   //Warehouses
   { path: '/warehouse', name: 'Warehouse', element: IncomingWarehouse, exact: true },
+  {
+    path: '/warehouse/outgoing/assemblyorder',
+    name: 'Assembly order',
+    element: AssemblyOrderList,
+    exact: true,
+  },
   { path: '/warehouse/incoming', name: 'Incoming Warehouse', element: IncomingWarehouse },
   {
     path: '/warehouse/outcoming',

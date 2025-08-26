@@ -139,12 +139,18 @@ const _nav = [
     to: '/production/batch',
     icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   },
+
   {
     component: CNavGroup,
     name: 'Assembly',
     to: '/production/assembly',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
+      {
+        component: CNavItem,
+        name: 'Req. Assembly Order',
+        to: '/production/assembly/assemblyorder',
+      },
       {
         component: CNavItem,
         name: 'Scan Before',
@@ -372,16 +378,23 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Incoming',
-    to: '/warehouse/incoming',
+    name: 'Acc. Assembly Order',
+    to: '/warehouse/outgoing/assemblyorder',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
-  {
-    component: CNavItem,
-    name: 'Outcoming',
-    to: '/warehouse/outcoming',
-    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Incoming',
+  //   to: '/warehouse/incoming',
+  //   icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  // },
+
+  // {
+  //   component: CNavItem,
+  //   name: 'Outcoming',
+  //   to: '/warehouse/outcoming',
+  //   icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  // },
   {
     component: CNavItem,
     name: 'WH Data Master',
