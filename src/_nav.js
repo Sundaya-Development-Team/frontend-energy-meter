@@ -139,12 +139,18 @@ const _nav = [
     to: '/production/batch',
     icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   },
+
   {
     component: CNavGroup,
     name: 'Assembly',
     to: '/production/assembly',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
+      {
+        component: CNavItem,
+        name: 'Assembly Order',
+        to: '/production/assembly/assemblyorder',
+      },
       {
         component: CNavItem,
         name: 'Scan Before',

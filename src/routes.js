@@ -60,6 +60,7 @@ const QCAssembly = React.lazy(() => import('./views/production/assembly/QCAssemb
 const ScanAfterAssembly = React.lazy(
   () => import('./views/production/assembly/ScanAfterAssembly.js'),
 )
+const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder.js'))
 
 // On
 const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
@@ -250,7 +251,12 @@ const routes = [
   },
 
   { path: '/production', name: 'Production', element: IncomingUnit, exact: true },
-  { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
+  // { path: '/production/batch', name: 'Batching Production', element: BatchingProduction },
+  {
+    path: '/production/assembly/assemblyorder',
+    name: 'Assembly Order',
+    element: AssemblyOrder,
+  },
   {
     path: '/production/assembly',
     name: 'Assembly Production',
