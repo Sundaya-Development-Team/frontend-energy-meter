@@ -103,18 +103,16 @@ const OrderForm = () => {
 
       // Build items payload dari parentOf + perkalian qty utama
       const itemsPayload = (selectedParent.components || [])
-        .filter((c) => formData.items.includes(c.component.id))
+        .filter((c) => formData.items.includes(c.product.id))
         .map((c) => ({
-          product_id: c.component.id,
+          product_id: c.product.id,
           qty_request: (Number(c.quantity) || 0) * Number(formData.qty),
         }))
 
       const payload = {
         order_number: formData.order_number,
         product_id: formData.product_id,
-
-        qty: Number(formData.qty),
-
+        quantity: Number(formData.qty),
         status: 'pending',
         request_by: 1,
         notes: formData.notes || '', // biar gak undefined
@@ -126,7 +124,7 @@ const OrderForm = () => {
       // contoh call API
       const res = await backendAssembly.post('/assembly-orders/with-items', payload)
 
-      // toast.success(res.data.message || 'Order submitted successfully!')
+      toast.success(res.data.message || 'Order submitted successfully!')
     } catch (err) {
       console.error('Submit error:', err)
       toast.error(err.response?.data?.message || 'Failed to submit order.')
@@ -199,6 +197,7 @@ const OrderForm = () => {
 
               {/* Items - tabel dari parentOf (BOM) */}
               {/* Items - tabel dari parentOf (BOM) */}
+              {/* Items - tabel dari BOM */}
               {selectedParent && selectedParent.components?.length > 0 && (
                 <CRow className="mb-3">
                   <CCol md={12}>
@@ -211,26 +210,44 @@ const OrderForm = () => {
                           <CTableHeaderCell scope="col">Name</CTableHeaderCell>
                           <CTableHeaderCell scope="col">BOM Qty</CTableHeaderCell>
                           <CTableHeaderCell scope="col">Total Qty</CTableHeaderCell>
-                          <CTableHeaderCell scope="col">Select</CTableHeaderCell>
+                          <CTableHeaderCell scope="col">
+                            <input
+                              type="checkbox"
+                              checked={formData.items.length === selectedParent.components.length}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  // pilih semua
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    items: selectedParent.components.map((c) => c.product.id),
+                                  }))
+                                } else {
+                                  // kosongkan semua
+                                  setFormData((prev) => ({ ...prev, items: [] }))
+                                }
+                              }}
+                            />{' '}
+                            Select All
+                          </CTableHeaderCell>
                         </CTableRow>
                       </CTableHead>
                       <CTableBody>
                         {selectedParent.components.map((c, idx) => {
-                          const checked = formData.items.includes(c.component.id)
+                          const checked = formData.items.includes(c.product.id)
                           const baseQty = Number(c.quantity) || 0
                           const totalQty = baseQty * Number(formData.qty || 0)
                           return (
-                            <CTableRow key={c.component.id}>
+                            <CTableRow key={c.product.id}>
                               <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                              <CTableDataCell>{c.component.sap_code}</CTableDataCell>
-                              <CTableDataCell>{c.component.name}</CTableDataCell>
+                              <CTableDataCell>{c.product.sap_code}</CTableDataCell>
+                              <CTableDataCell>{c.product.name}</CTableDataCell>
                               <CTableDataCell>{baseQty}</CTableDataCell>
                               <CTableDataCell>{totalQty}</CTableDataCell>
                               <CTableDataCell>
                                 <input
                                   type="checkbox"
                                   checked={checked}
-                                  onChange={() => toggleItem(c.component.id)}
+                                  onChange={() => toggleItem(c.product.id)}
                                 />
                               </CTableDataCell>
                             </CTableRow>
