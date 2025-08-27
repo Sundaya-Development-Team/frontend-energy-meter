@@ -20,6 +20,7 @@ import {
 } from '@coreui/react'
 import { backendAssembly, backendWh } from '../../api/axios'
 import { toast } from 'react-toastify'
+import Select from 'react-select'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -265,14 +266,12 @@ const AssemblyOrders = () => {
           <>
             {/* Dropdown pilih order */}
             <FormRow label="Assembly Order">
-              <CFormSelect onChange={handleOrderChange}>
-                <option value="">-- Select Order --</option>
-                {orders.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.order_number}
-                  </option>
-                ))}
-              </CFormSelect>
+              <Select
+                options={orders.map((o) => ({ value: o.id, label: o.order_number }))}
+                onChange={(selected) => handleOrderChange({ target: { value: selected.value } })}
+                isClearable
+                placeholder="-- Select Order --"
+              />
             </FormRow>
 
             <FormRow label="Product Name">
@@ -304,14 +303,18 @@ const AssemblyOrders = () => {
                 name="status"
                 value={formData.status}
                 onChange={handleInput}
-                disabled={!selectedOrder}
+                disabled={!selectedOrder || selectedOrder.status !== 'pending'}
               >
                 <option value="">-- Select Status --</option>
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="failed">Reject</option>
-                <option value="partial">Partial</option>
-                <option value="completed">Completed</option>
+                {(selectedOrder?.status === 'pending' || !formData.status) && (
+                  <>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="failed">Reject</option>
+                  </>
+                )}
+                {formData.status === 'partial' && <option value="partial">Partial</option>}
+                {formData.status === 'completed' && <option value="completed">Completed</option>}
               </CFormSelect>
             </FormRow>
 
