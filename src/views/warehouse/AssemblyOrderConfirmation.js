@@ -18,7 +18,7 @@ import {
   CButton,
   CFormTextarea,
 } from '@coreui/react'
-import { backendAssembly } from '../../api/axios'
+import { backendAssembly, backendWh } from '../../api/axios'
 import { toast } from 'react-toastify'
 
 const FormRow = ({ label, children }) => (
@@ -35,6 +35,7 @@ const AssemblyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedItems, setSelectedItems] = useState({})
+  const [stockData, setStockData] = useState({})
   const [formData, setFormData] = useState({
     notes: '',
   })
@@ -55,18 +56,98 @@ const AssemblyOrders = () => {
     }
   }
 
-  const handleOrderChange = (e) => {
-    const orderId = e.target.value
-    const order = orders.find((o) => o.id === Number(orderId))
+  // const handleOrderChange = (e) => {
+  //   const orderId = e.target.value
+  //   const order = orders.find((o) => o.id === Number(orderId))
 
+  //   setSelectedOrder(order || null)
+
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     status: order?.status || '', // isi default dari order yg dipilih
+  //     notes: '', // reset notes tiap ganti order
+  //   }))
+  // }
+
+  // const handleOrderChange = async (e) => {
+  //   const orderId = e.target.value
+  //   const order = orders.find((o) => o.id === Number(orderId))
+  //   setSelectedOrder(order || null)
+  //   setSelectedItems({})
+
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     status: order?.status || '', // isi default dari order yg dipilih
+  //     notes: '', // reset notes tiap ganti order
+  //   }))
+
+  //   if (order && order.assembly_order_items?.length > 0) {
+  //     const productIds = order.assembly_order_items.map((i) => i.product_id)
+
+  //     try {
+  //       const res = await backendWh.post('/stock-units/stock-by-multiple-products', {
+  //         product_ids: productIds,
+  //         warehouse_id: 1, // ganti sesuai warehouse kamu
+  //         include_zero_stock: true,
+  //       })
+
+  //       if (res.data.success) {
+  //         const map = {}
+  //         res.data.data.stock_by_product.forEach((s) => {
+  //           map[s.product_id] = s.total_quantity
+  //         })
+  //         setStockData(map)
+  //       }
+  //     } catch (err) {
+  //       console.error('Failed fetch stock', err)
+  //     }
+  //   } else {
+  //     setStockData({})
+  //   }
+  // }
+
+  // Fungsi reusable untuk fetch order & stock
+  const fetchOrderData = async (orderId) => {
+    const order = orders.find((o) => o.id === Number(orderId))
     setSelectedOrder(order || null)
+    setSelectedItems({})
 
     setFormData((prev) => ({
       ...prev,
-      status: order?.status || '', // isi default dari order yg dipilih
-      notes: '', // reset notes tiap ganti order
+      status: order?.status || '',
+      notes: '',
     }))
+
+    if (order && order.assembly_order_items?.length > 0) {
+      const productIds = order.assembly_order_items.map((i) => i.product_id)
+
+      try {
+        const res = await backendWh.post('/stock-units/stock-by-multiple-products', {
+          product_ids: productIds,
+          warehouse_id: 1, // sesuaikan warehouse
+          include_zero_stock: true,
+        })
+
+        if (res.data.success) {
+          const map = {}
+          res.data.data.stock_by_product.forEach((s) => {
+            map[s.product_id] = s.total_quantity
+          })
+          setStockData(map)
+        }
+      } catch (err) {
+        console.error('Failed fetch stock', err)
+      }
+    } else {
+      setStockData({})
+    }
   }
+
+  // Untuk dipanggil di onChange select
+  const handleOrderChange = (e) => {
+    fetchOrderData(e.target.value)
+  }
+
   const handleInput = (e) => {
     const { name, value, type } = e.target
 
@@ -115,9 +196,8 @@ const AssemblyOrders = () => {
     try {
       if (!selectedOrder) return
 
-      // ambil item yg dicentang
       const confirmations = Object.entries(selectedItems)
-        .filter(([_, item]) => item.checked && item.qty > 0) // cuma yg dipilih
+        .filter(([_, item]) => item.checked && item.qty > 0)
         .map(([id, item]) => {
           const orderItem = selectedOrder.assembly_order_items.find((i) => i.id === Number(id))
           return {
@@ -130,11 +210,9 @@ const AssemblyOrders = () => {
 
       const payload = {
         assembly_order_id: selectedOrder.id,
-        confirmed_by: 123, // ganti id user login
+        confirmed_by: 1, // ganti id user login
         confirmations,
       }
-
-      console.log('payload : ', payload)
 
       const response = await backendAssembly.post(
         '/assembly-order-items-confirmations/batch',
@@ -143,10 +221,31 @@ const AssemblyOrders = () => {
 
       if (response.data.success) {
         toast.success(response.data?.message || 'SUCCESS CONFIRM ORDER')
-        setSelectedOrder((prev) => ({
-          ...prev,
-          status: 'in_progress',
-        }))
+
+        if (selectedOrder?.id) {
+          try {
+            const res = await backendAssembly.get(`/assembly-orders/${selectedOrder.id}`)
+            if (res.data.success) {
+              const updatedOrder = res.data.data
+              setSelectedOrder(updatedOrder) // update full order
+              setSelectedItems({}) // reset selection
+              // update stock
+              const productIds = updatedOrder.assembly_order_items.map((i) => i.product_id)
+              const stockRes = await backendWh.post('/stock-units/stock-by-multiple-products', {
+                product_ids: productIds,
+                warehouse_id: 1,
+                include_zero_stock: true,
+              })
+              const map = {}
+              stockRes.data.data.stock_by_product.forEach((s) => {
+                map[s.product_id] = s.total_quantity
+              })
+              setStockData(map)
+            }
+          } catch (err) {
+            console.error('Failed to refresh order', err)
+          }
+        }
       } else {
         toast.error('FAILED CONFIRM ORDER!!')
       }
@@ -211,6 +310,8 @@ const AssemblyOrders = () => {
                 <option value="pending">Pending</option>
                 <option value="in_progress">In Progress</option>
                 <option value="failed">Reject</option>
+                <option value="partial">Partial</option>
+                <option value="completed">Completed</option>
               </CFormSelect>
             </FormRow>
 
@@ -265,6 +366,7 @@ const AssemblyOrders = () => {
                     <CTableHeaderCell>Qty Request</CTableHeaderCell>
                     <CTableHeaderCell>Confirmed</CTableHeaderCell>
                     <CTableHeaderCell>Remaining</CTableHeaderCell>
+                    <CTableHeaderCell>Stock</CTableHeaderCell>
                     <CTableHeaderCell>Confirm Qty</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -272,13 +374,14 @@ const AssemblyOrders = () => {
                 <CTableBody>
                   {!selectedOrder ? (
                     <CTableRow>
-                      <CTableDataCell colSpan={6} className="text-center text-muted">
+                      <CTableDataCell colSpan={7} className="text-center text-muted">
                         Order not selected
                       </CTableDataCell>
                     </CTableRow>
                   ) : selectedOrder.assembly_order_items?.length > 0 ? (
                     selectedOrder.assembly_order_items.map((item) => {
-                      const remaining = item.qty_request - item.qty_confirmed
+                      const remaining = item.qty_remaining
+                      const stock = stockData[item.product_id] ?? '-' // ✅ ambil dari state
                       return (
                         <CTableRow key={item.id}>
                           {/* Checkbox */}
@@ -289,7 +392,8 @@ const AssemblyOrders = () => {
                               disabled={
                                 selectedOrder.status === 'pending' ||
                                 selectedOrder.status === 'failed' ||
-                                remaining === 0
+                                remaining === 0 ||
+                                stock < remaining // ✅ tambahkan kondisi ini
                               }
                               onChange={(e) =>
                                 setSelectedItems((prev) => ({
@@ -314,13 +418,16 @@ const AssemblyOrders = () => {
 
                           {/* Qty Confirmed */}
                           <CTableDataCell className="text-success fw-semibold">
-                            {item.qty_confirmed}
+                            {item.qty_remaining}
                           </CTableDataCell>
 
                           {/* Remaining */}
                           <CTableDataCell className="text-danger fw-semibold">
                             {remaining}
                           </CTableDataCell>
+
+                          {/* Stock */}
+                          <CTableDataCell className="fw-semibold">{stock}</CTableDataCell>
 
                           {/* Input Confirm Qty */}
                           <CTableDataCell>
@@ -334,7 +441,8 @@ const AssemblyOrders = () => {
                                 !selectedItems[item.id]?.checked ||
                                 selectedOrder.status === 'pending' ||
                                 selectedOrder.status === 'failed' ||
-                                remaining === 0
+                                remaining === 0 ||
+                                stock < remaining // ✅ tambahkan juga di sini
                               }
                               onChange={(e) => {
                                 let value = e.target.value.replace(/\D/g, '')
@@ -357,7 +465,7 @@ const AssemblyOrders = () => {
                     })
                   ) : (
                     <CTableRow>
-                      <CTableDataCell colSpan={6} className="text-center text-muted">
+                      <CTableDataCell colSpan={7} className="text-center text-muted">
                         No data available
                       </CTableDataCell>
                     </CTableRow>
