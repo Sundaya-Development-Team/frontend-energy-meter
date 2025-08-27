@@ -379,90 +379,92 @@ const AssemblyOrders = () => {
                       </CTableDataCell>
                     </CTableRow>
                   ) : selectedOrder.assembly_order_items?.length > 0 ? (
-                    selectedOrder.assembly_order_items.map((item) => {
-                      const remaining = item.qty_remaining
-                      const stock = stockData[item.product_id] ?? '-' // ✅ ambil dari state
-                      return (
-                        <CTableRow key={item.id}>
-                          {/* Checkbox */}
-                          <CTableDataCell>
-                            <input
-                              type="checkbox"
-                              checked={!!selectedItems[item.id]?.checked}
-                              disabled={
-                                selectedOrder.status === 'pending' ||
-                                selectedOrder.status === 'failed' ||
-                                remaining === 0 ||
-                                stock < remaining // ✅ tambahkan kondisi ini
-                              }
-                              onChange={(e) =>
-                                setSelectedItems((prev) => ({
-                                  ...prev,
-                                  [item.id]: {
-                                    ...prev[item.id],
-                                    checked: e.target.checked,
-                                    qty: e.target.checked ? prev[item.id]?.qty || 0 : 0,
-                                  },
-                                }))
-                              }
-                            />
-                          </CTableDataCell>
+                    [...selectedOrder.assembly_order_items]
+                      .sort((a, b) => a.product_name.localeCompare(b.product_name))
+                      .map((item) => {
+                        const remaining = item.qty_remaining
+                        const stock = stockData[item.product_id] ?? '-'
+                        return (
+                          <CTableRow key={item.id}>
+                            {/* Checkbox */}
+                            <CTableDataCell>
+                              <input
+                                type="checkbox"
+                                checked={!!selectedItems[item.id]?.checked}
+                                disabled={
+                                  selectedOrder.status === 'pending' ||
+                                  selectedOrder.status === 'failed' ||
+                                  remaining === 0 ||
+                                  stock < remaining
+                                }
+                                onChange={(e) =>
+                                  setSelectedItems((prev) => ({
+                                    ...prev,
+                                    [item.id]: {
+                                      ...prev[item.id],
+                                      checked: e.target.checked,
+                                      qty: e.target.checked ? prev[item.id]?.qty || 0 : 0,
+                                    },
+                                  }))
+                                }
+                              />
+                            </CTableDataCell>
 
-                          {/* Product Name */}
-                          <CTableDataCell className="fw-medium text-start ps-3">
-                            {item.product_name}
-                          </CTableDataCell>
+                            {/* Product Name */}
+                            <CTableDataCell className="fw-medium text-start ps-3">
+                              {item.product_name}
+                            </CTableDataCell>
 
-                          {/* Qty Request */}
-                          <CTableDataCell>{item.qty_request}</CTableDataCell>
+                            {/* Qty Request */}
+                            <CTableDataCell>{item.qty_request}</CTableDataCell>
 
-                          {/* Qty Confirmed */}
-                          <CTableDataCell className="text-success fw-semibold">
-                            {item.qty_remaining}
-                          </CTableDataCell>
+                            {/* Qty Confirmed */}
+                            <CTableDataCell className="text-success fw-semibold">
+                              {item.qty_remaining}
+                            </CTableDataCell>
 
-                          {/* Remaining */}
-                          <CTableDataCell className="text-danger fw-semibold">
-                            {remaining}
-                          </CTableDataCell>
+                            {/* Remaining */}
+                            <CTableDataCell className="text-danger fw-semibold">
+                              {remaining}
+                            </CTableDataCell>
 
-                          {/* Stock */}
-                          <CTableDataCell className="fw-semibold">{stock}</CTableDataCell>
+                            {/* Stock */}
+                            <CTableDataCell className="fw-semibold">{stock}</CTableDataCell>
 
-                          {/* Input Confirm Qty */}
-                          <CTableDataCell>
-                            <input
-                              type="number"
-                              className="form-control text-center"
-                              min={0}
-                              max={remaining}
-                              value={selectedItems[item.id]?.qty || ''}
-                              disabled={
-                                !selectedItems[item.id]?.checked ||
-                                selectedOrder.status === 'pending' ||
-                                selectedOrder.status === 'failed' ||
-                                remaining === 0 ||
-                                stock < remaining // ✅ tambahkan juga di sini
-                              }
-                              onChange={(e) => {
-                                let value = e.target.value.replace(/\D/g, '')
-                                value = Number(value)
-                                if (value > remaining) value = remaining
-                                if (value < 0) value = 0
-                                setSelectedItems((prev) => ({
-                                  ...prev,
-                                  [item.id]: {
-                                    ...prev[item.id],
-                                    checked: true,
-                                    qty: value,
-                                  },
-                                }))
-                              }}
-                            />
-                          </CTableDataCell>
-                        </CTableRow>
-                      )
-                    })
+                            {/* Input Confirm Qty */}
+                            <CTableDataCell>
+                              <input
+                                type="number"
+                                className="form-control text-center"
+                                min={0}
+                                max={remaining}
+                                value={selectedItems[item.id]?.qty || ''}
+                                disabled={
+                                  !selectedItems[item.id]?.checked ||
+                                  selectedOrder.status === 'pending' ||
+                                  selectedOrder.status === 'failed' ||
+                                  remaining === 0 ||
+                                  stock < remaining
+                                }
+                                onChange={(e) => {
+                                  let value = e.target.value.replace(/\D/g, '')
+                                  value = Number(value)
+                                  if (value > remaining) value = remaining
+                                  if (value < 0) value = 0
+                                  setSelectedItems((prev) => ({
+                                    ...prev,
+                                    [item.id]: {
+                                      ...prev[item.id],
+                                      checked: true,
+                                      qty: value,
+                                    },
+                                  }))
+                                }}
+                              />
+                            </CTableDataCell>
+                          </CTableRow>
+                        )
+                      })
                   ) : (
                     <CTableRow>
                       <CTableDataCell colSpan={7} className="text-center text-muted">
