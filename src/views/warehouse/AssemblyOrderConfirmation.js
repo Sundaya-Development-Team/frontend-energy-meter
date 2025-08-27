@@ -16,8 +16,10 @@ import {
   CFormLabel,
   CFormInput,
   CButton,
+  CFormTextarea,
 } from '@coreui/react'
 import { backendAssembly } from '../../api/axios'
+import { toast } from 'react-toastify'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -33,6 +35,9 @@ const AssemblyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedItems, setSelectedItems] = useState({})
+  const [formData, setFormData] = useState({
+    notes: '',
+  })
 
   useEffect(() => {
     fetchOrders()
@@ -53,50 +58,102 @@ const AssemblyOrders = () => {
   const handleOrderChange = (e) => {
     const orderId = e.target.value
     const order = orders.find((o) => o.id === Number(orderId))
+
     setSelectedOrder(order || null)
-    setSelectedItems({})
+
+    setFormData((prev) => ({
+      ...prev,
+      status: order?.status || '', // isi default dari order yg dipilih
+      notes: '', // reset notes tiap ganti order
+    }))
+  }
+  const handleInput = (e) => {
+    const { name, value, type } = e.target
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'number' ? Number(value) || 0 : value,
+    }))
+
+    //jika ingin checklist aktif berdasarkan select status
+    // setSelectedOrder((prev) => ({
+    //   ...prev,
+    //   [name]: type === 'number' ? Number(value) || 0 : value,
+    // }))
   }
 
-  const handleInput = (e) => {
-    const { name, value } = e.target
-    setSelectedOrder((prev) => ({
-      ...prev,
-      [name]: Number(value) || 0,
-    }))
+  const handleOrderConfirmation = async () => {
+    try {
+      if (!selectedOrder) return
+
+      const payload = {
+        assembly_order_id: selectedOrder.id,
+        status: formData.status, // 🔥 ambil dari formData
+        confirmed_by: 1, // bisa diganti user login
+        note: formData.notes || '', // 🔥 ambil dari formData
+      }
+
+      const response = await backendAssembly.post('/assembly-order-confirmations', payload)
+      if (response.data.success === true) {
+        // Update state biar UI langsung ikut berubah
+        setSelectedOrder((prev) => ({
+          ...prev,
+          status: 'in_progress',
+        }))
+
+        toast.success(response.data?.message || 'SUCCESS')
+      } else {
+        toast.error('FAILED CONFIRM ORDER!!')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(error.response?.data?.message || 'FAILED TO ORDER CONFRIMATION')
+    }
   }
 
   const handleSubmit = async () => {
-    if (!selectedOrder) {
-      alert('Please select an order first.')
-      return
-    }
+    try {
+      if (!selectedOrder) return
 
-    // Bentuk payload dari selectedItems
-    const payload = {
-      order_id: selectedOrder.id,
-      items: Object.entries(selectedItems)
-        .filter(([_, val]) => val.checked && val.qty > 0) // ambil hanya yang dipilih
-        .map(([id, val]) => ({
-          product_id: Number(id),
-          quantity: val.qty,
-        })),
-    }
-    console.log('Payload : ', payload)
-    // if (payload.items.length === 0) {
-    //   alert('Please select at least one item with quantity.')
-    //   return
-    // }
+      // ambil item yg dicentang
+      const confirmations = Object.entries(selectedItems)
+        .filter(([_, item]) => item.checked && item.qty > 0) // cuma yg dipilih
+        .map(([id, item]) => {
+          const orderItem = selectedOrder.assembly_order_items.find((i) => i.id === Number(id))
+          return {
+            request_order_item_id: orderItem.id,
+            product_id: orderItem.product_id,
+            qty_confirmed: item.qty,
+            note: formData.notes || '',
+          }
+        })
 
-    // try {
-    //   const response = await backendTracking.post('/confirmations', payload)
-    //   console.log('Response:', response.data)
-    //   alert('Confirmation submitted successfully!')
-    //   // reset pilihan
-    //   setSelectedItems({})
-    // } catch (error) {
-    //   console.error(error)
-    //   alert('Failed to submit confirmation.')
-    // }
+      const payload = {
+        assembly_order_id: selectedOrder.id,
+        confirmed_by: 123, // ganti id user login
+        confirmations,
+      }
+
+      console.log('payload : ', payload)
+
+      const response = await backendAssembly.post(
+        '/assembly-order-items-confirmations/batch',
+        payload,
+      )
+
+      if (response.data.success) {
+        toast.success(response.data?.message || 'SUCCESS CONFIRM ORDER')
+        setSelectedOrder((prev) => ({
+          ...prev,
+          status: 'in_progress',
+        }))
+      } else {
+        toast.error('FAILED CONFIRM ORDER!!')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(error.response?.data?.message || 'FAILED TO CONFIRM ORDER')
+    }
   }
 
   return (
@@ -143,7 +200,52 @@ const AssemblyOrders = () => {
               />
             </FormRow>
 
-            {/* Detail order */}
+            <FormRow label="Status">
+              <CFormSelect
+                name="status"
+                value={formData.status}
+                onChange={handleInput}
+                disabled={!selectedOrder}
+              >
+                <option value="">-- Select Status --</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="failed">Reject</option>
+              </CFormSelect>
+            </FormRow>
+
+            <FormRow label="Notes">
+              <CFormTextarea
+                type="text"
+                name="notes"
+                rows={3}
+                placeholder="Enter notes here"
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    notes: e.target.value,
+                  })
+                }
+                disabled={!selectedOrder || formData.status !== 'pending'}
+              />
+            </FormRow>
+
+            {/* Tombol tambahan sebelum Order Details */}
+            <div className="d-flex justify-content-end mt-3">
+              {selectedOrder?.status === 'pending' && (
+                <div>
+                  <CButton
+                    color="success"
+                    className="me-2 text-white"
+                    onClick={handleOrderConfirmation}
+                  >
+                    Order Confirmation
+                  </CButton>
+                </div>
+              )}
+            </div>
+
             {/* Detail order */}
             <div className="mt-4">
               <h6 className="fw-bold mb-3">Order Details</h6>
@@ -184,6 +286,11 @@ const AssemblyOrders = () => {
                             <input
                               type="checkbox"
                               checked={!!selectedItems[item.id]?.checked}
+                              disabled={
+                                selectedOrder.status === 'pending' ||
+                                selectedOrder.status === 'failed' ||
+                                remaining === 0
+                              }
                               onChange={(e) =>
                                 setSelectedItems((prev) => ({
                                   ...prev,
@@ -223,7 +330,12 @@ const AssemblyOrders = () => {
                               min={0}
                               max={remaining}
                               value={selectedItems[item.id]?.qty || ''}
-                              disabled={!selectedItems[item.id]?.checked}
+                              disabled={
+                                !selectedItems[item.id]?.checked ||
+                                selectedOrder.status === 'pending' ||
+                                selectedOrder.status === 'failed' ||
+                                remaining === 0
+                              }
                               onChange={(e) => {
                                 let value = e.target.value.replace(/\D/g, '')
                                 value = Number(value)
@@ -255,13 +367,13 @@ const AssemblyOrders = () => {
 
               {/* Tombol submit */}
               <div className="d-flex justify-content-end mt-3">
-                <CButton
-                  color="primary"
-                  disabled={!selectedOrder} // tombol disable kalau belum pilih order
-                  onClick={handleSubmit}
-                >
-                  Submit Confirmation
-                </CButton>
+                {selectedOrder &&
+                  selectedOrder.status !== 'pending' &&
+                  selectedOrder.status !== 'failed' && (
+                    <CButton color="primary" onClick={handleSubmit}>
+                      Submit Confirmation
+                    </CButton>
+                  )}
               </div>
             </div>
           </>
