@@ -44,7 +44,7 @@ const ReceivingSerialQc = () => {
   const [answers, setAnswers] = useState({})
   const [questionData, setQuestionData] = useState([])
   const [qcName, setQcName] = useState([])
-  const qcIdReceivingSerial = 'QC-SPS002'
+  const qcIdReceivingSerial = 'QC-SPS-PCBA-001'
   const inspected_by = 'ADMIN_RECEIVING'
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)

@@ -423,7 +423,7 @@ const AssemblyOrders = () => {
 
                             {/* Qty Confirmed */}
                             <CTableDataCell className="text-success fw-semibold">
-                              {item.qty_remaining}
+                              {item.qty_fulfilled}
                             </CTableDataCell>
 
                             {/* Remaining */}
