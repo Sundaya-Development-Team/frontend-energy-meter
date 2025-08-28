@@ -65,7 +65,6 @@ const ReceivingNonSerialQc = () => {
   }
 
   const columns = [
-    { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
     { name: 'Item Code', selector: (row) => row.code_item, sortable: true },
     { name: 'Batch', selector: (row) => row.batch, sortable: true },
     { name: 'Qty', selector: (row) => row.original_quantity, sortable: true },
