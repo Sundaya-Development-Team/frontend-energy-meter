@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react'
+/* eslint-disable prettier/prettier */
+import React, { useState, useCallback } from 'react'
 import {
-  CButton,
   CCard,
   CCardBody,
   CCardHeader,
   CCol,
-  CForm,
   CFormInput,
   CFormLabel,
   CRow,
@@ -17,10 +16,12 @@ import {
   CTableRow,
   CPagination,
   CPaginationItem,
+  CButton,
 } from '@coreui/react'
-import Select from 'react-select'
-import { backendReceiving } from '../../api/axios'
-import { CounterCard6 } from '../components/CounterCard'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { backendWh } from '../../api/axios'
+import { CounterCard6, CounterCard12 } from '../components/CounterCard'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -31,128 +32,113 @@ const FormRow = ({ label, children }) => (
   </CRow>
 )
 
-const fetchPOs = () =>
-  backendReceiving.get('/purchase-orders', {
-    params: {
-      page: 1,
-      limit: 100,
-    },
-  })
-
-const SerialStockConfirm = () => {
-  const [poOptions, setPoOptions] = useState([])
-  const [formData, setFormData] = useState({
-    barcode: '',
-    productionBatch: '10',
-    agingBatch: '',
-    serialNumber: '',
-  })
-
-  useEffect(() => {
-    // const todayJakarta = new Date().toLocaleDateString('en-CA', {
-    //   timeZone: 'Asia/Jakarta',
-    // })
-
-    fetchPOs()
-      .then((res) => {
-        const options = res.data.data.map((po) => ({
-          value: po.id,
-          label: po.po_number,
-        }))
-        setPoOptions(options)
-      })
-      .catch((err) => console.error('Fetch POs error:', err))
-  }, [])
-
-  // scanningItem langsung dummy
-  const [scanningItem, setScanningItem] = useState({
-    itemName: 'Product ABC',
-    expectedQuantity: 10,
-    remainingStage: 10,
-    totalStaged: 0,
-    serialNumbers: [],
-  })
-
+const WarehouseScanUI = () => {
+  const [serialNumber, setSerialNumber] = useState('')
+  const [summary, setSummary] = useState(null)
+  const [serials, setSerials] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
+  const [receivingItemId, setReceivingItemId] = useState(null)
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+  // scan serial
+  const handleSerial = async () => {
+    if (!serialNumber.trim()) return
+    try {
+      const scanRes = await backendWh.post('/stock-transactions/scan', {
+        serial_number: serialNumber,
+        performed_by: 1,
+      })
+
+      if (scanRes.data.success) {
+        toast.success(scanRes.data.message ?? 'Serial scanned successfully')
+        const itemId = scanRes.data.data?.stock_unit?.receiving_item_id
+        setReceivingItemId(itemId)
+
+        // fetch staging setelah scan
+        fetchStaging(itemId)
+      } else {
+        toast.error(scanRes.data.message ?? 'Scan failed')
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Scan failed')
+    } finally {
+      setSerialNumber('')
+    }
   }
 
-  // scan serial number → push ke list
-  const handleSerial = () => {
-    if (!formData.serialNumber.trim()) return
-    setScanningItem((prev) => {
-      const newSerial = {
-        serial_number: formData.serialNumber,
-        created_at: new Date(),
-      }
-      const updatedList = [...prev.serialNumbers, newSerial]
-      return {
-        ...prev,
-        serialNumbers: updatedList,
-        totalStaged: updatedList.length,
-        remainingStage: prev.expectedQuantity - updatedList.length,
-      }
-    })
-    setFormData((prev) => ({
-      ...prev,
-      serialNumber: '',
-    }))
-  }
+  // fetch staging data
+  const fetchStaging = useCallback(async (itemId) => {
+    if (!itemId) return
+    try {
+      const res = await backendWh.get('/stock-units/zero-quantity-staging', {
+        params: { receiving_item_id: itemId },
+      })
 
-  const paginatedSerialNumbers = scanningItem.serialNumbers.slice(
+      if (res.data.success) {
+        setSummary(res.data.data.summary)
+        setSerials(res.data.data.serial_numbers || [])
+      } else {
+        toast.error(res.data.message ?? 'Failed to fetch staging')
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error fetching staging')
+    }
+  }, [])
+
+  // pagination serials
+  const paginatedSerials = serials.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   )
 
   return (
     <CRow>
-      {/* Scan Serial Number */}
+      {/* Scan + Counter */}
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Product Name : {scanningItem.itemName}</strong>
+            <strong>Warehouse Scan</strong>
           </CCardHeader>
           <CCardBody>
-            {/* <FormRow label="Reference PO">
-              <Select
-                options={poOptions}
-                value={poOptions.find((opt) => opt.value === formData.reference_po) || null}
-                onChange={(opt) =>
-                  setFormData((prev) => ({ ...prev, reference_po: opt ? opt.value : '' }))
-                }
-                isClearable
-                placeholder="Select PO"
-              />
-            </FormRow> */}
             <FormRow label="Serial Number">
               <CFormInput
-                name="serialNumber"
-                onChange={handleChange}
+                value={serialNumber}
+                onChange={(e) => setSerialNumber(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
                     handleSerial()
                   }
                 }}
+                placeholder="Scan Serial Number"
               />
+              {/* <CButton
+                color="primary"
+                className="mt-2"
+                onClick={handleSerial}
+                disabled={!serialNumber.trim()}
+              >
+                Scan
+              </CButton> */}
             </FormRow>
 
             <div className="mt-3">
-              {' '}
-              <FormRow label="Counter"></FormRow>
-              <CRow className="mb-3">
-                <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
-                <CounterCard6 title="Expected Quantity" value={scanningItem.expectedQuantity} />
-                <CounterCard6 title="Remaining Quantity" value={scanningItem.remainingStage} />
-              </CRow>
+              <FormRow label="Counter Remaining" />
+              {summary ? (
+                <CRow className="mb-3">
+                  <CounterCard12 title="Total Found" value={summary.total_found} />
+                  <CounterCard12 title="Displayed" value={summary.displayed} />
+                  {/* <CounterCard6 title="Serial Retrieved" value={summary.serial_retrieved} />
+                  <CounterCard6 title="Missing Serials" value={summary.missing_serials} /> */}
+                </CRow>
+              ) : (
+                <CRow className="mb-3">
+                  <CounterCard12 title="Total Found" value={'No Data'} />
+                  <CounterCard12 title="Displayed" value={'No Data'} />
+                  {/* <CounterCard6 title="Serial Retrieved" value={'No Data'} />
+                  <CounterCard6 title="Missing Serials" value={'No Data'} /> */}
+                </CRow>
+              )}
             </div>
           </CCardBody>
         </CCard>
@@ -162,7 +148,9 @@ const SerialStockConfirm = () => {
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Staged Serial Numbers || Total: {scanningItem.totalStaged}</strong>
+            <strong>
+              List of Remaining Serial Numbers {summary ? `|| Total: ${serials.length}` : ''}
+            </strong>
           </CCardHeader>
           <CCardBody className="d-flex flex-column">
             <div className="flex-grow-1 overflow-auto">
@@ -175,15 +163,23 @@ const SerialStockConfirm = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {paginatedSerialNumbers.map((sn, index) => (
-                    <CTableRow key={index}>
-                      <CTableDataCell>
-                        {(currentPage - 1) * itemsPerPage + index + 1}
+                  {paginatedSerials.length > 0 ? (
+                    paginatedSerials.map((sn, idx) => (
+                      <CTableRow key={idx}>
+                        <CTableDataCell>
+                          {(currentPage - 1) * itemsPerPage + idx + 1}
+                        </CTableDataCell>
+                        <CTableDataCell>{sn.serial_number}</CTableDataCell>
+                        <CTableDataCell>{new Date(sn.created_at).toLocaleString()}</CTableDataCell>
+                      </CTableRow>
+                    ))
+                  ) : (
+                    <CTableRow>
+                      <CTableDataCell colSpan={3} className="text-center text-muted">
+                        No serials scanned yet...
                       </CTableDataCell>
-                      <CTableDataCell>{sn.serial_number}</CTableDataCell>
-                      <CTableDataCell>{new Date(sn.created_at).toLocaleString()}</CTableDataCell>
                     </CTableRow>
-                  ))}
+                  )}
                 </CTableBody>
               </CTable>
             </div>
@@ -195,9 +191,7 @@ const SerialStockConfirm = () => {
                 >
                   Previous
                 </CPaginationItem>
-                {Array.from({
-                  length: Math.ceil(scanningItem.serialNumbers.length / itemsPerPage),
-                }).map((_, i) => (
+                {Array.from({ length: Math.ceil(serials.length / itemsPerPage) }).map((_, i) => (
                   <CPaginationItem
                     key={i}
                     active={i + 1 === currentPage}
@@ -207,9 +201,7 @@ const SerialStockConfirm = () => {
                   </CPaginationItem>
                 ))}
                 <CPaginationItem
-                  disabled={
-                    currentPage === Math.ceil(scanningItem.serialNumbers.length / itemsPerPage)
-                  }
+                  disabled={currentPage === Math.ceil(serials.length / itemsPerPage)}
                   onClick={() => setCurrentPage((prev) => prev + 1)}
                 >
                   Next
@@ -223,4 +215,4 @@ const SerialStockConfirm = () => {
   )
 }
 
-export default SerialStockConfirm
+export default WarehouseScanUI

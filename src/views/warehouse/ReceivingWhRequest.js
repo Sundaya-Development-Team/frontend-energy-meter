@@ -58,7 +58,7 @@ const ReceivingWhReq = () => {
     try {
       const res = await backendTracking.get('/sample-inspections/receiving-items-summary', {
         params: {
-          qc_id: 'QC-SPS002',
+          qc_id: 'QC-SPNS-PCBA-001',
           tracking_type: 'receiving',
           status: 'pass',
           page,
