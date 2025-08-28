@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { backendTracking } from '../../api/axios'
+import { backendTracking, backendQc } from '../../api/axios'
 import {
   CCard,
   CCardBody,
@@ -16,12 +16,11 @@ import {
   CRow,
   CCol,
   CBadge,
-  CFormInput,
-  CFormTextarea,
   CFormLabel,
+  CForm,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
-import { CounterCard6, CounterCard12 } from '../components/CounterCard'
+import { CounterCard6 } from '../components/CounterCard'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -37,44 +36,78 @@ const DetailNonSerialQc = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [detail, setDetail] = useState(null)
+  const [inspectionSummary, setInspectionSummary] = useState(null)
+  const [aqlConfiguration, setAqlConfig] = useState(null)
+  const [answers, setAnswers] = useState({})
+  const [qcName, setQcName] = useState([])
+  const [questionData, setQuestionData] = useState([])
 
   const fetchTrackingSumary = async (receivingItemId, qcProduct) => {
-    console.log('masuk sumary')
     try {
       const response = await backendTracking.get('/sample-inspections/aql-summary', {
         params: {
           receiving_item_id: receivingItemId,
-          qc_id: qcProduct, //cek kembali ini nanti
+          qc_id: qcProduct,
         },
       })
-      const remainingSample = response.data.data.inspection_summary.remaining_samples
-      console.log('remaining Sample : ', remainingSample)
-      if (remainingSample <= 0) {
+
+      const summary = response.data.data.inspection_summary
+      const aql_config = response.data.data.aql_configuration
+      const qcId = response.data.data.qc_id
+      setInspectionSummary(summary)
+      setAqlConfig(aql_config)
+
+      if (summary.remaining_samples <= 0) {
         toast.error(
           <span>
             <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
           </span>,
         )
-        //Besihkan page
-        // setProductData(null)
-        // setTrackingProduct(null)
-        // setQuestionData([])
-        // setAnswers({})
-        // setFormData({ serialNumber: '', notes: '' })
       } else {
-        console.log('LANJUT')
-        // setTrackingProduct(response.data.data)
-        // const baseMessage = response.data?.message ?? ''
-
-        // toast.success(
-        //   <span>
-        //     {baseMessage || ''} -{' '}
-        //     <span style={{ color: 'green', fontWeight: 'bold' }}> LANJUT QC</span>
-        //   </span>,
-        // )
+        fetchValidationQc(trackingId, qcId)
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed Validation')
+    }
+  }
+
+  const fetchValidationQc = async (trackingId, qcId) => {
+    try {
+      const response = await backendQc.get('/validation-noserial', {
+        params: {
+          tracking_id: trackingId,
+          qc_id: qcId,
+        },
+      })
+
+      // if (response.data.valid === true) {
+      //   // toast.success(response.data.message ?? 'Serial number valid')
+
+      //   // Convert object questions → array
+      //   const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
+      //     id: Number(id),
+      //     question: text,
+      //   }))
+
+      //   // Simpan ke state
+      //   setQcName(response.data.category)
+      //   setQuestionData(convertedQuestions)
+
+      //   // inisialisasi semua jawaban default ke false
+      //   const initialAnswers = {}
+      //   convertedQuestions.forEach((q) => {
+      //     initialAnswers[q.id] = false
+      //   })
+      //   setAnswers(initialAnswers)
+
+      //   // Ambil product
+      //   // fetchProduct(serialNumber)
+      // } else {
+      //   toast.error(response.data.message ?? 'QC CANT CONTINUE')
+      // }
+    } catch (error) {
+      console.log('ERROR')
+      toast.error(error.response?.data?.message || 'QCValidation Failed')
     }
   }
 
@@ -83,11 +116,10 @@ const DetailNonSerialQc = () => {
     try {
       const response = await backendTracking.get(`/${trackingId}`)
       setDetail(response.data.data)
+
       const receivingItemId = response.data.data.receiving_item_id
       const qcProduct = response.data.data.product.qc_product
-      console.log('receivingItemId : ', receivingItemId)
-      console.log('qc id : ', qcProduct)
-      //ambil data QC sumary - nanti berikan validasi dari question, jika sudah tervalidasi, baru masuk tahap ini
+
       fetchTrackingSumary(receivingItemId, qcProduct)
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Failed to fetch QC Non Serial Detail')
@@ -123,29 +155,40 @@ const DetailNonSerialQc = () => {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+  }
+
   return (
     <CRow>
       <CCol xs={12}>
         <CRow className="g-4 mb-4">
-          {/* Scan Serial Number */}
+          {/* Left card - Product & Counter */}
           <CCol md={6}>
             <CCard className="mb-4 h-100">
               <CCardHeader>
-                <strong>Product Name : {'-'}</strong>
+                <strong>Product Name : {detail?.product?.name || '-'}</strong>
               </CCardHeader>
               <CCardBody>
                 <FormRow label="Counter"></FormRow>
                 <CRow className="mb-3">
-                  <CounterCard6 title="Required Sample" value={`-`} />
-                  <CounterCard6 title="Remaining Samples" value={`-`} />
-                  <CounterCard6 title="Max Fail" value={`-`} />
-                  <CounterCard6 title="Fail Count" value={`-`} />
+                  <CounterCard6
+                    title="Required Sample"
+                    value={inspectionSummary?.required_sample ?? '-'}
+                  />
+                  <CounterCard6
+                    title="Remaining Samples"
+                    value={inspectionSummary?.remaining_samples ?? '-'}
+                  />
+                  <CounterCard6 title="Max Fail" value={aqlConfiguration?.aql_accept ?? '-'} />
+                  <CounterCard6 title="Fail Count" value={inspectionSummary?.fail_count ?? '-'} />
                 </CRow>
               </CCardBody>
             </CCard>
           </CCol>
+
+          {/* Right card - QC detail */}
           <CCol md={6}>
-            {' '}
             <CCard className="mb-4 h-100">
               <CCardHeader className="d-flex justify-content-between align-items-center">
                 <strong>Receiving QC : {detail.product.name || 'Non Serial'} Detail</strong>
@@ -253,60 +296,55 @@ const DetailNonSerialQc = () => {
                     </CTable>
                   </>
                 )}
-
-                {/* Parent Of */}
-                {/* {detail.parentOf?.length > 0 && (
-          <>
-            <h5 className="mt-4 mb-3">Parent Of (Child Components)</h5>
-            <CTable bordered>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell>Serial Number</CTableHeaderCell>
-                  <CTableHeaderCell>Item Code</CTableHeaderCell>
-                  <CTableHeaderCell>Quantity</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {detail.parentOf.map((child, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell>{child.serial_number || '-'}</CTableDataCell>
-                    <CTableDataCell>{child.code_item || '-'}</CTableDataCell>
-                    <CTableDataCell>{child.original_quantity}</CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
-          </>
-        )} */}
-
-                {/* Component Of */}
-                {/* {detail.componentOf?.length > 0 && (
-          <>
-            <h5 className="mt-4 mb-3">Component Of (Parent Assembly)</h5>
-            <CTable bordered>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell>Serial Number</CTableHeaderCell>
-                  <CTableHeaderCell>Item Code</CTableHeaderCell>
-                  <CTableHeaderCell>Quantity</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {detail.componentOf.map((parent, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell>{parent.serial_number || '-'}</CTableDataCell>
-                    <CTableDataCell>{parent.code_item || '-'}</CTableDataCell>
-                    <CTableDataCell>{parent.original_quantity}</CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
-          </>
-        )} */}
               </CCardBody>
             </CCard>
           </CCol>
         </CRow>
+      </CCol>
+
+      {/* Quality Control Assembly */}
+      <CCol xs={12}>
+        <CCard className="mb-4">
+          <CCardHeader>
+            <strong>Quality Control</strong>
+          </CCardHeader>
+          <CCardBody>
+            <CForm onSubmit={handleSubmit}>
+              {questionData.length === 0 ? (
+                <p className="text-muted">Questions not yet available...</p>
+              ) : (
+                questionData.map((q) => {
+                  const isYes = answers[q.id] === true // memastikan boolean
+
+                  return (
+                    <div
+                      key={q.id}
+                      className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
+                    >
+                      <CFormLabel className="mb-0">{q.question}</CFormLabel>
+                      <CFormSwitch
+                        name={`question-${q.id}`}
+                        label={answers[q.id] ? 'Ya' : 'Tidak'}
+                        checked={!!answers[q.id]}
+                        onChange={(e) =>
+                          setAnswers((prev) => ({
+                            ...prev,
+                            [q.id]: e.target.checked, // true kalau on, false kalau off
+                          }))
+                        }
+                      />
+                    </div>
+                  )
+                })
+              )}
+              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                <CButton color="primary" type="submit">
+                  Submit
+                </CButton>
+              </div>
+            </CForm>
+          </CCardBody>
+        </CCard>
       </CCol>
     </CRow>
   )
