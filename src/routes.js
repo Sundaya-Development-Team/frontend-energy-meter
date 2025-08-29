@@ -92,19 +92,19 @@ const ScanBeforeClearZero = React.lazy(
   () => import('./views/production/finishing/ScanBeforeClearZero'),
 )
 const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
-const ClosingCover = React.lazy(() => import('./views/production/finishing/ClosingCover'))
+const SidePlnSerial = React.lazy(() => import('./views/production/finishing/SidePlnSerial'))
 
 // Closing Cover (tidak terpakai)
-const ScanBeforeClosingCover = React.lazy(
-  () => import('./views/production/closingcover/ScanBeforeClosingCover'),
-)
+// const ScanBeforeClosingCover = React.lazy(
+//   () => import('./views/production/closingcover/ScanBeforeClosingCover'),
+// )
 const ScanAfterZeroClear = React.lazy(
   () => import('./views/production/finishing/ScanAfterClearZero.js'),
 )
-const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
-const ScanAfterClosingCover = React.lazy(
-  () => import('./views/production/closingcover/ScanAfterClosingCover'),
-)
+// const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
+// const ScanAfterClosingCover = React.lazy(
+//   () => import('./views/production/closingcover/ScanAfterClosingCover'),
+// )
 
 // Inventory
 const IncomingUnits = React.lazy(() => import('./views/production/inventory/IncomingUnits'))
@@ -333,9 +333,9 @@ const routes = [
     exact: true,
   },
   {
-    path: '/production/finishing/closingcover',
+    path: '/production/finishing/scansidepln',
     name: 'Quality Control Clear Zero',
-    element: ClosingCover,
+    element: SidePlnSerial,
   },
   {
     path: '/production/finishing/clearzero/after',
