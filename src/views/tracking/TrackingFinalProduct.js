@@ -21,7 +21,7 @@ const TrackingFinalProduct = () => {
   const navigate = useNavigate()
 
   const handleDetail = (row) => {
-    navigate(`/tracking/final-product/${row.id}`)
+    navigate(`/tracking/detail/${row.tracking_id}`)
   }
 
   // === FILTER STATE PER KOLOM ===
