@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   CCard,
   CCardBody,
@@ -7,17 +7,16 @@ import {
   CFormInput,
   CRow,
   CCol,
-  CFormCheck,
   CButton,
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
+import { backendTracking } from '../../api/axios'
 
 const TrackingFinalProduct = () => {
   const [loading, setLoading] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState('')
-  const [filterSerialized, setFilterSerialized] = useState(false)
-  const [filterNonSerialized, setFilterNonSerialized] = useState(false)
+  const [data, setData] = useState([])
 
   const navigate = useNavigate()
 
@@ -27,51 +26,44 @@ const TrackingFinalProduct = () => {
 
   // === FILTER STATE PER KOLOM ===
   const [filters, setFilters] = useState({
-    receiving_test: '',
-    assembly_test: '',
-    on_test: '',
-    hippot_test: '',
-    aging_test: '',
-    clear_zero1: '',
-    clear_zero2: '',
+    'QC-SPS-PCBA-001': '',
+    'QC-AT003': '',
+    'QC-OT004': '',
+    'QC-HT005': '',
+    'QC-AT007': '',
+    'QC-CZ1008': '',
+    'QC-CZ2010': '',
   })
 
-  // === DUMMY DATA ===
-  const data = [
-    {
-      id: 1,
-      pln_serial: 'PLN123456',
-      receiving_test: 'PASS',
-      assembly_test: 'PASS',
-      on_test: 'PASS',
-      hippot_test: 'PASS',
-      aging_test: 'PASS',
-      clear_zero1: 'PASS',
-      clear_zero2: 'PASS',
-    },
-    {
-      id: 2,
-      pln_serial: 'PLN654321',
-      receiving_test: 'PASS',
-      assembly_test: 'FAIL',
-      on_test: 'PASS',
-      hippot_test: 'FAIL',
-      aging_test: 'PASS',
-      clear_zero1: 'PASS',
-      clear_zero2: 'FAIL',
-    },
-    {
-      id: 3,
-      pln_serial: 'PLN777888',
-      receiving_test: 'FAIL',
-      assembly_test: 'PASS',
-      on_test: 'FAIL',
-      hippot_test: 'PASS',
-      aging_test: 'FAIL',
-      clear_zero1: 'FAIL',
-      clear_zero2: 'PASS',
-    },
-  ]
+  // === FETCH DATA FROM API ===
+  // === FETCH DATA FROM API ===
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        const res = await backendTracking.post('/qc-results/history', {
+          page: 1,
+          limit: 50,
+          is_serial: true,
+        })
+
+        console.log('API response:', res.data) // cek dulu struktur
+
+        // sesuaikan dengan struktur response
+        // const result = res.data?.data?.items ?? res.data?.data ?? []
+        const result = res.data?.data?.records
+
+        setData(Array.isArray(result) ? result : [])
+      } catch (err) {
+        console.error('Gagal fetch data:', err)
+        setData([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   // === FILTER LOGIC ===
   const filteredData = useMemo(() => {
@@ -85,9 +77,9 @@ const TrackingFinalProduct = () => {
             .includes(keyword),
         )
 
-      const matchesFilters = Object.entries(filters).every(([key, value]) => {
-        if (value === '') return true
-        return row[key] === value
+      const matchesFilters = Object.entries(filters).every(([qcKey, qcValue]) => {
+        if (qcValue === '') return true
+        return row.qc_history?.[qcKey]?.status === qcValue
       })
 
       return matchesSearch && matchesFilters
@@ -95,14 +87,35 @@ const TrackingFinalProduct = () => {
   }, [data, searchKeyword, filters])
 
   const columns = [
+    { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
     { name: 'PLN Serial', selector: (row) => row.pln_serial, sortable: true },
-    { name: 'Receiving Test', selector: (row) => row.receiving_test, sortable: true },
-    { name: 'Assembly Test', selector: (row) => row.assembly_test, sortable: true },
-    { name: 'ON Test', selector: (row) => row.on_test, sortable: true },
-    { name: 'Hippot Test', selector: (row) => row.hippot_test, sortable: true },
-    { name: 'Aging Test', selector: (row) => row.aging_test, sortable: true },
-    { name: 'Clear Zero1', selector: (row) => row.clear_zero1, sortable: true },
-    { name: 'Clear Zero2', selector: (row) => row.clear_zero2, sortable: true },
+    {
+      name: 'Receiving Test',
+      selector: (row) => row.qc_history?.['QC-SPS-PCBA-001']?.status,
+      sortable: true,
+    },
+    {
+      name: 'Assembly Test',
+      selector: (row) => row.qc_history?.['QC-AT003']?.status,
+      sortable: true,
+    },
+    { name: 'ON Test', selector: (row) => row.qc_history?.['QC-OT004']?.status, sortable: true },
+    {
+      name: 'Hippot Test',
+      selector: (row) => row.qc_history?.['QC-HT005']?.status,
+      sortable: true,
+    },
+    { name: 'Aging Test', selector: (row) => row.qc_history?.['QC-AT007']?.status, sortable: true },
+    {
+      name: 'Clear Zero1',
+      selector: (row) => row.qc_history?.['QC-CZ1008']?.status,
+      sortable: true,
+    },
+    {
+      name: 'Clear Zero2',
+      selector: (row) => row.qc_history?.['QC-CZ2010']?.status,
+      sortable: true,
+    },
     {
       name: 'Actions',
       cell: (row) => (
@@ -125,6 +138,8 @@ const TrackingFinalProduct = () => {
         <option value="">All</option>
         <option value="PASS">PASS</option>
         <option value="FAIL">FAIL</option>
+        <option value="PENDING">PENDING</option>
+        <option value="on_progress">on_progress</option>
       </CFormSelect>
     </div>
   )
@@ -132,7 +147,7 @@ const TrackingFinalProduct = () => {
   return (
     <CCard>
       <CCardBody>
-        {/* Search & Checkbox */}
+        {/* Search */}
         <CRow className="mb-3">
           <CCol md={4} sm={6}>
             <CFormInput
@@ -143,37 +158,24 @@ const TrackingFinalProduct = () => {
               size="sm"
             />
           </CCol>
-
-          {/* <CCol md={8} sm={6} className="d-flex align-items-center gap-3 mt-2 mt-sm-0">
-            <CFormCheck
-              label="Serialized"
-              checked={filterSerialized}
-              onChange={(e) => setFilterSerialized(e.target.checked)}
-            />
-            <CFormCheck
-              label="Non-Serialized"
-              checked={filterNonSerialized}
-              onChange={(e) => setFilterNonSerialized(e.target.checked)}
-            />
-          </CCol> */}
         </CRow>
 
         {/* Filter Dropdowns */}
         <CRow className="mb-3">
           <CCol md={6}>
             <CRow className="g-2">
-              <CCol xs={6}>{renderFilterSelect('receiving_test', 'Receiving')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('assembly_test', 'Assembly')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('on_test', 'ON Test')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('hippot_test', 'Hippot')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('QC-SPS-PCBA-001', 'Receiving')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('QC-AT003', 'Assembly')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('QC-OT004', 'ON Test')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('QC-HT005', 'Hippot')}</CCol>
             </CRow>
           </CCol>
 
           <CCol md={6}>
             <CRow className="g-2">
-              <CCol xs={6}>{renderFilterSelect('aging_test', 'Aging')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('clear_zero1', 'Clear Zero1')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('clear_zero2', 'Clear Zero2')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('QC-AT007', 'Aging')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('QC-CZ1008', 'Clear Zero1')}</CCol>
+              <CCol xs={6}>{renderFilterSelect('QC-CZ2010', 'Clear Zero2')}</CCol>
             </CRow>
           </CCol>
         </CRow>
@@ -187,6 +189,7 @@ const TrackingFinalProduct = () => {
           pagination
           highlightOnHover
           persistTableHead
+          noDataComponent="No data available"
         />
       </CCardBody>
     </CCard>
