@@ -18,6 +18,7 @@ import {
   CBadge,
   CFormLabel,
   CForm,
+  CFormSwitch,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
 import { CounterCard6 } from '../components/CounterCard'
@@ -42,6 +43,10 @@ const DetailNonSerialQc = () => {
   const [qcName, setQcName] = useState([])
   const [questionData, setQuestionData] = useState([])
 
+  //tambahan
+  const [formData, setFormData] = useState({ notes: '' })
+  const [qcIdReceivingSerial, setQcIdReceivingSerial] = useState(null)
+
   const fetchTrackingSumary = async (receivingItemId, qcProduct) => {
     try {
       const response = await backendTracking.get('/sample-inspections/aql-summary', {
@@ -56,6 +61,7 @@ const DetailNonSerialQc = () => {
       const qcId = response.data.data.qc_id
       setInspectionSummary(summary)
       setAqlConfig(aql_config)
+      setQcIdReceivingSerial(qcId)
 
       if (summary.remaining_samples <= 0) {
         toast.error(
@@ -80,31 +86,31 @@ const DetailNonSerialQc = () => {
         },
       })
 
-      // if (response.data.valid === true) {
-      //   // toast.success(response.data.message ?? 'Serial number valid')
+      if (response.data.valid === true) {
+        // toast.success(response.data.message ?? 'Serial number valid')
 
-      //   // Convert object questions → array
-      //   const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
-      //     id: Number(id),
-      //     question: text,
-      //   }))
+        // Convert object questions → array
+        const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
+          id: Number(id),
+          question: text,
+        }))
 
-      //   // Simpan ke state
-      //   setQcName(response.data.category)
-      //   setQuestionData(convertedQuestions)
+        // Simpan ke state
+        setQcName(response.data.category)
+        setQuestionData(convertedQuestions)
 
-      //   // inisialisasi semua jawaban default ke false
-      //   const initialAnswers = {}
-      //   convertedQuestions.forEach((q) => {
-      //     initialAnswers[q.id] = false
-      //   })
-      //   setAnswers(initialAnswers)
+        // inisialisasi semua jawaban default ke false
+        const initialAnswers = {}
+        convertedQuestions.forEach((q) => {
+          initialAnswers[q.id] = false
+        })
+        setAnswers(initialAnswers)
 
-      //   // Ambil product
-      //   // fetchProduct(serialNumber)
-      // } else {
-      //   toast.error(response.data.message ?? 'QC CANT CONTINUE')
-      // }
+        // Ambil product
+        // fetchProduct(serialNumber)
+      } else {
+        toast.error(response.data.message ?? 'QC CANT CONTINUE')
+      }
     } catch (error) {
       console.log('ERROR')
       toast.error(error.response?.data?.message || 'QCValidation Failed')
@@ -155,8 +161,60 @@ const DetailNonSerialQc = () => {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
   }
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+  // }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (!detail) {
+      toast.error('Data produk tidak ditemukan')
+      return
+    }
+
+    const payload = {
+      inspector_by: 1, // sementara hardcode
+      inspector_name: 'Inspector A', // bisa ambil dari user login
+      qc_name: qcName, // array kategori QC
+      qc_id: qcIdReceivingSerial,
+      qc_place: 'Receiving', // sementara hardcode
+      tracking_id: detail.id, // id tracking
+      notes: formData.notes,
+      answers,
+    }
+
+    console.log('Submit payload:', payload)
+
+    try {
+      const res = await backendQc.post('/submit/noserial', payload)
+
+      const qcStatus = res.data?.data?.qcStatus ?? ''
+      const messageShow = (
+        <span>
+          {res.data?.message ?? ''}. QC Status :{' '}
+          <span style={{ color: qcStatus.toUpperCase() === 'FAIL' ? 'red' : 'green' }}>
+            {qcStatus}
+          </span>
+        </span>
+      )
+
+      toast.success(messageShow)
+
+      // reset jawaban & catatan
+      const resetAnswers = {}
+      questionData.forEach((q) => {
+        resetAnswers[q.id] = false
+      })
+      setAnswers(resetAnswers)
+      setFormData({ notes: '' })
+
+      // 🔄 Refresh counter & detail setelah submit
+      await fetchDetail()
+    } catch (error) {
+      console.error('QC submit error:', error)
+      toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
+    }
   }
 
   return (
