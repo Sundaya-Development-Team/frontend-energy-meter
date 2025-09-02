@@ -88,7 +88,7 @@ const TrackingFinalProduct = () => {
 
   const columns = [
     { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
-    { name: 'PLN Serial', selector: (row) => row.pln_serial, sortable: true },
+    { name: 'PLN Serial', selector: (row) => row.pln_code || '-', sortable: true },
     {
       name: 'Receiving Test',
       selector: (row) => row.qc_history?.['QC-SPS-PCBA-001']?.status,

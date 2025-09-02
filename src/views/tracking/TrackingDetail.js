@@ -54,6 +54,7 @@ const TrackingDetail = () => {
   }
 
   const formatDateTime = (dateString) => {
+    if (!dateString) return '-'
     const date = new Date(dateString)
     const yyyy = date.getFullYear()
     const mm = String(date.getMonth() + 1).padStart(2, '0')
@@ -65,75 +66,80 @@ const TrackingDetail = () => {
   }
 
   return (
-    <CCard>
-      <CCardHeader className="d-flex justify-content-between align-items-center">
-        <strong>Tracking Detail</strong>
-        <CButton color="secondary" size="sm" onClick={() => navigate(-1)}>
-          Back
-        </CButton>
-      </CCardHeader>
-      <CCardBody>
-        <div className="mb-4 space-y-2">
-          <CRow className="mb-3">
-            <CCol md={6}>
-              <div className="fw-semibold">ID</div>
-              <div>{detail.id}</div>
-            </CCol>
-            <CCol md={6}>
-              <div className="fw-semibold">Serial Number</div>
-              <div>{detail.serial_number || '-'}</div>
-            </CCol>
-          </CRow>
+    <>
+      {/* Card Detail */}
+      <CCard>
+        <CCardHeader className="d-flex justify-content-between align-items-center">
+          <strong>Tracking Detail</strong>
+          <CButton color="secondary" size="sm" onClick={() => navigate(-1)}>
+            Back
+          </CButton>
+        </CCardHeader>
+        <CCardBody>
+          <div className="mb-4 space-y-2">
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">ID</div>
+                <div>{detail.id}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">Serial Number</div>
+                <div>{detail.serial_number || '-'}</div>
+              </CCol>
+            </CRow>
 
-          <CRow className="mb-3">
-            <CCol md={6}>
-              <div className="fw-semibold">Item Code</div>
-              <div>{detail.code_item || '-'}</div>
-            </CCol>
-            <CCol md={6}>
-              <div className="fw-semibold">Batch</div>
-              <div>{detail.batch || '-'}</div>
-            </CCol>
-          </CRow>
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">Item Code</div>
+                <div>{detail.code_item || '-'}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">Batch</div>
+                <div>{detail.batch || '-'}</div>
+              </CCol>
+            </CRow>
 
-          <CRow className="mb-3">
-            <CCol md={6}>
-              <div className="fw-semibold">Quantity</div>
-              <div>{detail.original_quantity}</div>
-            </CCol>
-            <CCol md={6}>
-              <div className="fw-semibold">Serialized</div>
-              <div>{detail.is_serialize ? 'Yes' : 'No'}</div>
-            </CCol>
-          </CRow>
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">Quantity</div>
+                <div>{detail.original_quantity}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">Serialized</div>
+                <div>{detail.is_serialize ? 'Yes' : 'No'}</div>
+              </CCol>
+            </CRow>
 
-          <CRow className="mb-3">
-            <CCol md={6}>
-              <div className="fw-semibold">Tracking Type</div>
-              <div>{detail.tracking_type || '-'}</div>
-            </CCol>
-            <CCol md={6}>
-              <div className="fw-semibold">Status</div>
-              <CBadge color={detail.status === 'delivered' ? 'success' : 'warning'}>
-                {detail.status}
-              </CBadge>
-            </CCol>
-          </CRow>
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">Tracking Type</div>
+                <div>{detail.tracking_type || '-'}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">Status</div>
+                <CBadge color={detail.status === 'delivered' ? 'success' : 'warning'}>
+                  {detail.status}
+                </CBadge>
+              </CCol>
+            </CRow>
 
-          <CRow className="mb-3">
-            <CCol md={6}>
-              <div className="fw-semibold">Created At</div>
-              <div>{formatDateTime(detail.created_at)}</div>
-            </CCol>
-          </CRow>
-        </div>
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">Created At</div>
+                <div>{formatDateTime(detail.created_at)}</div>
+              </CCol>
+            </CRow>
+          </div>
+        </CCardBody>
+      </CCard>
 
-        {/* QC Results */}
-        {detail.qc_results?.length > 0 && (
-          <>
-            <h5 className="mb-3">
-              <b>QC Results</b>
-            </h5>
+      {/* Card QC Results */}
+      {detail.qc_results?.length > 0 && (
+        <CCard className="mt-4">
+          <CCardHeader>
+            <strong>QC Results</strong>
+          </CCardHeader>
+          <CCardBody>
             <CTable bordered>
               <CTableHead>
                 <CTableRow>
@@ -150,76 +156,30 @@ const TrackingDetail = () => {
                 {detail.qc_results.map((qc, index) => (
                   <CTableRow key={index}>
                     <CTableDataCell>{qc.qc_name}</CTableDataCell>
-                    <CTableDataCell>{new Date(qc.created_at).toLocaleString()}</CTableDataCell>
+                    <CTableDataCell>{formatDateTime(qc.created_at)}</CTableDataCell>
                     <CTableDataCell>{qc.pic || '-'}</CTableDataCell>
                     <CTableDataCell
                       className={
-                        qc.result === 'PASS' ? 'text-success fw-bold' : 'text-danger fw-bold'
+                        qc.result === 'PASS'
+                          ? 'text-success fw-bold'
+                          : qc.result === 'PENDING'
+                            ? 'text-warning fw-bold'
+                            : 'text-danger fw-bold'
                       }
                     >
                       {qc.result}
                     </CTableDataCell>
-                    <CTableDataCell>{qc.qc_place}</CTableDataCell>
-                    <CTableDataCell>{qc.notes}</CTableDataCell>
-                    <CTableDataCell>{'-'}</CTableDataCell>
+                    <CTableDataCell>{qc.qc_place || '-'}</CTableDataCell>
+                    <CTableDataCell>{qc.notes || '-'}</CTableDataCell>
+                    <CTableDataCell>-</CTableDataCell>
                   </CTableRow>
                 ))}
               </CTableBody>
             </CTable>
-          </>
-        )}
-
-        {/* Parent Of */}
-        {/* {detail.parentOf?.length > 0 && (
-          <>
-            <h5 className="mt-4 mb-3">Parent Of (Child Components)</h5>
-            <CTable bordered>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell>Serial Number</CTableHeaderCell>
-                  <CTableHeaderCell>Item Code</CTableHeaderCell>
-                  <CTableHeaderCell>Quantity</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {detail.parentOf.map((child, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell>{child.serial_number || '-'}</CTableDataCell>
-                    <CTableDataCell>{child.code_item || '-'}</CTableDataCell>
-                    <CTableDataCell>{child.original_quantity}</CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
-          </>
-        )} */}
-
-        {/* Component Of */}
-        {/* {detail.componentOf?.length > 0 && (
-          <>
-            <h5 className="mt-4 mb-3">Component Of (Parent Assembly)</h5>
-            <CTable bordered>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell>Serial Number</CTableHeaderCell>
-                  <CTableHeaderCell>Item Code</CTableHeaderCell>
-                  <CTableHeaderCell>Quantity</CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {detail.componentOf.map((parent, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell>{parent.serial_number || '-'}</CTableDataCell>
-                    <CTableDataCell>{parent.code_item || '-'}</CTableDataCell>
-                    <CTableDataCell>{parent.original_quantity}</CTableDataCell>
-                  </CTableRow>
-                ))}
-              </CTableBody>
-            </CTable>
-          </>
-        )} */}
-      </CCardBody>
-    </CCard>
+          </CCardBody>
+        </CCard>
+      )}
+    </>
   )
 }
 
