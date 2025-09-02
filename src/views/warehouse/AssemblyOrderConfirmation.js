@@ -313,6 +313,9 @@ const AssemblyOrders = () => {
                     <option value="failed">Reject</option>
                   </>
                 )}
+                {formData.status === 'in_progress' && (
+                  <option value="in_progress">In Progress</option>
+                )}
                 {formData.status === 'partial' && <option value="partial">Partial</option>}
                 {formData.status === 'completed' && <option value="completed">Completed</option>}
               </CFormSelect>
@@ -385,8 +388,13 @@ const AssemblyOrders = () => {
                     [...selectedOrder.assembly_order_items]
                       .sort((a, b) => a.product_name.localeCompare(b.product_name))
                       .map((item) => {
-                        const remaining = item.qty_remaining
-                        const stock = stockData[item.product_id] ?? '-'
+                        const remaining = Number(item.qty_remaining ?? 0)
+                        const stock = Number(stockData[item.product_id] ?? 0)
+
+                        const safeRemaining = isNaN(remaining) ? 0 : remaining
+                        const safeStock = isNaN(stock) ? 0 : stock
+
+                        const maxAllowed = Math.min(safeRemaining, safeStock)
                         return (
                           <CTableRow key={item.id}>
                             {/* Checkbox */}
@@ -397,8 +405,8 @@ const AssemblyOrders = () => {
                                 disabled={
                                   selectedOrder.status === 'pending' ||
                                   selectedOrder.status === 'failed' ||
-                                  remaining === 0 ||
-                                  stock < remaining
+                                  safeRemaining === 0 ||
+                                  safeStock === 0
                                 }
                                 onChange={(e) =>
                                   setSelectedItems((prev) => ({
@@ -440,19 +448,22 @@ const AssemblyOrders = () => {
                                 type="number"
                                 className="form-control text-center"
                                 min={0}
-                                max={remaining}
+                                max={String(maxAllowed)}
                                 value={selectedItems[item.id]?.qty || ''}
                                 disabled={
                                   !selectedItems[item.id]?.checked ||
                                   selectedOrder.status === 'pending' ||
                                   selectedOrder.status === 'failed' ||
                                   remaining === 0 ||
-                                  stock < remaining
+                                  stock <= 0
                                 }
                                 onChange={(e) => {
                                   let value = e.target.value.replace(/\D/g, '')
                                   value = Number(value)
-                                  if (value > remaining) value = remaining
+
+                                  if (value > remaining && value > stock) value = stock
+                                  if (value > remaining && value < stock) value = remaining
+                                  if (value > stock) value = stock
                                   if (value < 0) value = 0
                                   setSelectedItems((prev) => ({
                                     ...prev,
