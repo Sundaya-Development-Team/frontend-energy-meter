@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   CButton,
   CCard,
@@ -18,50 +18,79 @@ import {
   CTableDataCell,
   CSpinner,
   CFormTextarea,
+  CFormCheck,
 } from '@coreui/react'
 import Select from 'react-select'
 import { toast } from 'react-toastify'
 import { backendProduct, backendAssembly } from '../../../api/axios'
 
+/** Row helper sederhana untuk label + field */
+const FormRow = ({ label, children }) => (
+  <CRow className="mb-3">
+    <CFormLabel className="col-sm-3 col-form-label">{label}</CFormLabel>
+    <CCol sm={9}>{children}</CCol>
+  </CRow>
+)
+
 const OrderForm = () => {
   const [productsData, setProductsData] = useState([])
   const [selectedParent, setSelectedParent] = useState(null)
+
   const [formData, setFormData] = useState({
     product_id: '',
     qty: 1,
     order_number: '',
-    items: [], // array of selected component IDs
+    notes: '',
+    items: [], // array of selected component IDs (termasuk required)
   })
-  const [loading, setLoading] = useState(false)
+
+  const [loadingSubmit, setLoadingSubmit] = useState(false)
+  const [loadingProducts, setLoadingProducts] = useState(false)
+
+  // ref utk set indeterminate di "Select All"
+  const selectAllRef = useRef(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoadingProducts(true)
       try {
         const res = await backendProduct.get('/parents')
-        setProductsData(res.data.data || [])
+        setProductsData(res.data?.data || [])
       } catch (err) {
         console.error('Fetch product error:', err)
+        toast.error(err.response?.data?.message || 'Failed to load products')
+      } finally {
+        setLoadingProducts(false)
       }
     }
-
     fetchProducts()
   }, [])
 
   const getOptionLabel = (p) => `${p.sap_code} - ${p.name}`
 
-  // Handle pilih product → simpan parent & reset items
+  /** Saat pilih parent product */
   const handleSelectProduct = (opt) => {
-    const parent = productsData.find((p) => p.id === opt?.value)
-    setSelectedParent(parent || null)
+    const parent = productsData.find((p) => p.id === opt?.value) || null
+    setSelectedParent(parent)
+
+    // auto centang semua required component
+    const requiredIds = parent?.components?.filter((c) => c.required).map((c) => c.product.id) || []
+
     setFormData((prev) => ({
       ...prev,
       product_id: opt ? opt.value : '',
-      items: [], // reset pilihan item ketika ganti parent
+      items: requiredIds,
     }))
   }
 
-  // Checklist item (berdasarkan component.id)
+  /** Toggle komponen per-baris */
   const toggleItem = (componentId) => {
+    const comp = selectedParent?.components?.find((c) => c.product.id === componentId)
+    if (!comp) return
+
+    // block jika required
+    if (comp.required) return
+
     setFormData((prev) => {
       const exists = prev.items.includes(componentId)
       return {
@@ -70,38 +99,62 @@ const OrderForm = () => {
       }
     })
   }
+
+  /** helper: id2 untuk required & optional */
+  const requiredIds =
+    selectedParent?.components?.filter((c) => c.required).map((c) => c.product.id) || []
+  const optionalIds =
+    selectedParent?.components?.filter((c) => !c.required).map((c) => c.product.id) || []
+
+  const allOptionalSelected =
+    optionalIds.length > 0 && optionalIds.every((id) => formData.items.includes(id))
+  const anyOptionalSelected =
+    optionalIds.length > 0 && optionalIds.some((id) => formData.items.includes(id))
+
+  // set indeterminate untuk Select All checkbox
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = anyOptionalSelected && !allOptionalSelected
+    }
+  }, [anyOptionalSelected, allOptionalSelected])
+
+  /** Select All hanya untuk optional */
+  const handleSelectAllChange = (e) => {
+    const checked = e.target.checked
+    setFormData((prev) => {
+      if (checked) {
+        // pilih semua optional + pertahankan required
+        const merged = Array.from(new Set([...prev.items, ...optionalIds]))
+        return { ...prev, items: merged }
+      }
+      // uncheck semua optional, tapi pertahankan required
+      return { ...prev, items: requiredIds }
+    })
+  }
+
   const handleInput = (e) => {
     const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
+    if (!formData.product_id || formData.qty <= 0 || !formData.order_number) {
+      toast.warn('Please fill all fields correctly.')
+      return
+    }
+    if (!selectedParent) {
+      toast.warn('Please select a product.')
+      return
+    }
+    if (formData.items.length === 0) {
+      toast.warn('Please select at least one item.')
+      return
+    }
 
+    setLoadingSubmit(true)
     try {
-      if (!formData.product_id || formData.qty <= 0 || !formData.order_number) {
-        toast.warn('Please fill all fields correctly.')
-        setLoading(false)
-        return
-      }
-
-      if (!selectedParent) {
-        toast.warn('Please select a product.')
-        setLoading(false)
-        return
-      }
-
-      if (formData.items.length === 0) {
-        toast.warn('Please select at least one item.')
-        setLoading(false)
-        return
-      }
-
-      // Build items payload dari parentOf + perkalian qty utama
+      // Build items payload dari komponen yang dipilih
       const itemsPayload = (selectedParent.components || [])
         .filter((c) => formData.items.includes(c.product.id))
         .map((c) => ({
@@ -115,23 +168,27 @@ const OrderForm = () => {
         quantity: Number(formData.qty),
         status: 'pending',
         request_by: 1,
-        notes: formData.notes || '', // biar gak undefined
+        notes: formData.notes || '',
         assembly_order_items: itemsPayload,
       }
 
-      console.log('Payload:', payload)
-
-      // contoh call API
       const res = await backendAssembly.post('/assembly-orders/with-items', payload)
-
-      toast.success(res.data.message || 'Order submitted successfully!')
+      toast.success(res.data?.message || 'Order submitted successfully!')
+      // (opsional) reset form:
+      // setSelectedParent(null)
+      // setFormData({ product_id: '', qty: 1, order_number: '', notes: '', items: [] })
     } catch (err) {
       console.error('Submit error:', err)
       toast.error(err.response?.data?.message || 'Failed to submit order.')
     } finally {
-      setLoading(false)
+      setLoadingSubmit(false)
     }
   }
+
+  const selectedValue =
+    selectedParent != null
+      ? { value: selectedParent.id, label: getOptionLabel(selectedParent) }
+      : null
 
   return (
     <CRow>
@@ -146,30 +203,28 @@ const OrderForm = () => {
               <FormRow label="AO/PO">
                 <CFormInput
                   type="text"
+                  name="order_number"
                   value={formData.order_number}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, order_number: e.target.value }))
-                  }
+                  onChange={handleInput}
                   required
                 />
               </FormRow>
 
               {/* Product */}
               <FormRow label="Product">
-                <Select
-                  options={productsData.map((p) => ({ value: p.id, label: getOptionLabel(p) }))}
-                  value={
-                    formData.product_id
-                      ? (() => {
-                          const found = productsData.find((p) => p.id === formData.product_id)
-                          return found ? { value: found.id, label: getOptionLabel(found) } : null
-                        })()
-                      : null
-                  }
-                  onChange={handleSelectProduct}
-                  isClearable
-                  placeholder="Select Product"
-                />
+                {loadingProducts ? (
+                  <div className="d-flex align-items-center gap-2">
+                    <CSpinner size="sm" /> Loading products…
+                  </div>
+                ) : (
+                  <Select
+                    options={productsData.map((p) => ({ value: p.id, label: getOptionLabel(p) }))}
+                    value={selectedValue}
+                    onChange={handleSelectProduct}
+                    isClearable
+                    placeholder="Select Product"
+                  />
+                )}
               </FormRow>
 
               {/* Qty */}
@@ -177,14 +232,16 @@ const OrderForm = () => {
                 <CFormInput
                   type="number"
                   min={1}
+                  name="qty"
                   value={formData.qty}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, qty: Number(e.target.value) }))
+                    setFormData((prev) => ({ ...prev, qty: Number(e.target.value) || 1 }))
                   }
                   required
                 />
               </FormRow>
 
+              {/* Notes */}
               <FormRow label="Notes">
                 <CFormTextarea
                   rows={3}
@@ -195,9 +252,7 @@ const OrderForm = () => {
                 />
               </FormRow>
 
-              {/* Items - tabel dari parentOf (BOM) */}
-              {/* Items - tabel dari parentOf (BOM) */}
-              {/* Items - tabel dari BOM */}
+              {/* Tabel Items (BOM) */}
               {selectedParent && selectedParent.components?.length > 0 && (
                 <CRow className="mb-3">
                   <CCol md={12}>
@@ -205,49 +260,66 @@ const OrderForm = () => {
                     <CTable striped bordered hover responsive>
                       <CTableHead>
                         <CTableRow>
-                          <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                          <CTableHeaderCell scope="col">Code</CTableHeaderCell>
-                          <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                          <CTableHeaderCell scope="col">BOM Qty</CTableHeaderCell>
-                          <CTableHeaderCell scope="col">Total Qty</CTableHeaderCell>
-                          <CTableHeaderCell scope="col">
-                            <input
-                              type="checkbox"
-                              checked={formData.items.length === selectedParent.components.length}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  // pilih semua
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    items: selectedParent.components.map((c) => c.product.id),
-                                  }))
-                                } else {
-                                  // kosongkan semua
-                                  setFormData((prev) => ({ ...prev, items: [] }))
-                                }
-                              }}
-                            />{' '}
-                            Select All
+                          <CTableHeaderCell scope="col" className="align-middle">
+                            #
+                          </CTableHeaderCell>
+                          <CTableHeaderCell scope="col" className="align-middle">
+                            Code
+                          </CTableHeaderCell>
+                          <CTableHeaderCell scope="col" className="align-middle">
+                            Name
+                          </CTableHeaderCell>
+                          <CTableHeaderCell scope="col" className="align-middle">
+                            BOM Qty
+                          </CTableHeaderCell>
+                          <CTableHeaderCell scope="col" className="align-middle">
+                            Total Qty
+                          </CTableHeaderCell>
+                          <CTableHeaderCell scope="col" className="align-middle">
+                            Required
+                          </CTableHeaderCell>
+                          <CTableHeaderCell scope="col" className="align-middle">
+                            <div className="d-flex align-items-center gap-2">
+                              <CFormCheck
+                                inputRef={selectAllRef}
+                                checked={allOptionalSelected}
+                                onChange={handleSelectAllChange}
+                                disabled={optionalIds.length === 0}
+                              />
+                              <span>Select All</span>
+                            </div>
                           </CTableHeaderCell>
                         </CTableRow>
                       </CTableHead>
                       <CTableBody>
                         {selectedParent.components.map((c, idx) => {
-                          const checked = formData.items.includes(c.product.id)
+                          const id = c.product.id
                           const baseQty = Number(c.quantity) || 0
                           const totalQty = baseQty * Number(formData.qty || 0)
+                          const isRequired = !!c.required
+                          const checked = formData.items.includes(id)
+
                           return (
-                            <CTableRow key={c.product.id}>
-                              <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                              <CTableDataCell>{c.product.sap_code}</CTableDataCell>
-                              <CTableDataCell>{c.product.name}</CTableDataCell>
-                              <CTableDataCell>{baseQty}</CTableDataCell>
-                              <CTableDataCell>{totalQty}</CTableDataCell>
-                              <CTableDataCell>
-                                <input
-                                  type="checkbox"
+                            <CTableRow key={id}>
+                              <CTableHeaderCell scope="row" className="align-middle">
+                                {idx + 1}
+                              </CTableHeaderCell>
+                              <CTableDataCell className="align-middle">
+                                {c.product.sap_code}
+                              </CTableDataCell>
+                              <CTableDataCell className="align-middle">
+                                {c.product.name}
+                              </CTableDataCell>
+                              <CTableDataCell className="align-middle">{baseQty}</CTableDataCell>
+                              <CTableDataCell className="align-middle">{totalQty}</CTableDataCell>
+                              <CTableDataCell className="align-middle">
+                                {isRequired ? 'Yes' : 'No'}
+                              </CTableDataCell>
+                              <CTableDataCell className="align-middle">
+                                <CFormCheck
                                   checked={checked}
-                                  onChange={() => toggleItem(c.product.id)}
+                                  onChange={() => toggleItem(id)}
+                                  disabled={isRequired}
                                 />
                               </CTableDataCell>
                             </CTableRow>
@@ -261,8 +333,8 @@ const OrderForm = () => {
 
               {/* Submit */}
               <div className="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                <CButton color="primary" type="submit" disabled={loading}>
-                  {loading ? (
+                <CButton color="primary" type="submit" disabled={loadingSubmit}>
+                  {loadingSubmit ? (
                     <>
                       <CSpinner size="sm" /> Saving…
                     </>
@@ -271,11 +343,6 @@ const OrderForm = () => {
                   )}
                 </CButton>
               </div>
-              {/* <div className="d-grid gap-2 mt-3">
-                <CButton type="submit" color="primary">
-                  Submit
-                </CButton>
-              </div> */}
             </CForm>
           </CCardBody>
         </CCard>
@@ -283,12 +350,5 @@ const OrderForm = () => {
     </CRow>
   )
 }
-
-const FormRow = ({ label, children }) => (
-  <CRow className="mb-3">
-    <CFormLabel className="col-sm-3 col-form-label">{label}</CFormLabel>
-    <CCol sm={9}>{children}</CCol>
-  </CRow>
-)
 
 export default OrderForm
