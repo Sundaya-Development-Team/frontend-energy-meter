@@ -174,34 +174,28 @@ const DetailNonSerialQc = () => {
     }
 
     const payload = {
-      inspector_by: 1, // sementara hardcode
-      inspector_name: 'Inspector A', // bisa ambil dari user login
-      qc_name: qcName, // array kategori QC
+      inspector_by: 1,
+      inspector_name: 'Inspector A',
+      qc_name: qcName,
       qc_id: qcIdReceivingSerial,
-      qc_place: 'Receiving', // sementara hardcode
-      tracking_id: detail.id, // id tracking
+      qc_place: 'Receiving',
+      tracking_id: detail.id,
       notes: formData.notes,
       answers,
     }
 
-    console.log('Submit payload:', payload)
-
     try {
       const res = await backendQc.post('/submit/noserial', payload)
-
       const qcStatus = res.data?.data?.qcStatus ?? ''
-      const messageShow = (
+
+      toast.success(
         <span>
           {res.data?.message ?? ''}. QC Status :{' '}
-          <span style={{ color: qcStatus.toUpperCase() === 'FAIL' ? 'red' : 'green' }}>
-            {qcStatus}
-          </span>
-        </span>
+          <span style={{ color: qcStatus === 'FAIL' ? 'red' : 'green' }}>{qcStatus}</span>
+        </span>,
       )
 
-      toast.success(messageShow)
-
-      // reset jawaban & catatan
+      // ✅ Reset jawaban & catatan
       const resetAnswers = {}
       questionData.forEach((q) => {
         resetAnswers[q.id] = false
@@ -209,10 +203,20 @@ const DetailNonSerialQc = () => {
       setAnswers(resetAnswers)
       setFormData({ notes: '' })
 
-      // 🔄 Refresh counter & detail setelah submit
-      await fetchDetail()
+      // ✅ Update summary secara manual (optimistic update)
+      setInspectionSummary((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          remaining_samples: Math.max(prev.remaining_samples - 1, 0),
+          inspected_samples: (prev.inspected_samples ?? 0) + 1,
+          fail_count:
+            payload.answers && Object.values(payload.answers).includes(false)
+              ? (prev.fail_count ?? 0) + 1
+              : prev.fail_count,
+        }
+      })
     } catch (error) {
-      console.error('QC submit error:', error)
       toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
     }
   }
