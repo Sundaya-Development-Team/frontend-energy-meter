@@ -160,6 +160,7 @@ const OrderForm = () => {
         .map((c) => ({
           product_id: c.product.id,
           qty_request: (Number(c.quantity) || 0) * Number(formData.qty),
+          required: !!c.required,
         }))
 
       const payload = {
@@ -281,7 +282,7 @@ const OrderForm = () => {
                           <CTableHeaderCell scope="col" className="align-middle">
                             <div className="d-flex align-items-center gap-2">
                               <CFormCheck
-                                inputRef={selectAllRef}
+                                ref={selectAllRef}
                                 checked={allOptionalSelected}
                                 onChange={handleSelectAllChange}
                                 disabled={optionalIds.length === 0}
