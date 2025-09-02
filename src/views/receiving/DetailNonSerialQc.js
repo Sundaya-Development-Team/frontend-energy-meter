@@ -253,7 +253,7 @@ const DetailNonSerialQc = () => {
                 </div>
 
                 {/* QC Results */}
-                {detail.qc_results?.length > 0 && (
+                {/* {detail.qc_results?.length > 0 && (
                   <>
                     <h5 className="mb-3">
                       <b>QC Results</b>
@@ -295,14 +295,14 @@ const DetailNonSerialQc = () => {
                       </CTableBody>
                     </CTable>
                   </>
-                )}
+                )} */}
               </CCardBody>
             </CCard>
           </CCol>
         </CRow>
       </CCol>
 
-      {/* Quality Control Assembly */}
+      {/* Quality Control Question */}
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
