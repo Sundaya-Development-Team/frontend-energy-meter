@@ -42,18 +42,25 @@ const AssemblyOrders = () => {
     notes: '',
   })
   const [showSubmit, setShowSubmit] = useState(true)
+  const TOAST_ID = 'stock-warning'
 
   useEffect(() => {
     fetchOrders()
   }, [])
 
-  const TOAST_ID = 'stock-warning'
-
   useEffect(() => {
-    if (!selectedOrder || !stockData || Object.keys(stockData).length === 0) return
+    if (!selectedOrder) return
 
-    // Tutup notifikasi lama dulu
-    // toast.dismiss(TOAST_ID)
+    const statusOrder = selectedOrder?.status?.toLowerCase()
+
+    // completed selalu prioritas
+    if (statusOrder === 'completed') {
+      setShowSubmit(false)
+      toast.dismiss(TOAST_ID)
+      return
+    }
+
+    if (!stockData || Object.keys(stockData).length === 0) return
 
     const init = {}
     const insufficient = []
@@ -81,7 +88,9 @@ const AssemblyOrders = () => {
     if (insufficient.length > 0) {
       if (toast.isActive(TOAST_ID)) {
         toast.update(TOAST_ID, {
-          render: `INSUFFICIENT STOCK FOR ${insufficient.length} item(s):\n- ${insufficient.join('\n- ')}`,
+          render: `INSUFFICIENT STOCK FOR ${insufficient.length} item(s):\n- ${insufficient.join(
+            '\n- ',
+          )}`,
           autoClose: 10000,
           closeOnClick: true,
           pauseOnHover: true,
@@ -111,90 +120,46 @@ const AssemblyOrders = () => {
     }
   }
 
-  // const handleOrderChange = (e) => {
-  //   const orderId = e.target.value
-  //   const order = orders.find((o) => o.id === Number(orderId))
-
-  //   setSelectedOrder(order || null)
-
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     status: order?.status || '', // isi default dari order yg dipilih
-  //     notes: '', // reset notes tiap ganti order
-  //   }))
-  // }
-
-  // const handleOrderChange = async (e) => {
-  //   const orderId = e.target.value
-  //   const order = orders.find((o) => o.id === Number(orderId))
-  //   setSelectedOrder(order || null)
-  //   setSelectedItems({})
-
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     status: order?.status || '', // isi default dari order yg dipilih
-  //     notes: '', // reset notes tiap ganti order
-  //   }))
-
-  //   if (order && order.assembly_order_items?.length > 0) {
-  //     const productIds = order.assembly_order_items.map((i) => i.product_id)
-
-  //     try {
-  //       const res = await backendWh.post('/stock-units/stock-by-multiple-products', {
-  //         product_ids: productIds,
-  //         warehouse_id: 1, // ganti sesuai warehouse kamu
-  //         include_zero_stock: true,
-  //       })
-
-  //       if (res.data.success) {
-  //         const map = {}
-  //         res.data.data.stock_by_product.forEach((s) => {
-  //           map[s.product_id] = s.total_quantity
-  //         })
-  //         setStockData(map)
-  //       }
-  //     } catch (err) {
-  //       console.error('Failed fetch stock', err)
-  //     }
-  //   } else {
-  //     setStockData({})
-  //   }
-  // }
-
   // Fungsi reusable untuk fetch order & stock
   const fetchOrderData = async (orderId) => {
     const order = orders.find((o) => o.id === Number(orderId))
     setSelectedOrder(order || null)
     setSelectedItems({})
 
-    setFormData((prev) => ({
-      ...prev,
-      status: order?.status || '',
-      notes: '',
-    }))
-
-    if (order && order.assembly_order_items?.length > 0) {
-      const productIds = order.assembly_order_items.map((i) => i.product_id)
-
-      try {
-        const res = await backendWh.post('/stock-units/stock-by-multiple-products', {
-          product_ids: productIds,
-          warehouse_id: 1, // sesuaikan warehouse
-          include_zero_stock: true,
-        })
-
-        if (res.data.success) {
-          const map = {}
-          res.data.data.stock_by_product.forEach((s) => {
-            map[s.product_id] = s.total_quantity
-          })
-          setStockData(map)
-        }
-      } catch (err) {
-        console.error('Failed fetch stock', err)
-      }
+    const statusOrder = order?.status?.toLowerCase()
+    if (statusOrder === 'completed') {
+      setShowSubmit(false)
+      return // stop biar tidak ditimpa logic stock
     } else {
-      setStockData({})
+      setFormData((prev) => ({
+        ...prev,
+        status: order?.status || '',
+        notes: '',
+      }))
+
+      if (order && order.assembly_order_items?.length > 0) {
+        const productIds = order.assembly_order_items.map((i) => i.product_id)
+
+        try {
+          const res = await backendWh.post('/stock-units/stock-by-multiple-products', {
+            product_ids: productIds,
+            warehouse_id: 1, // sesuaikan warehouse
+            include_zero_stock: true,
+          })
+
+          if (res.data.success) {
+            const map = {}
+            res.data.data.stock_by_product.forEach((s) => {
+              map[s.product_id] = s.total_quantity
+            })
+            setStockData(map)
+          }
+        } catch (err) {
+          console.error('Failed fetch stock', err)
+        }
+      } else {
+        setStockData({})
+      }
     }
   }
 
@@ -425,7 +390,7 @@ const AssemblyOrders = () => {
                     <CTableHeaderCell className="text-start ps-3">Product Name</CTableHeaderCell>
                     <CTableHeaderCell>Qty Request</CTableHeaderCell>
                     <CTableHeaderCell>Confirmed</CTableHeaderCell>
-                    <CTableHeaderCell>Remaining</CTableHeaderCell>
+                    <CTableHeaderCell>Remaining Req</CTableHeaderCell>
                     <CTableHeaderCell>Stock</CTableHeaderCell>
                     <CTableHeaderCell>Confirm Qty</CTableHeaderCell>
                   </CTableRow>
