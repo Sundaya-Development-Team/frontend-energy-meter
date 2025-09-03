@@ -17,6 +17,7 @@ import {
   CFormInput,
   CButton,
   CFormTextarea,
+  CFormCheck,
 } from '@coreui/react'
 import { backendAssembly, backendWh } from '../../api/axios'
 import { toast } from 'react-toastify'
@@ -40,10 +41,63 @@ const AssemblyOrders = () => {
   const [formData, setFormData] = useState({
     notes: '',
   })
+  const [showSubmit, setShowSubmit] = useState(true)
 
   useEffect(() => {
     fetchOrders()
   }, [])
+
+  const TOAST_ID = 'stock-warning'
+
+  useEffect(() => {
+    if (!selectedOrder || !stockData || Object.keys(stockData).length === 0) return
+
+    // Tutup notifikasi lama dulu
+    // toast.dismiss(TOAST_ID)
+
+    const init = {}
+    const insufficient = []
+
+    selectedOrder.assembly_order_items?.forEach((item) => {
+      const remaining = Number(item.qty_remaining ?? 0)
+      const stock = Number(stockData[item.product_id] ?? 0)
+
+      if (item.required) {
+        if (remaining > 0 && stock < remaining) {
+          init[item.id] = { checked: true, qty: stock }
+          insufficient.push(
+            `${item.product_name} (Available Stock: ${stock} < Remaining Qty: ${remaining})`,
+          )
+        } else {
+          init[item.id] = { checked: true, qty: remaining }
+        }
+      } else {
+        init[item.id] = { checked: false, qty: 0 }
+      }
+    })
+
+    setSelectedItems(init)
+
+    if (insufficient.length > 0) {
+      if (toast.isActive(TOAST_ID)) {
+        toast.update(TOAST_ID, {
+          render: `INSUFFICIENT STOCK FOR ${insufficient.length} item(s):\n- ${insufficient.join('\n- ')}`,
+          autoClose: 10000,
+          closeOnClick: true,
+          pauseOnHover: true,
+        })
+      } else {
+        toast.error(
+          `INSUFFICIENT STOCK FOR ${insufficient.length} item(s):\n- ${insufficient.join('\n- ')}`,
+          { toastId: TOAST_ID, autoClose: 10000, closeOnClick: true, pauseOnHover: true },
+        )
+      }
+      setShowSubmit(false)
+    } else {
+      toast.dismiss(TOAST_ID)
+      setShowSubmit(true)
+    }
+  }, [selectedOrder, stockData])
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -399,10 +453,11 @@ const AssemblyOrders = () => {
                           <CTableRow key={item.id}>
                             {/* Checkbox */}
                             <CTableDataCell>
-                              <input
-                                type="checkbox"
-                                checked={!!selectedItems[item.id]?.checked}
+                              <CFormCheck
+                                id={`check-${item.id}`}
+                                checked={item.required ? true : !!selectedItems[item.id]?.checked}
                                 disabled={
+                                  item.required ||
                                   selectedOrder.status === 'pending' ||
                                   selectedOrder.status === 'failed' ||
                                   safeRemaining === 0 ||
@@ -413,11 +468,15 @@ const AssemblyOrders = () => {
                                     ...prev,
                                     [item.id]: {
                                       ...prev[item.id],
-                                      checked: e.target.checked,
-                                      qty: e.target.checked ? prev[item.id]?.qty || 0 : 0,
+                                      checked: item.required ? true : e.target.checked,
+                                      qty:
+                                        item.required || e.target.checked
+                                          ? prev[item.id]?.qty || 0
+                                          : 0,
                                     },
                                   }))
                                 }
+                                color="primary" // <== ini yang bikin checkbox pakai warna theme
                               />
                             </CTableDataCell>
 
@@ -451,6 +510,7 @@ const AssemblyOrders = () => {
                                 max={String(maxAllowed)}
                                 value={selectedItems[item.id]?.qty || ''}
                                 disabled={
+                                  item.required || // 🔥 jika required maka otomatis disable
                                   !selectedItems[item.id]?.checked ||
                                   selectedOrder.status === 'pending' ||
                                   selectedOrder.status === 'failed' ||
@@ -493,7 +553,8 @@ const AssemblyOrders = () => {
               <div className="d-flex justify-content-end mt-3">
                 {selectedOrder &&
                   selectedOrder.status !== 'pending' &&
-                  selectedOrder.status !== 'failed' && (
+                  selectedOrder.status !== 'failed' &&
+                  showSubmit && (
                     <CButton color="primary" onClick={handleSubmit}>
                       Submit Confirmation
                     </CButton>
