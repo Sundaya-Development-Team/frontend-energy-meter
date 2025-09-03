@@ -21,18 +21,19 @@ const ReceivingNonSerialQc = () => {
       const params = {
         page,
         limit,
-        sort_by: 'created_at',
-        sort_order: 'desc',
-        is_serialize: false, // 🔑 hanya ambil non-serial
+        is_serialize: false,
+        status: 'in_progress',
       }
 
       if (searchKeyword.trim() !== '') {
         params.search = searchKeyword.trim()
       }
 
-      const res = await backendTracking.get('/', { params })
+      const res = await backendTracking.get('/sample-inspections/receiving-items-aql-summary', {
+        params,
+      })
 
-      setData(res.data.data.records || [])
+      setData(res.data.data.receiving_items || [])
       setTotalRows(res.data.data.pagination?.total || 0)
     } catch (error) {
       toast.error('Failed to fetch tracking data')
@@ -59,25 +60,41 @@ const ReceivingNonSerialQc = () => {
     setPage(1)
   }
 
-  const handleSelectDetail = (id) => {
-    const trackingId = id
+  const handleSelectDetail = (trackingId) => {
     navigate(`/receiving/detailnonserialqc/${trackingId}`)
   }
 
   const columns = [
-    { name: 'Item Code', selector: (row) => row.code_item, sortable: true },
+    { name: 'Product', selector: (row) => row.product_name, sortable: true },
     { name: 'Batch', selector: (row) => row.batch, sortable: true },
-    { name: 'Qty', selector: (row) => row.original_quantity, sortable: true },
-    { name: 'Serialized', selector: (row) => (row.is_serialize ? 'Yes' : 'No'), sortable: true },
-    { name: 'Tracking', selector: (row) => row.tracking_type, sortable: true },
+    { name: 'QC Code', selector: (row) => row.qc_standard, sortable: true },
+    { name: 'Status', selector: (row) => row.status, sortable: true },
     {
-      name: 'Actions',
-      cell: (row) => (
-        <CButton size="sm" color="primary" onClick={() => handleSelectDetail(row.id)}>
-          Select Product
-        </CButton>
-      ),
-      ignoreRowClick: true,
+      name: 'Progress',
+      selector: (row) => row.aql_info?.progress ?? '0%',
+      sortable: false,
+    },
+    {
+      name: 'Samples (Pass/Fail)',
+      selector: (row) => `${row.items_summary.samples_passed}/${row.items_summary.samples_failed}`,
+      sortable: false,
+    },
+    { name: 'Next Action', selector: (row) => row.next_action, sortable: false },
+    {
+      name: 'Action',
+      cell: (row) => {
+        const trackingId = row.tracking_items?.[0]?.tracking_id
+        return (
+          <CButton
+            size="sm"
+            color="primary"
+            disabled={!trackingId}
+            onClick={() => handleSelectDetail(trackingId)}
+          >
+            Inspect
+          </CButton>
+        )
+      },
     },
   ]
 

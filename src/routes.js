@@ -92,19 +92,19 @@ const ScanBeforeClearZero = React.lazy(
   () => import('./views/production/finishing/ScanBeforeClearZero'),
 )
 const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
-const ClosingCover = React.lazy(() => import('./views/production/finishing/ClosingCover'))
+const SidePlnSerial = React.lazy(() => import('./views/production/finishing/SidePlnSerial'))
 
 // Closing Cover (tidak terpakai)
-const ScanBeforeClosingCover = React.lazy(
-  () => import('./views/production/closingcover/ScanBeforeClosingCover'),
-)
+// const ScanBeforeClosingCover = React.lazy(
+//   () => import('./views/production/closingcover/ScanBeforeClosingCover'),
+// )
 const ScanAfterZeroClear = React.lazy(
   () => import('./views/production/finishing/ScanAfterClearZero.js'),
 )
-const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
-const ScanAfterClosingCover = React.lazy(
-  () => import('./views/production/closingcover/ScanAfterClosingCover'),
-)
+// const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
+// const ScanAfterClosingCover = React.lazy(
+//   () => import('./views/production/closingcover/ScanAfterClosingCover'),
+// )
 
 // Inventory
 const IncomingUnits = React.lazy(() => import('./views/production/inventory/IncomingUnits'))
@@ -115,7 +115,9 @@ const OutcomingWarehouse = React.lazy(() => import('./views/warehouse/OutcomingW
 const WarehouseMaster = React.lazy(() => import('./views/warehouse/WarehouseMaster'))
 const ReceivingWhRequest = React.lazy(() => import('./views/warehouse/ReceivingWhRequest'))
 const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStockConfirm'))
-const AssemblyOrderList = React.lazy(() => import('./views/warehouse/AssemblyOrderConfirmation'))
+const AssemblyOrderConfirmation = React.lazy(
+  () => import('./views/warehouse/AssemblyOrderConfirmation'),
+)
 
 // Delivery
 const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
@@ -333,9 +335,9 @@ const routes = [
     exact: true,
   },
   {
-    path: '/production/finishing/closingcover',
+    path: '/production/finishing/scansidepln',
     name: 'Quality Control Clear Zero',
-    element: ClosingCover,
+    element: SidePlnSerial,
   },
   {
     path: '/production/finishing/clearzero/after',
@@ -468,7 +470,7 @@ const routes = [
   {
     path: '/warehouse/outgoing/assemblyorder',
     name: 'Assembly order',
-    element: AssemblyOrderList,
+    element: AssemblyOrderConfirmation,
     exact: true,
   },
   { path: '/warehouse/incoming', name: 'Incoming Warehouse', element: IncomingWarehouse },

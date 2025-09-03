@@ -135,7 +135,8 @@ const ReceivingHeader = () => {
         item.product_type = selected?.type?.name || ''
         item.serialize = selected?.is_serialize ?? false
       } else if (field === 'ref_quantity') {
-        item[field] = Number(value)
+        // kalau kosong, simpan string kosong dulu
+        item[field] = value === '' ? '' : Math.max(0, Number(value))
       } else {
         item[field] = value
       }
@@ -329,10 +330,9 @@ const ReceivingHeader = () => {
                           <CFormInput
                             type="number"
                             min={0}
-                            value={item.ref_quantity ?? ''}
+                            value={item.ref_quantity === '' ? '' : item.ref_quantity}
                             onChange={(e) => {
-                              const val = Math.max(0, Number(e.target.value))
-                              handleDetailChange(index, 'ref_quantity', val)
+                              handleDetailChange(index, 'ref_quantity', e.target.value)
                             }}
                           />
                         </td>
@@ -405,10 +405,14 @@ const ReceivingHeader = () => {
                       <CFormInput
                         type="number"
                         min={0}
-                        value={item.ref_quantity ?? ''}
+                        value={item.ref_quantity === '' ? '' : item.ref_quantity}
                         onChange={(e) => {
-                          const val = Math.max(0, Number(e.target.value))
-                          handleDetailChange(index, 'ref_quantity', val)
+                          const raw = e.target.value
+                          handleDetailChange(
+                            index,
+                            'ref_quantity',
+                            raw === '' ? '' : Math.max(0, Number(raw)),
+                          )
                         }}
                         placeholder="Order Qty"
                       />
