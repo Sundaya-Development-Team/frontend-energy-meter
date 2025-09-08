@@ -317,7 +317,11 @@ const _nav = [
         name: 'QC Clear Zero 1',
         to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
       },
-
+      {
+        component: CNavItem,
+        name: 'Closing Cover',
+        to: '/production/serialnoaql/QC-CC009/Closing Cover',
+      },
       {
         component: CNavItem,
         name: 'QC Clear Zero 2',
