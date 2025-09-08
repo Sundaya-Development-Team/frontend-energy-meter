@@ -34,9 +34,12 @@ const FormRow = ({ label, children }) => (
 
 const OrderForm = () => {
   const [productsData, setProductsData] = useState([])
+  const [plnOrders, setPlnOrders] = useState([])
+
   const [selectedParent, setSelectedParent] = useState(null)
 
   const [formData, setFormData] = useState({
+    pln_order_id: '', // 🔹 tambahan
     product_id: '',
     qty: 1,
     order_number: '',
@@ -46,10 +49,29 @@ const OrderForm = () => {
 
   const [loadingSubmit, setLoadingSubmit] = useState(false)
   const [loadingProducts, setLoadingProducts] = useState(false)
+  const [loadingPlnOrders, setLoadingPlnOrders] = useState(false)
 
   // ref utk set indeterminate di "Select All"
   const selectAllRef = useRef(null)
 
+  // fetch PLN Orders
+  useEffect(() => {
+    const fetchPlnOrders = async () => {
+      setLoadingPlnOrders(true)
+      try {
+        const res = await backendAssembly.get('/pln-orders')
+        setPlnOrders(res.data?.data || [])
+      } catch (err) {
+        console.error('Fetch PLN Orders error:', err)
+        toast.error(err.response?.data?.message || 'Failed to load PLN orders')
+      } finally {
+        setLoadingPlnOrders(false)
+      }
+    }
+    fetchPlnOrders()
+  }, [])
+
+  // fetch Products
   useEffect(() => {
     const fetchProducts = async () => {
       setLoadingProducts(true)
@@ -165,6 +187,7 @@ const OrderForm = () => {
 
       const payload = {
         order_number: formData.order_number,
+        pln_order_id: formData.pln_order_id || null, // 🔹 tambahan ke payload
         product_id: formData.product_id,
         quantity: Number(formData.qty),
         status: 'pending',
@@ -200,13 +223,47 @@ const OrderForm = () => {
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
+              {/* PLN Order */}
+              <FormRow label="PLN Order">
+                {loadingPlnOrders ? (
+                  <div className="d-flex align-items-center gap-2">
+                    <CSpinner size="sm" /> Loading PLN orders…
+                  </div>
+                ) : (
+                  <Select
+                    options={plnOrders.map((o) => ({
+                      value: o.id,
+                      label: `${o.order_number} (Qty: ${o.quantity})`,
+                    }))}
+                    value={
+                      formData.pln_order_id
+                        ? {
+                            value: formData.pln_order_id,
+                            label: plnOrders.find((o) => o.id === formData.pln_order_id)
+                              ?.order_number,
+                          }
+                        : null
+                    }
+                    onChange={(opt) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        pln_order_id: opt ? opt.value : '',
+                      }))
+                    }
+                    isClearable
+                    placeholder="Select PLN Order"
+                  />
+                )}
+              </FormRow>
+
               {/* AO/PO */}
-              <FormRow label="AO/PO">
+              <FormRow label="AO">
                 <CFormInput
                   type="text"
                   name="order_number"
                   value={formData.order_number}
                   onChange={handleInput}
+                  placeholder="AO"
                   required
                 />
               </FormRow>
