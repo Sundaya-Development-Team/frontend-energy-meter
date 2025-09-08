@@ -9,6 +9,7 @@ import {
   CListGroupItem,
   CSpinner,
   CRow,
+  CFormSelect,
 } from '@coreui/react'
 import { backendTracking } from '../../api/axios'
 import { CounterCard6 } from '../components/CounterCard'
@@ -20,16 +21,26 @@ const DashboardPLN = () => {
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
 
+  // simpan pagination dari API
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pages: 1,
+    hasNext: false,
+    hasPrev: false,
+  })
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
         const res = await backendTracking.get('/pln-order-grouping', {
-          params: { page, limit, order: 'desc' },
+          params: { page, limit: 2, order: 'desc' },
         })
 
         if (res.data.success) {
-          setOrders(res.data.data.pln_orders || [])
+          const { pln_orders, pagination } = res.data.data
+          setOrders(pln_orders || [])
+          setPagination(pagination)
         }
       } catch (err) {
         console.error('Error fetching PLN orders:', err)
@@ -68,7 +79,7 @@ const DashboardPLN = () => {
             </CCardHeader>
 
             <CCardBody>
-              {/* 🔹 Counter Cards */}
+              {/* Counter Cards */}
               <CRow>
                 <CounterCard6
                   title="Order Date"
@@ -85,7 +96,7 @@ const DashboardPLN = () => {
                 />
               </CRow>
 
-              {/* 🔹 Assemblies */}
+              {/* Assemblies */}
               {order.assemblies.map((asm, idx) => (
                 <div key={asm.assembly_id} className="mb-2 mt-3">
                   <CButton
@@ -113,13 +124,34 @@ const DashboardPLN = () => {
         ))
       )}
 
-      {/* 🔹 Pagination Control */}
-      <div className="d-flex justify-content-between mt-3">
-        <CButton disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+      {/* Pagination Control */}
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <CButton disabled={!pagination.hasPrev} onClick={() => setPage((p) => p - 1)}>
           Prev
         </CButton>
-        <span>Page {page}</span>
-        <CButton onClick={() => setPage((p) => p + 1)}>Next</CButton>
+
+        <span>
+          Page {pagination.page} / {pagination.pages}
+        </span>
+
+        <CButton disabled={!pagination.hasNext} onClick={() => setPage((p) => p + 1)}>
+          Next
+        </CButton>
+
+        {/* Dropdown untuk pilih limit */}
+        {/* <CFormSelect
+          value={limit}
+          onChange={(e) => {
+            setLimit(Number(e.target.value))
+            setPage(1) // reset ke page 1 tiap ganti limit
+          }}
+          style={{ width: '120px' }}
+        >
+          <option value="5">5 / page</option>
+          <option value="10">10 / page</option>
+          <option value="20">20 / page</option>
+          <option value="50">50 / page</option>
+        </CFormSelect> */}
       </div>
     </div>
   )
