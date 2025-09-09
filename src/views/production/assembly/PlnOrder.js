@@ -50,6 +50,7 @@ const PlnOrderForm = () => {
         quantity: Number(formData.quantity),
       }
 
+      // console.log(' payload :', payload)
       const res = await backendAssembly.post('/pln-orders', payload)
       toast.success(res.data?.message || 'PLN Order created successfully!')
 
