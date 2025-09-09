@@ -3,28 +3,41 @@ import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CImage } 
 import { toast } from 'react-toastify'
 import { backendGenerate, backendTracking } from '../../../api/axios'
 
-const ClosingCover = () => {
+const SidePlnSerial = () => {
   const [formData, setFormData] = useState({
-    sideCoverSnumb: '',
-    closingCoverSnumb: '',
+    sideProdSnumb: '',
+    sidePlnSerial: '',
   })
 
   const [pcbDisabled, setPcbDisabled] = useState(false)
-  const [closingCoverDisable, setclosingCoverDisable] = useState(true)
+  const [sidePlnDisable, setSidePlnDisable] = useState(true)
 
   const sideCoverInputRef = useRef(null)
-  const closingCoverRef = useRef(null)
+  const sidePlnRef = useRef(null)
 
   useEffect(() => {
     sideCoverInputRef.current.focus()
-    if (!closingCoverDisable && closingCoverRef.current) {
-      closingCoverRef.current.focus()
+    if (!sidePlnDisable && sidePlnRef.current) {
+      sidePlnRef.current.focus()
     }
-  }, [closingCoverDisable])
+  }, [sidePlnDisable])
 
-  const handlesideCoverSnumb = () => {
-    setPcbDisabled(true)
-    setclosingCoverDisable(false) // setelah ini, useEffect di atas akan fokus otomatis
+  const handlesideProdSnumb = async () => {
+    try {
+      const response = await backendTracking.get(`/serial/${formData.sideProdSnumb}`)
+
+      console.log('Response:', response.data)
+
+      if (response.data.success === true) {
+        setPcbDisabled(true)
+        setSidePlnDisable(false) // setelah ini, useEffect di atas akan fokus otomatis
+      } else {
+        toast.error(response.data.message || 'Failed Get Item, Item Not Found')
+      }
+    } catch (error) {
+      console.error('Error fetching serial:', error)
+      toast.error(error.response?.data?.message || 'Failed Get Item Data!')
+    }
   }
 
   const handleChange = (e) => {
@@ -36,21 +49,21 @@ const ClosingCover = () => {
   }
 
   // Fungsi untuk update PLN Code ke backendTracking
-  const updatePlnCode = async (sideCoverSnumb, closingCoverSnumb) => {
+  const updatePlnCode = async (sideProdSnumb, sidePlnSerial) => {
     try {
       const payloadUpdate = {
-        serial_number: sideCoverSnumb, // SIDE COVER SN
-        pln_code: closingCoverSnumb, // CLOSING COVER SN
+        serial_number: sideProdSnumb, // SIDE COVER SN
+        pln_code: sidePlnSerial, // Side PLN Serial SN
       }
 
       const updateRes = await backendTracking.post('/update-pln-code', payloadUpdate)
       toast.success(updateRes.data?.message || 'PLN Code berhasil diupdate!')
 
       // Reset form
-      setFormData({ sideCoverSnumb: '', closingCoverSnumb: '' })
+      setFormData({ sideProdSnumb: '', sidePlnSerial: '' })
 
       // Setelah sukses:
-      setclosingCoverDisable(true) // Closing Cover disable
+      setSidePlnDisable(true) // Side PLN Serial disable
       setPcbDisabled(false) // Side Cover enable lagi
 
       // Fokus ke Side Cover input
@@ -62,38 +75,38 @@ const ClosingCover = () => {
     }
   }
 
-  // Fungsi utama untuk handle Closing Cover
-  const handleClosingCover = async () => {
-    const { closingCoverSnumb, sideCoverSnumb } = formData
+  // Fungsi utama untuk handle Side PLN Serial
+  const handleSidePLNSerial = async () => {
+    const { sidePlnSerial, sideProdSnumb } = formData
 
-    if (!closingCoverSnumb || !sideCoverSnumb) {
-      toast.warning('Serial number Closing Cover & Side Cover harus diisi!')
+    if (!sidePlnSerial || !sideProdSnumb) {
+      toast.warning('Serial number Side PLN Serial & Side Cover harus diisi!')
       return
     }
 
-    console.log('Closing Cover SN :', closingCoverSnumb)
-    console.log('Side Cover SN    :', sideCoverSnumb)
+    console.log('Side PLN Serial SN :', sidePlnSerial)
+    console.log('Side Cover SN    :', sideProdSnumb)
 
     try {
-      const payloadValidate = { serialCode: closingCoverSnumb }
+      const payloadValidate = { serialCode: sidePlnSerial }
       const response = await backendGenerate.post('/validate', payloadValidate)
       const validation = response.data?.data?.isValid
 
       if (!validation) {
-        console.log('Closing Cover tidak valid')
-        setFormData({ sideCoverSnumb: '', closingCoverSnumb: '' })
+        console.log('Side PLN Serial tidak valid')
+        setFormData({ sideProdSnumb: '', sidePlnSerial: '' })
 
         setTimeout(() => {
           sideCoverInputRef.current?.focus()
         }, 100)
 
-        toast.error(response.data?.data?.message || 'Closing Cover tidak valid!')
+        toast.error(response.data?.data?.message || 'Side PLN Serial tidak valid!')
         return
       }
 
-      console.log('Closing Cover valid')
+      console.log('Side PLN Serial valid')
 
-      await updatePlnCode(sideCoverSnumb, closingCoverSnumb)
+      await updatePlnCode(sideProdSnumb, sidePlnSerial)
     } catch (error) {
       toast.error(error.response?.data?.message || 'Terjadi kesalahan saat validasi!')
     }
@@ -105,7 +118,7 @@ const ClosingCover = () => {
       <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Side Cover Serial Number</strong>
+            <strong>Side Product Serial Number</strong>
           </CCardHeader>
           <CCardBody>
             <CForm>
@@ -113,7 +126,7 @@ const ClosingCover = () => {
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
                     src={`/src/assets/images/assembly/side_cover_serial_number.jpeg`}
-                    alt="Side Cover Serial Number"
+                    alt="Side Product Serial Number"
                     fluid
                     className="mt-2"
                     style={{ width: '60%' }}
@@ -123,19 +136,19 @@ const ClosingCover = () => {
 
               <CRow className="mb-3">
                 <div className="text-center">
-                  <strong>SIDE COVER SERIAL NUMBER</strong>
+                  <strong>Side Product Serial Number</strong>
                 </div>
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CFormInput
                     type="text"
-                    id="sideCoverSnumb"
-                    name="sideCoverSnumb"
-                    value={formData.sideCoverSnumb}
+                    id="sideProdSnumb"
+                    name="sideProdSnumb"
+                    value={formData.sideProdSnumb}
                     onChange={handleChange}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault()
-                        handlesideCoverSnumb()
+                        handlesideProdSnumb()
                       }
                     }}
                     ref={sideCoverInputRef}
@@ -149,11 +162,11 @@ const ClosingCover = () => {
         </CCard>
       </CCol>
 
-      {/* Closing Cover  Serial Number */}
+      {/* Side PLN Serial  Serial Number */}
       <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Closing Cover Serial Number</strong>
+            <strong>Side PLN Serial Serial Number</strong>
           </CCardHeader>
           <CCardBody>
             <CForm>
@@ -161,7 +174,7 @@ const ClosingCover = () => {
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
                     src={`/src/assets/images/assembly/tutup_cover.jpeg`}
-                    alt="Closing Cover Serial Number"
+                    alt="Side PLN Serial Serial Number"
                     fluid
                     className="mt-2"
                     style={{ width: '60%' }}
@@ -171,24 +184,24 @@ const ClosingCover = () => {
 
               <CRow className="mb-3">
                 <div className="text-center">
-                  <strong>CLOSING COVER SERIAL NUMBER</strong>
+                  <strong>Side PLN Serial SERIAL NUMBER</strong>
                 </div>
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CFormInput
                     type="text"
-                    id="closingCoverSnumb"
-                    name="closingCoverSnumb"
-                    value={formData.closingCoverSnumb}
+                    id="sidePlnSerial"
+                    name="sidePlnSerial"
+                    value={formData.sidePlnSerial}
                     onChange={handleChange}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault()
-                        handleClosingCover()
+                        handleSidePLNSerial()
                       }
                     }}
-                    ref={closingCoverRef}
+                    ref={sidePlnRef}
                     required
-                    disabled={closingCoverDisable}
+                    disabled={sidePlnDisable}
                   />
                 </CCol>
               </CRow>
@@ -200,4 +213,4 @@ const ClosingCover = () => {
   )
 }
 
-export default ClosingCover
+export default SidePlnSerial
