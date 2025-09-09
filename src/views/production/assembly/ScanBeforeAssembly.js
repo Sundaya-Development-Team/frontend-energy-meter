@@ -22,10 +22,24 @@ const ScanBeforeAssembly = () => {
     }
   }, [sideCoverDisabled])
 
-  const handlePcbSnumb = () => {
-    console.log('PCB Barcode scanned:', formData.pcbSnumb)
-    setPcbDisabled(true)
-    setSideCoverDisabled(false) // setelah ini, useEffect di atas akan fokus otomatis
+  const handlePcbSnumb = async () => {
+    try {
+      console.log('PCB Barcode scanned:', formData.pcbSnumb)
+
+      const response = await backendTracking.get(`/serial/${formData.pcbSnumb}`)
+
+      console.log('Response:', response.data)
+
+      if (response.data.success === true) {
+        setPcbDisabled(true)
+        setSideCoverDisabled(false) // setelah ini, useEffect di atas akan fokus otomatis
+      } else {
+        toast.error(response.data.message || 'Failed Get Item, Item Not Found')
+      }
+    } catch (error) {
+      console.error('Error fetching serial:', error)
+      toast.error(error.response?.data?.message || 'Failed Get Item Data!')
+    }
   }
 
   const handleChange = (e) => {
