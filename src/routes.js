@@ -61,6 +61,7 @@ const ScanAfterAssembly = React.lazy(
   () => import('./views/production/assembly/ScanAfterAssembly.js'),
 )
 const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder.js'))
+const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder.js'))
 
 // On
 const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
@@ -244,6 +245,7 @@ const routes = [
   // { path: '/notifications/badges', name: 'Badges', element: Badges },
   // { path: '/notifications/modals', name: 'Modals', element: Modals },
   // { path: '/notifications/toasts', name: 'Toasts', element: Toasts },NonAqlUnits
+
   //Production : Master QC
   { path: '/production/nonAqlUnits', name: 'Non Aql Units', element: NonAqlUnits, exact: true },
   {
@@ -259,6 +261,11 @@ const routes = [
     path: '/production/assembly/assemblyorder',
     name: 'Assembly Order',
     element: AssemblyOrder,
+  },
+  {
+    path: '/production/assembly/plnorder',
+    name: 'PLN Order',
+    element: PlnOrder,
   },
   {
     path: '/production/assembly',

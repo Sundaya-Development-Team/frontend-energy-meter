@@ -148,6 +148,11 @@ const _nav = [
     items: [
       {
         component: CNavItem,
+        name: 'Create PLN Order',
+        to: '/production/assembly/plnorder',
+      },
+      {
+        component: CNavItem,
         name: 'Req. Assembly Order',
         to: '/production/assembly/assemblyorder',
       },
