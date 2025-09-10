@@ -94,14 +94,17 @@ const ScanBeforeClearZero = React.lazy(
 )
 const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
 const SidePlnSerial = React.lazy(() => import('./views/production/finishing/SidePlnSerial'))
+const ScanAfterZeroClear = React.lazy(
+  () => import('./views/production/finishing/ScanAfterClearZero.js'),
+)
+const PlnSerialComparator = React.lazy(
+  () => import('./views/production/finishing/PlnSerialComparator'),
+)
 
 // Closing Cover (tidak terpakai)
 // const ScanBeforeClosingCover = React.lazy(
 //   () => import('./views/production/closingcover/ScanBeforeClosingCover'),
 // )
-const ScanAfterZeroClear = React.lazy(
-  () => import('./views/production/finishing/ScanAfterClearZero.js'),
-)
 // const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
 // const ScanAfterClosingCover = React.lazy(
 //   () => import('./views/production/closingcover/ScanAfterClosingCover'),
@@ -360,6 +363,11 @@ const routes = [
     path: '/production/finishing/clearzero/qc',
     name: 'Quality Control Clear Zero',
     element: QCClearZero,
+  },
+  {
+    path: '/production/finishing/comparePlnSerial',
+    name: 'Check Side & Cover Serial',
+    element: PlnSerialComparator,
   },
 
   // {

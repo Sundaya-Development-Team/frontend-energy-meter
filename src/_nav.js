@@ -337,6 +337,11 @@ const _nav = [
         name: 'SCAN PLN Serial',
         to: '/production/finishing/scansidepln',
       },
+      {
+        component: CNavItem,
+        name: 'Check Side & Cover Serial',
+        to: '/production/finishing/comparePlnSerial',
+      },
     ],
   },
   // {
