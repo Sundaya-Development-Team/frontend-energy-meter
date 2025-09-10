@@ -158,6 +158,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Assembly Serial List',
+        to: '/production/assembly/assemblyseriallist',
+      },
+      {
+        component: CNavItem,
         name: 'Scan Before',
         to: '/production/assembly/before',
       },
