@@ -148,6 +148,11 @@ const _nav = [
     items: [
       {
         component: CNavItem,
+        name: 'Create PLN Order',
+        to: '/production/assembly/plnorder',
+      },
+      {
+        component: CNavItem,
         name: 'Req. Assembly Order',
         to: '/production/assembly/assemblyorder',
       },
@@ -317,7 +322,11 @@ const _nav = [
         name: 'QC Clear Zero 1',
         to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
       },
-
+      {
+        component: CNavItem,
+        name: 'Closing Cover',
+        to: '/production/serialnoaql/QC-CC009/Closing Cover',
+      },
       {
         component: CNavItem,
         name: 'QC Clear Zero 2',
@@ -327,6 +336,11 @@ const _nav = [
         component: CNavItem,
         name: 'SCAN PLN Serial',
         to: '/production/finishing/scansidepln',
+      },
+      {
+        component: CNavItem,
+        name: 'Check Side & Cover Serial',
+        to: '/production/finishing/comparePlnSerial',
       },
     ],
   },

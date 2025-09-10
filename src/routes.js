@@ -61,6 +61,7 @@ const ScanAfterAssembly = React.lazy(
   () => import('./views/production/assembly/ScanAfterAssembly.js'),
 )
 const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder.js'))
+const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder.js'))
 
 // On
 const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
@@ -93,14 +94,17 @@ const ScanBeforeClearZero = React.lazy(
 )
 const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
 const SidePlnSerial = React.lazy(() => import('./views/production/finishing/SidePlnSerial'))
+const ScanAfterZeroClear = React.lazy(
+  () => import('./views/production/finishing/ScanAfterClearZero.js'),
+)
+const PlnSerialComparator = React.lazy(
+  () => import('./views/production/finishing/PlnSerialComparator'),
+)
 
 // Closing Cover (tidak terpakai)
 // const ScanBeforeClosingCover = React.lazy(
 //   () => import('./views/production/closingcover/ScanBeforeClosingCover'),
 // )
-const ScanAfterZeroClear = React.lazy(
-  () => import('./views/production/finishing/ScanAfterClearZero.js'),
-)
 // const QCClosingCover = React.lazy(() => import('./views/production/closingcover/QCClosingCover'))
 // const ScanAfterClosingCover = React.lazy(
 //   () => import('./views/production/closingcover/ScanAfterClosingCover'),
@@ -244,6 +248,7 @@ const routes = [
   // { path: '/notifications/badges', name: 'Badges', element: Badges },
   // { path: '/notifications/modals', name: 'Modals', element: Modals },
   // { path: '/notifications/toasts', name: 'Toasts', element: Toasts },NonAqlUnits
+
   //Production : Master QC
   { path: '/production/nonAqlUnits', name: 'Non Aql Units', element: NonAqlUnits, exact: true },
   {
@@ -259,6 +264,11 @@ const routes = [
     path: '/production/assembly/assemblyorder',
     name: 'Assembly Order',
     element: AssemblyOrder,
+  },
+  {
+    path: '/production/assembly/plnorder',
+    name: 'PLN Order',
+    element: PlnOrder,
   },
   {
     path: '/production/assembly',
@@ -353,6 +363,11 @@ const routes = [
     path: '/production/finishing/clearzero/qc',
     name: 'Quality Control Clear Zero',
     element: QCClearZero,
+  },
+  {
+    path: '/production/finishing/comparePlnSerial',
+    name: 'Check Side & Cover Serial',
+    element: PlnSerialComparator,
   },
 
   // {
