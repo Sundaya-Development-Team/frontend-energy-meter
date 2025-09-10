@@ -62,6 +62,9 @@ const ScanAfterAssembly = React.lazy(
 )
 const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder.js'))
 const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder.js'))
+const AssemblySerialList = React.lazy(
+  () => import('./views/production/assembly/AssemblySerialList.js'),
+)
 
 // On
 const ScanBeforeOn = React.lazy(() => import('./views/production/ontest/ScanBeforeOn'))
@@ -269,6 +272,11 @@ const routes = [
     path: '/production/assembly/plnorder',
     name: 'PLN Order',
     element: PlnOrder,
+  },
+  {
+    path: '/production/assembly/assemblyseriallist',
+    name: 'PLN Order',
+    element: AssemblySerialList,
   },
   {
     path: '/production/assembly',
