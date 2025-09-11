@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import DataTable from 'react-data-table-component'
 import { CCard, CCardBody, CSpinner, CFormInput, CRow, CCol, CButton } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 import { backendGenerate } from '../../../api/axios'
+import { toast } from 'react-toastify'
 
 const AssemblySerialList = () => {
   const [records, setRecords] = useState([])
@@ -28,6 +29,7 @@ const AssemblySerialList = () => {
       }
     } catch (error) {
       console.error('Error fetching records:', error)
+      toast.error('Failed to fetch records')
     } finally {
       setLoading(false)
     }
@@ -37,10 +39,10 @@ const AssemblySerialList = () => {
     fetchRecords()
   }, [fetchRecords])
 
-  // Download CSV
-  const downloadCSV = () => {
+  // Download CSV + update ke API
+  const downloadCSV = async () => {
     if (records.length === 0) {
-      alert('No data to export!')
+      toast.error('No data to export!')
       return
     }
 
@@ -76,6 +78,17 @@ const AssemblySerialList = () => {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+
+    // ✅ Ambil semua id dari records
+    const ids = records.map((row) => row.id)
+
+    try {
+      await backendGenerate.post('/production/print-by-ids', { ids })
+      toast.success('Print status updated successfully!')
+    } catch (error) {
+      console.error('Error update print status:', error)
+      toast.error(error.response?.data?.message || 'Failed to update print status')
+    }
   }
 
   const columns = [
@@ -89,7 +102,12 @@ const AssemblySerialList = () => {
     { name: 'Year', selector: (row) => row.year, sortable: true, width: '80px' },
     { name: 'Month', selector: (row) => row.month, sortable: true, width: '80px' },
     { name: 'Sequence', selector: (row) => row.sequence, sortable: true },
-    { name: 'Serial Number', selector: (row) => row.serialNumber, sortable: true, grow: 2 },
+    {
+      name: 'Serial Number',
+      selector: (row) => row.serialNumber,
+      sortable: true,
+      grow: 2,
+    },
     { name: 'Status', selector: (row) => row.status, sortable: true },
     {
       name: 'Created At',
