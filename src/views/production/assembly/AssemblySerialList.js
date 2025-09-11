@@ -13,15 +13,11 @@ const AssemblySerialList = () => {
   const [searchKeyword, setSearchKeyword] = useState('')
   const navigate = useNavigate()
 
-  const fetchRecords = async () => {
+  const fetchRecords = useCallback(async () => {
     try {
       setLoading(true)
       const response = await backendGenerate.get('/production/generated', {
-        params: {
-          page,
-          limit,
-          search: searchKeyword || undefined,
-        },
+        params: { page, limit, search: searchKeyword || undefined },
       })
 
       if (response.data.success) {
@@ -35,11 +31,52 @@ const AssemblySerialList = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, limit, searchKeyword])
 
   useEffect(() => {
     fetchRecords()
-  }, [page, limit, searchKeyword])
+  }, [fetchRecords])
+
+  // Download CSV
+  const downloadCSV = () => {
+    if (records.length === 0) {
+      alert('No data to export!')
+      return
+    }
+
+    const headers = [
+      'No',
+      'Company',
+      'Year',
+      'Month',
+      'Sequence',
+      'Serial Number',
+      'Status',
+      'Created At',
+    ]
+
+    const rows = records.map((row, index) => [
+      (page - 1) * limit + index + 1,
+      row.companyCode,
+      row.year,
+      row.month,
+      row.sequence,
+      row.serialNumber,
+      row.status,
+      new Date(row.createdAt).toLocaleString(),
+    ])
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(',')).join('\n')
+
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `assembly_serials_${Date.now()}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   const columns = [
     {
@@ -48,39 +85,12 @@ const AssemblySerialList = () => {
       sortable: false,
       width: '90px',
     },
-    {
-      name: 'Company',
-      selector: (row) => row.companyCode,
-      sortable: true,
-    },
-    {
-      name: 'Year',
-      selector: (row) => row.year,
-      sortable: true,
-      width: '80px',
-    },
-    {
-      name: 'Month',
-      selector: (row) => row.month,
-      sortable: true,
-      width: '80px',
-    },
-    {
-      name: 'Sequence',
-      selector: (row) => row.sequence,
-      sortable: true,
-    },
-    {
-      name: 'Serial Number',
-      selector: (row) => row.serialNumber,
-      sortable: true,
-      grow: 2,
-    },
-    {
-      name: 'Status',
-      selector: (row) => row.status,
-      sortable: true,
-    },
+    { name: 'Company', selector: (row) => row.companyCode, sortable: true },
+    { name: 'Year', selector: (row) => row.year, sortable: true, width: '80px' },
+    { name: 'Month', selector: (row) => row.month, sortable: true, width: '80px' },
+    { name: 'Sequence', selector: (row) => row.sequence, sortable: true },
+    { name: 'Serial Number', selector: (row) => row.serialNumber, sortable: true, grow: 2 },
+    { name: 'Status', selector: (row) => row.status, sortable: true },
     {
       name: 'Created At',
       selector: (row) => new Date(row.createdAt).toLocaleString(),
@@ -102,6 +112,11 @@ const AssemblySerialList = () => {
                 setPage(1)
               }}
             />
+          </CCol>
+          <CCol md="auto" className="d-flex align-items-center">
+            <CButton color="success" onClick={downloadCSV} disabled={records.length === 0}>
+              Download CSV
+            </CButton>
           </CCol>
         </CRow>
 
