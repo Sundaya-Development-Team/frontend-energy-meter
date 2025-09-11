@@ -23,9 +23,7 @@ const AssemblySerialList = () => {
 
       if (response.data.success) {
         setRecords(response.data.data || [])
-        setTotalRows(
-          response.data.pagination?.itemsPerPage * response.data.pagination?.totalPages || 0,
-        )
+        setTotalRows(response.data.pagination?.totalItems || 0)
       }
     } catch (error) {
       console.error('Error fetching records:', error)
@@ -79,11 +77,11 @@ const AssemblySerialList = () => {
     link.click()
     document.body.removeChild(link)
 
-    // ✅ Ambil semua id dari records
+    // Ambil semua id dari records
     const ids = records.map((row) => row.id)
 
     try {
-      await backendGenerate.post('/production/print-by-ids', { ids })
+      await backendGenerate.patch('/production/print-by-ids', { ids })
       toast.success('Print status updated successfully!')
     } catch (error) {
       console.error('Error update print status:', error)
@@ -93,15 +91,11 @@ const AssemblySerialList = () => {
 
   const columns = [
     {
-      name: 'Nomor',
+      name: 'No',
       selector: (row, index) => (page - 1) * limit + index + 1,
       sortable: false,
       width: '90px',
     },
-    { name: 'Company', selector: (row) => row.companyCode, sortable: true },
-    { name: 'Year', selector: (row) => row.year, sortable: true, width: '80px' },
-    { name: 'Month', selector: (row) => row.month, sortable: true, width: '80px' },
-    { name: 'Sequence', selector: (row) => row.sequence, sortable: true },
     {
       name: 'Serial Number',
       selector: (row) => row.serialNumber,
@@ -131,8 +125,13 @@ const AssemblySerialList = () => {
               }}
             />
           </CCol>
-          <CCol md="auto" className="d-flex align-items-center">
-            <CButton color="success" onClick={downloadCSV} disabled={records.length === 0}>
+          <CCol className="d-flex justify-content-end">
+            <CButton
+              color="success"
+              className="text-white"
+              onClick={downloadCSV}
+              disabled={records.length === 0}
+            >
               Download CSV
             </CButton>
           </CCol>

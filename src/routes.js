@@ -275,7 +275,7 @@ const routes = [
   },
   {
     path: '/production/assembly/assemblyseriallist',
-    name: 'PLN Order',
+    name: 'Assembly Serial List',
     element: AssemblySerialList,
   },
   {
