@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import DataTable from 'react-data-table-component'
 import { CCard, CCardBody, CSpinner, CFormInput, CRow, CCol, CButton } from '@coreui/react'
 import { useNavigate } from 'react-router-dom'
 import { backendGenerate } from '../../../api/axios'
+import { toast } from 'react-toastify'
 
 const AssemblySerialList = () => {
   const [records, setRecords] = useState([])
@@ -13,62 +14,87 @@ const AssemblySerialList = () => {
   const [searchKeyword, setSearchKeyword] = useState('')
   const navigate = useNavigate()
 
-  const fetchRecords = async () => {
+  const fetchRecords = useCallback(async () => {
     try {
       setLoading(true)
       const response = await backendGenerate.get('/production/generated', {
-        params: {
-          page,
-          limit,
-          search: searchKeyword || undefined,
-        },
+        params: { page, limit, search: searchKeyword || undefined },
       })
 
       if (response.data.success) {
         setRecords(response.data.data || [])
-        setTotalRows(
-          response.data.pagination?.itemsPerPage * response.data.pagination?.totalPages || 0,
-        )
+        setTotalRows(response.data.pagination?.totalItems || 0)
       }
     } catch (error) {
       console.error('Error fetching records:', error)
+      toast.error('Failed to fetch records')
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, limit, searchKeyword])
 
   useEffect(() => {
     fetchRecords()
-  }, [page, limit, searchKeyword])
+  }, [fetchRecords])
+
+  // Download CSV + update ke API
+  const downloadCSV = async () => {
+    if (records.length === 0) {
+      toast.error('No data to export!')
+      return
+    }
+
+    const headers = [
+      'No',
+      'Company',
+      'Year',
+      'Month',
+      'Sequence',
+      'Serial Number',
+      'Status',
+      'Created At',
+    ]
+
+    const rows = records.map((row, index) => [
+      (page - 1) * limit + index + 1,
+      row.companyCode,
+      row.year,
+      row.month,
+      row.sequence,
+      row.serialNumber,
+      row.status,
+      new Date(row.createdAt).toLocaleString(),
+    ])
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(',')).join('\n')
+
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `assembly_serials_${Date.now()}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    // Ambil semua id dari records
+    const ids = records.map((row) => row.id)
+
+    try {
+      await backendGenerate.patch('/production/print-by-ids', { ids })
+      toast.success('Print status updated successfully!')
+    } catch (error) {
+      console.error('Error update print status:', error)
+      toast.error(error.response?.data?.message || 'Failed to update print status')
+    }
+  }
 
   const columns = [
     {
-      name: 'Nomor',
+      name: 'No',
       selector: (row, index) => (page - 1) * limit + index + 1,
       sortable: false,
       width: '90px',
-    },
-    {
-      name: 'Company',
-      selector: (row) => row.companyCode,
-      sortable: true,
-    },
-    {
-      name: 'Year',
-      selector: (row) => row.year,
-      sortable: true,
-      width: '80px',
-    },
-    {
-      name: 'Month',
-      selector: (row) => row.month,
-      sortable: true,
-      width: '80px',
-    },
-    {
-      name: 'Sequence',
-      selector: (row) => row.sequence,
-      sortable: true,
     },
     {
       name: 'Serial Number',
@@ -76,11 +102,7 @@ const AssemblySerialList = () => {
       sortable: true,
       grow: 2,
     },
-    {
-      name: 'Status',
-      selector: (row) => row.status,
-      sortable: true,
-    },
+    { name: 'Status', selector: (row) => row.status, sortable: true },
     {
       name: 'Created At',
       selector: (row) => new Date(row.createdAt).toLocaleString(),
@@ -102,6 +124,16 @@ const AssemblySerialList = () => {
                 setPage(1)
               }}
             />
+          </CCol>
+          <CCol className="d-flex justify-content-end">
+            <CButton
+              color="success"
+              className="text-white"
+              onClick={downloadCSV}
+              disabled={records.length === 0}
+            >
+              Download CSV
+            </CButton>
           </CCol>
         </CRow>
 

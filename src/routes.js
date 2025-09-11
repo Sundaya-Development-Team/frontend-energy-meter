@@ -125,6 +125,7 @@ const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStoc
 const AssemblyOrderConfirmation = React.lazy(
   () => import('./views/warehouse/AssemblyOrderConfirmation'),
 )
+const WarehouseStock = React.lazy(() => import('./views/warehouse/WarehouseStock'))
 
 // Delivery
 const ScanAfterPacking = React.lazy(() => import('./views/delivery/ScanAfterPacking'))
@@ -275,7 +276,7 @@ const routes = [
   },
   {
     path: '/production/assembly/assemblyseriallist',
-    name: 'PLN Order',
+    name: 'Assembly Serial List',
     element: AssemblySerialList,
   },
   {
@@ -490,6 +491,12 @@ const routes = [
 
   //Warehouses
   { path: '/warehouse', name: 'Warehouse', element: IncomingWarehouse, exact: true },
+  {
+    path: '/warehouse/stock/WarehouseStock',
+    name: 'Warehouse Stock',
+    element: WarehouseStock,
+    exact: true,
+  },
   {
     path: '/warehouse/outgoing/assemblyorder',
     name: 'Assembly order',

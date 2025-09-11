@@ -339,6 +339,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'QC Ref. Meter',
+        to: '/production/serialnoaql/QC-RM013/Reference Meter',
+      },
+      {
+        component: CNavItem,
         name: 'SCAN PLN Serial',
         to: '/production/finishing/scansidepln',
       },
@@ -400,6 +405,12 @@ const _nav = [
     component: CNavItem,
     name: 'Acc. Assembly Order',
     to: '/warehouse/outgoing/assemblyorder',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Warehouse Stock (Opname)',
+    to: '/warehouse/stock/WarehouseStock',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
   // {
