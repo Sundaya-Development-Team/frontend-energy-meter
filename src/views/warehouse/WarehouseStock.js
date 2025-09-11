@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { CCard, CCardBody, CCardHeader, CSpinner, CRow, CCol, CFormInput } from '@coreui/react'
 import DataTable from 'react-data-table-component'
-import { backendWh } from '../../../api/axios'
+import { backendWh } from '../../api/axios'
 
 const WarehouseStock = () => {
   const [records, setRecords] = useState([])
@@ -12,7 +12,7 @@ const WarehouseStock = () => {
   const fetchRecords = async () => {
     try {
       setLoading(true)
-      const response = await backendWh.get('/stock-units/stock-by-produc')
+      const response = await backendWh.get('/stock-units/stock-by-product')
 
       if (response.data.success) {
         const stockList = response.data.data?.stock_by_product || []
@@ -35,6 +35,11 @@ const WarehouseStock = () => {
     item.product_details?.name.toLowerCase().includes(searchKeyword.toLowerCase()),
   )
 
+  const handleUpdate = (row) => {
+    console.log('Update clicked for:', row)
+    // nanti bisa buka modal atau panggil API update unit_count
+  }
+
   const columns = [
     {
       name: 'No',
@@ -45,24 +50,24 @@ const WarehouseStock = () => {
       name: 'Product Name',
       selector: (row) => row.product_details?.name,
       sortable: true,
-      grow: 2,
     },
     {
       name: 'Description',
       selector: (row) => row.product_details?.description,
-      grow: 3,
     },
     {
       name: 'Total Quantity',
       selector: (row) => row.total_quantity,
       sortable: true,
-      right: true,
     },
     {
-      name: 'Unit Count',
-      selector: (row) => row.unit_count,
-      sortable: true,
-      right: true,
+      name: 'Action',
+      cell: (row) => (
+        <button className="btn btn-sm btn-primary" onClick={() => handleUpdate(row)}>
+          Update
+        </button>
+      ),
+      ignoreRowClick: true,
     },
   ]
 
@@ -92,7 +97,7 @@ const WarehouseStock = () => {
           pagination
         />
 
-        {summary && (
+        {/* {summary && (
           <div className="mt-3">
             <h6>Summary:</h6>
             <ul>
@@ -101,7 +106,7 @@ const WarehouseStock = () => {
               <li>Total Units: {summary.total_units}</li>
             </ul>
           </div>
-        )}
+        )} */}
       </CCardBody>
     </CCard>
   )

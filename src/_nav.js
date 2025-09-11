@@ -402,6 +402,12 @@ const _nav = [
     to: '/warehouse/outgoing/assemblyorder',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'Warehouse Stock (Opname)',
+    to: '/warehouse/stock/WarehouseStock',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
   // {
   //   component: CNavItem,
   //   name: 'Incoming',
