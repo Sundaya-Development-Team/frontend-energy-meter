@@ -339,6 +339,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'QC Ref. Meter',
+        to: '/production/serialnoaql/QC-RM013/Reference Meter',
+      },
+      {
+        component: CNavItem,
         name: 'SCAN PLN Serial',
         to: '/production/finishing/scansidepln',
       },
