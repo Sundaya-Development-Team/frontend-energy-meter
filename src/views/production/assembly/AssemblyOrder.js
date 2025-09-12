@@ -183,11 +183,12 @@ const OrderForm = () => {
           product_id: c.product.id,
           qty_request: (Number(c.quantity) || 0) * Number(formData.qty),
           required: !!c.required,
+          is_serialized: !!c.product.is_serialize,
         }))
 
       const payload = {
         order_number: formData.order_number,
-        pln_order_id: formData.pln_order_id || null, // 🔹 tambahan ke payload
+        pln_order_id: formData.pln_order_id || null,
         product_id: formData.product_id,
         quantity: Number(formData.qty),
         status: 'pending',
@@ -196,11 +197,20 @@ const OrderForm = () => {
         assembly_order_items: itemsPayload,
       }
 
+      console.log('Payload : ', payload)
       const res = await backendAssembly.post('/assembly-orders/with-items', payload)
       toast.success(res.data?.message || 'Order submitted successfully!')
-      // (opsional) reset form:
-      // setSelectedParent(null)
-      // setFormData({ product_id: '', qty: 1, order_number: '', notes: '', items: [] })
+      // // (opsional) reset form:
+
+      setSelectedParent(null)
+      setFormData({
+        pln_order_id: '',
+        product_id: '',
+        qty: 1,
+        order_number: '',
+        notes: '',
+        items: [],
+      })
     } catch (err) {
       console.error('Submit error:', err)
       toast.error(err.response?.data?.message || 'Failed to submit order.')
@@ -234,6 +244,7 @@ const OrderForm = () => {
                     options={plnOrders.map((o) => ({
                       value: o.id,
                       label: `${o.order_number} (Qty: ${o.quantity})`,
+                      quantity: o.quantity, // 🔹 simpan quantity di option
                     }))}
                     value={
                       formData.pln_order_id
@@ -241,6 +252,8 @@ const OrderForm = () => {
                             value: formData.pln_order_id,
                             label: plnOrders.find((o) => o.id === formData.pln_order_id)
                               ?.order_number,
+                            quantity: plnOrders.find((o) => o.id === formData.pln_order_id)
+                              ?.quantity, // 🔹 ambil quantity juga
                           }
                         : null
                     }
@@ -248,6 +261,7 @@ const OrderForm = () => {
                       setFormData((prev) => ({
                         ...prev,
                         pln_order_id: opt ? opt.value : '',
+                        qty: opt ? opt.quantity : 1, // 🔹 otomatis isi Qty
                       }))
                     }
                     isClearable
