@@ -284,7 +284,7 @@ const ProductPage = () => {
                   className="d-flex justify-content-center align-items-center"
                   style={{ minHeight: '300px' }}
                 >
-                  <CSpinner color="primary" size="lg" />
+                  <CSpinner color="primary" style={{ width: '3rem', height: '3rem' }} />
                 </div>
               ) : (
                 <DataTable

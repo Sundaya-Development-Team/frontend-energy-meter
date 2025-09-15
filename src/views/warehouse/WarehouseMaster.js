@@ -5,7 +5,6 @@ import {
   CCardHeader,
   CCol,
   CRow,
-  CFormInput,
   CButton,
   CModal,
   CModalHeader,
@@ -13,12 +12,13 @@ import {
   CForm,
   CModalBody,
   CFormLabel,
-  CFormSelect,
   CModalFooter,
+  CFormInput,
+  CSpinner,
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { toast } from 'react-toastify'
-import { backendWh } from '../../api/axios'
+import { backendWhNew } from '../../api/axios'
 
 // Komponen detail row
 const ExpandedComponent = ({ data }) => (
@@ -36,40 +36,26 @@ const ExpandedComponent = ({ data }) => (
         <strong>Location:</strong> {data.location || '-'}
       </CCol>
       <CCol md={6}>
-        <strong>Created:</strong> {data.created_at?.name || '-'}
+        <strong>Created:</strong>{' '}
+        {data.created_at ? new Date(data.created_at).toLocaleString() : '-'}
       </CCol>
     </CRow>
-    {/* <CRow>
-      <CCol>
-        <strong>Image:</strong>
-        <div className="mt-2">
-          {data.image_url ? (
-            <img
-              src={data.image_url}
-              alt="Warehouse"
-              style={{
-                width: '100%',
-                maxWidth: '300px',
-                height: 'auto',
-                borderRadius: '8px',
-              }}
-            />
-          ) : (
-            <span>-</span>
-          )}
-        </div>
+    <CRow className="mb-2">
+      <CCol md={6}>
+        <strong>Updated:</strong>{' '}
+        {data.updated_at ? new Date(data.updated_at).toLocaleString() : '-'}
       </CCol>
-    </CRow> */}
+    </CRow>
   </div>
 )
 
 const WarehouseList = () => {
   const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
   const [totalRows, setTotalRows] = useState(0)
   const [perPage, setPerPage] = useState(10)
   const [currentPage, setCurrentPage] = useState(1)
-  const [searchKeyword, setSearchKeyword] = useState('')
-  const [loading, setLoading] = useState(false)
+
   const [modalVisible, setModalVisible] = useState(false)
   const [editData, setEditData] = useState(null)
   const [form, setForm] = useState({
@@ -77,16 +63,18 @@ const WarehouseList = () => {
     location: '',
     code: '',
   })
+
+  // Fetch data sesuai pagination
   const fetchWarehouses = useCallback(
-    async (page = currentPage, limit = perPage, search = searchKeyword) => {
+    async (page = currentPage, limit = perPage) => {
       setLoading(true)
       try {
-        const res = await backendWh.get('/', {
-          params: { page, limit, search },
+        const res = await backendWhNew.get('/', {
+          params: { page, limit },
         })
-        const { data: warehouses, pagination } = res.data
+        const { data: warehouses, total } = res.data
         setData(warehouses || [])
-        setTotalRows(pagination?.total || 0)
+        setTotalRows(total || 0)
       } catch (error) {
         console.error(error)
         toast.error('Failed to fetch warehouses')
@@ -94,32 +82,14 @@ const WarehouseList = () => {
         setLoading(false)
       }
     },
-    [currentPage, perPage, searchKeyword],
+    [currentPage, perPage],
   )
 
   useEffect(() => {
-    fetchWarehouses()
-  }, [fetchWarehouses])
+    fetchWarehouses(currentPage, perPage)
+  }, [fetchWarehouses, currentPage, perPage])
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page)
-  }
-
-  const handlePerRowsChange = (newPerPage, page) => {
-    setPerPage(newPerPage)
-    setCurrentPage(page)
-  }
-
-  const handleSearchChange = (e) => {
-    setSearchKeyword(e.target.value)
-    setCurrentPage(1)
-  }
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault()
-    fetchWarehouses(1, perPage, searchKeyword)
-  }
-
+  // Reset form
   const resetForm = () => {
     setForm({
       name: '',
@@ -141,17 +111,10 @@ const WarehouseList = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this warehouse?')) return
-
     try {
-      const res = await backendWh.delete(`/${id}`)
+      const res = await backendWhNew.delete(`/${id}`)
       toast.success(res.data?.message || 'Warehouse deleted')
-
-      if (res.data.length === 1 && page > 1) {
-        setPage((prev) => prev - 1)
-      } else {
-        fetchWarehouses()
-      }
-
+      fetchWarehouses(currentPage, perPage)
       resetForm()
     } catch (error) {
       console.error(error)
@@ -169,37 +132,46 @@ const WarehouseList = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const payload = {
-      ...form,
-      code: form.code?.toUpperCase() || '', // ubah ke uppercase
-    }
-
+    const payload = { ...form, code: form.code?.toUpperCase() || '' }
     try {
       let res
       if (editData) {
-        // UPDATE
-        res = await backendWh.put(`/${editData.id}`, payload)
+        res = await backendWhNew.put(`/${editData.id}`, payload)
         toast.success(res.data?.message || 'Warehouse updated')
       } else {
-        // CREATE
-        res = await backendWh.post('/', payload)
+        res = await backendWhNew.post('/', payload)
         toast.success(res.data?.message || 'Warehouse created')
       }
-
       setModalVisible(false)
       resetForm()
-      fetchWarehouses()
+      fetchWarehouses(currentPage, perPage)
     } catch (error) {
       console.error(error)
       toast.error(error.response?.data?.message || 'Failed to save warehouse')
     }
   }
 
+  // Pagination handler
+  const handlePageChange = (page) => setCurrentPage(page)
+  const handlePerRowsChange = async (newPerPage, page) => {
+    setPerPage(newPerPage)
+    setCurrentPage(page)
+  }
+
   const columns = [
     { name: 'Warehouse Code', selector: (row) => row.code || '-', sortable: true },
     { name: 'Name', selector: (row) => row.name, sortable: true },
     { name: 'Location', selector: (row) => row.location || '-', sortable: true },
-    { name: 'Created', selector: (row) => row.created_at || '-', sortable: true },
+    {
+      name: 'Created',
+      selector: (row) => (row.created_at ? new Date(row.created_at).toLocaleString() : '-'),
+      sortable: true,
+    },
+    {
+      name: 'Updated',
+      selector: (row) => (row.updated_at ? new Date(row.updated_at).toLocaleString() : '-'),
+      sortable: true,
+    },
     {
       name: 'Actions',
       cell: (row) => (
@@ -224,32 +196,31 @@ const WarehouseList = () => {
             <CButton onClick={() => setModalVisible(true)}>+ Add Warehouse</CButton>
           </CCardHeader>
           <CCardBody>
-            <form onSubmit={handleSearchSubmit} className="mb-3">
-              <CRow>
-                <CCol md={4}>
-                  <CFormInput
-                    type="text"
-                    placeholder="Search..."
-                    value={searchKeyword}
-                    onChange={handleSearchChange}
-                  />
-                </CCol>
-              </CRow>
-            </form>
-            <DataTable
-              columns={columns}
-              data={data}
-              progressPending={loading}
-              pagination
-              paginationServer
-              paginationTotalRows={totalRows}
-              onChangeRowsPerPage={handlePerRowsChange}
-              onChangePage={handlePageChange}
-              expandableRows
-              expandableRowsComponent={ExpandedComponent}
-              highlightOnHover
-              striped
-            />
+            {' '}
+            {loading ? (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ minHeight: '300px' }}
+              >
+                <CSpinner color="primary" style={{ width: '3rem', height: '3rem' }} />
+              </div>
+            ) : (
+              <DataTable
+                columns={columns}
+                data={data}
+                progressPending={loading}
+                pagination
+                paginationServer
+                paginationTotalRows={totalRows}
+                paginationDefaultPage={currentPage}
+                onChangePage={handlePageChange}
+                onChangeRowsPerPage={handlePerRowsChange}
+                highlightOnHover
+                striped
+                expandableRows
+                expandableRowsComponent={ExpandedComponent}
+              />
+            )}
           </CCardBody>
         </CCard>
       </CCol>

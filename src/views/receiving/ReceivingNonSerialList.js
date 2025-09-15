@@ -109,21 +109,31 @@ const ReceivingNonSerialQc = () => {
             onChange={handleSearchChange}
             className="form-control w-25"
           />
-        </div>
-
-        <DataTable
-          columns={columns}
-          data={data}
-          progressPending={loading}
-          progressComponent={<CSpinner size="sm" />}
-          pagination
-          paginationServer
-          paginationTotalRows={totalRows}
-          onChangePage={handlePageChange}
-          onChangeRowsPerPage={handlePerRowsChange}
-          highlightOnHover
-          persistTableHead
-        />
+        </div>{' '}
+        {loading ? (
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: '300px' }}
+          >
+            <CSpinner color="primary" style={{ width: '3rem', height: '3rem' }} />
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={data}
+            progressPending={loading}
+            // progressComponent={
+            //   <CSpinner color="primary" style={{ width: '3rem', height: '3rem' }} />
+            // }
+            pagination
+            paginationServer
+            paginationTotalRows={totalRows}
+            onChangePage={handlePageChange}
+            onChangeRowsPerPage={handlePerRowsChange}
+            highlightOnHover
+            persistTableHead
+          />
+        )}
       </CCardBody>
     </CCard>
   )
