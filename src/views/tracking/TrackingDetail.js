@@ -157,7 +157,7 @@ const TrackingDetail = () => {
                   <CTableRow key={index}>
                     <CTableDataCell>{qc.qc_name}</CTableDataCell>
                     <CTableDataCell>{formatDateTime(qc.created_at)}</CTableDataCell>
-                    <CTableDataCell>{qc.pic || '-'}</CTableDataCell>
+                    <CTableDataCell>{qc.inspector_by || '-'}</CTableDataCell>
                     <CTableDataCell
                       className={
                         qc.result === 'PASS'
@@ -171,7 +171,22 @@ const TrackingDetail = () => {
                     </CTableDataCell>
                     <CTableDataCell>{qc.qc_place || '-'}</CTableDataCell>
                     <CTableDataCell>{qc.notes || '-'}</CTableDataCell>
-                    <CTableDataCell>-</CTableDataCell>
+                    <CTableDataCell>
+                      {qc.file_path ? (
+                        <CButton
+                          color="primary"
+                          size="sm"
+                          onClick={() => {
+                            const url = `${process.env.REACT_APP_UPLOAD_FILE_SERVICE}/api/v1/file/qc-test-report/stream?path=${qc.file_path}`
+                            window.open(url, '_blank')
+                          }}
+                        >
+                          Download
+                        </CButton>
+                      ) : (
+                        '-'
+                      )}
+                    </CTableDataCell>
                   </CTableRow>
                 ))}
               </CTableBody>
