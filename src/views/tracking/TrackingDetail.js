@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { backendTracking } from '../../api/axios'
+import { backendTracking, backendUploadFile } from '../../api/axios'
 import {
   CCard,
   CCardBody,
@@ -63,6 +63,23 @@ const TrackingDetail = () => {
     const min = String(date.getMinutes()).padStart(2, '0')
     const ss = String(date.getSeconds()).padStart(2, '0')
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
+  }
+
+  const handleReport = async (qc) => {
+    try {
+      const res = await backendUploadFile.get(`/qc-test-report/stream`, {
+        params: { path: qc.file_path },
+        responseType: 'blob',
+      })
+
+      // buat URL blob
+      const fileURL = window.URL.createObjectURL(new Blob([res.data]))
+      // buka di tab baru
+      window.open(fileURL, '_blank')
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to download file')
+    }
   }
 
   return (
@@ -149,7 +166,7 @@ const TrackingDetail = () => {
                   <CTableHeaderCell>Result</CTableHeaderCell>
                   <CTableHeaderCell>Location</CTableHeaderCell>
                   <CTableHeaderCell>Notes</CTableHeaderCell>
-                  <CTableHeaderCell>Download Report</CTableHeaderCell>
+                  <CTableHeaderCell className="text-center">View Report</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
@@ -171,17 +188,20 @@ const TrackingDetail = () => {
                     </CTableDataCell>
                     <CTableDataCell>{qc.qc_place || '-'}</CTableDataCell>
                     <CTableDataCell>{qc.notes || '-'}</CTableDataCell>
-                    <CTableDataCell>
+                    <CTableDataCell className="text-center">
                       {qc.file_path ? (
                         <CButton
                           color="primary"
                           size="sm"
                           onClick={() => {
-                            const url = `${process.env.REACT_APP_UPLOAD_FILE_SERVICE}/api/v1/file/qc-test-report/stream?path=${qc.file_path}`
-                            window.open(url, '_blank')
+                            if (!qc?.file_path) {
+                              toast.error('File path not available')
+                              return
+                            }
+                            handleReport(qc)
                           }}
                         >
-                          Download
+                          Report
                         </CButton>
                       ) : (
                         '-'

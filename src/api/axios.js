@@ -71,6 +71,11 @@ export const backendAssembly = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/assembly`,
 })
 
+//uploadFile
+export const backendUploadFile = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v1/upload-service`,
+})
+
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,
 // })
@@ -93,10 +98,6 @@ export const backendWarehouse = axios.create({
 
 export const backendQualityService = axios.create({
   baseURL: QUALITY_SERVICE,
-})
-
-export const backendUploadFile = axios.create({
-  baseURL: UPLOADFILE,
 })
 
 // export const backendProduct = axios.create({
