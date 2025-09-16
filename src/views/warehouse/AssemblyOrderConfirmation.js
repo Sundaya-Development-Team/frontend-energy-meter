@@ -189,9 +189,9 @@ const AssemblyOrders = () => {
 
       const payload = {
         assembly_order_id: selectedOrder.id,
-        status: formData.status, // 🔥 ambil dari formData
-        confirmed_by: 1, // bisa diganti user login
-        note: formData.notes || '', // 🔥 ambil dari formData
+        status: formData.status,
+        confirmed_by: 1,
+        note: formData.notes || '',
       }
 
       const response = await backendAssembly.post('/assembly-order-confirmations', payload)
@@ -521,7 +521,7 @@ const AssemblyOrders = () => {
                   selectedOrder.status !== 'failed' &&
                   showSubmit && (
                     <CButton color="primary" onClick={handleSubmit}>
-                      Submit Confirmation
+                      Submit Product Confirmation
                     </CButton>
                   )}
               </div>
