@@ -72,15 +72,56 @@ const CompletedSummaryList = () => {
     fetchData()
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!selectedWarehouse) {
       toast.error('Please select a warehouse first')
       return
     }
-    console.log('Selected Warehouse:', selectedWarehouse)
-    console.log('Selected Items:', selectedRows)
-    // TODO: API call submit
+    if (selectedRows.length === 0) {
+      toast.error('Please select at least one item')
+      return
+    }
+
+    const payload = {
+      items: selectedRows.map((id) => ({ receiving_item_id: id })),
+      warehouse_id: Number(selectedWarehouse),
+    }
+
+    // console.log('payload : ', payload)
+
+    try {
+      const res = await backendTracking.put('/update-status-to-stored', payload)
+      if (res.data.success) {
+        toast.success('Items updated successfully!')
+        // refresh data
+        fetchData(pagination.page)
+        setSelectedRows([])
+      } else {
+        toast.error(res.data.message || 'Failed to update status')
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error('API request failed')
+    }
+  }
+
+  const isAllSelected = data.length > 0 && selectedRows.length === data.length
+
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedRows(data.map((row) => row.receiving_item_id))
+    } else {
+      setSelectedRows([])
+    }
+  }
+
+  const handleRowSelect = (id, checked) => {
+    if (checked) {
+      setSelectedRows((prev) => [...new Set([...prev, id])])
+    } else {
+      setSelectedRows((prev) => prev.filter((rowId) => rowId !== id))
+    }
   }
 
   const columns = [
@@ -89,14 +130,8 @@ const CompletedSummaryList = () => {
         <div className="d-flex align-items-center">
           <input
             type="checkbox"
-            checked={selectedRows.length === data.length && data.length > 0}
-            onChange={(e) => {
-              if (e.target.checked) {
-                setSelectedRows(data.map((row) => row.receiving_item_id))
-              } else {
-                setSelectedRows([])
-              }
-            }}
+            checked={isAllSelected}
+            onChange={(e) => handleSelectAll(e.target.checked)}
             style={{ marginRight: '5px' }}
           />
           <small>All</small>
@@ -106,19 +141,15 @@ const CompletedSummaryList = () => {
         <input
           type="checkbox"
           checked={selectedRows.includes(row.receiving_item_id)}
-          onChange={(e) => {
-            if (e.target.checked) {
-              setSelectedRows([...selectedRows, row.receiving_item_id])
-            } else {
-              setSelectedRows(selectedRows.filter((id) => id !== row.receiving_item_id))
-            }
-          }}
+          onChange={(e) => handleRowSelect(row.receiving_item_id, e.target.checked)}
         />
       ),
       width: '120px',
     },
     { name: 'Product Name', selector: (row) => row.receiving_item_details?.name },
     { name: 'Product SAP', selector: (row) => row.receiving_item_details?.sap_code },
+    { name: 'GR Number', selector: (row) => row.receiving_item_details?.gr_number },
+    { name: 'PO Number', selector: (row) => row.receiving_item_details?.po_number },
     {
       name: 'Serialize',
       cell: (row) =>
@@ -154,7 +185,7 @@ const CompletedSummaryList = () => {
                 </CFormSelect>
               </FormRow>
 
-              <h6 className="mt-4 mb-2">Receiving List</h6>
+              <h6 className="mt-4 mb-2">Receiving Item List</h6>
               {loading ? (
                 <div className="text-center p-4">
                   <CSpinner />
