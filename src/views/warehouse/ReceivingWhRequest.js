@@ -44,33 +44,36 @@ const CompletedSummaryList = () => {
   }
 
   // fetch completed summary
-  const fetchData = async (page = 1) => {
-    try {
-      setLoading(true)
-      const res = await backendTracking.get(`/status/completed/summary/receiving_item_id`, {
-        params: { page, limit: pagination.limit },
-      })
-      if (res.data.success) {
-        setData(res.data.data.grouped_data || [])
-        setPagination({
-          page: res.data.data.pagination.current_page,
-          limit: res.data.data.pagination.per_page,
-          total: res.data.data.pagination.total_groups,
+  const fetchData = useCallback(
+    async (page = 1) => {
+      try {
+        setLoading(true)
+        const res = await backendTracking.get(`/status/completed/summary/receiving_item_id`, {
+          params: { page, limit: pagination.limit },
         })
-        setSelectedRows([]) // reset selection ketika data berubah
+        if (res.data.success) {
+          setData(res.data.data.grouped_data || [])
+          setPagination({
+            page: res.data.data.pagination.current_page,
+            limit: res.data.data.pagination.per_page,
+            total: res.data.data.pagination.total_groups,
+          })
+          setSelectedRows([])
+        }
+      } catch (err) {
+        console.error(err)
+        toast.error('Failed to fetch summary')
+      } finally {
+        setLoading(false)
       }
-    } catch (err) {
-      console.error(err)
-      toast.error('Failed to fetch summary')
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [pagination.limit],
+  )
 
   useEffect(() => {
     fetchWarehouses()
     fetchData()
-  }, [])
+  }, [fetchData])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

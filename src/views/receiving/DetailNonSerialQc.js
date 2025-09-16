@@ -47,35 +47,38 @@ const DetailNonSerialQc = () => {
   const [formData, setFormData] = useState({ notes: '' })
   const [qcIdReceivingSerial, setQcIdReceivingSerial] = useState(null)
 
-  const fetchTrackingSumary = async (receivingItemId, qcProduct) => {
-    try {
-      const response = await backendTracking.get('/sample-inspections/aql-summary', {
-        params: {
-          receiving_item_id: receivingItemId,
-          qc_id: qcProduct,
-        },
-      })
+  const fetchTrackingSumary = useCallback(
+    async (receivingItemId, qcProduct) => {
+      try {
+        const response = await backendTracking.get('/sample-inspections/aql-summary', {
+          params: {
+            receiving_item_id: receivingItemId,
+            qc_id: qcProduct,
+          },
+        })
 
-      const summary = response.data.data.inspection_summary
-      const aql_config = response.data.data.aql_configuration
-      const qcId = response.data.data.qc_id
-      setInspectionSummary(summary)
-      setAqlConfig(aql_config)
-      setQcIdReceivingSerial(qcId)
+        const summary = response.data.data.inspection_summary
+        const aql_config = response.data.data.aql_configuration
+        const qcId = response.data.data.qc_id
+        setInspectionSummary(summary)
+        setAqlConfig(aql_config)
+        setQcIdReceivingSerial(qcId)
 
-      if (summary.remaining_samples <= 0) {
-        toast.error(
-          <span>
-            <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
-          </span>,
-        )
-      } else {
-        fetchValidationQc(trackingId, qcId)
+        if (summary.remaining_samples <= 0) {
+          toast.error(
+            <span>
+              <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
+            </span>,
+          )
+        } else {
+          fetchValidationQc(trackingId, qcId)
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed Validation')
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed Validation')
-    }
-  }
+    },
+    [trackingId],
+  )
 
   const fetchValidationQc = async (trackingId, qcId) => {
     try {
@@ -132,7 +135,7 @@ const DetailNonSerialQc = () => {
     } finally {
       setLoading(false)
     }
-  }, [trackingId])
+  }, [trackingId, fetchTrackingSumary]) // 👈 dependensi ditambah
 
   useEffect(() => {
     fetchDetail()
