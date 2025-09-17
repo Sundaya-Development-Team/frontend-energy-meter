@@ -19,7 +19,7 @@ import {
   CFormTextarea,
   CFormCheck,
 } from '@coreui/react'
-import { backendAssembly, backendWh } from '../../api/axios'
+import { backendAssembly } from '../../api/axios'
 import { toast } from 'react-toastify'
 import Select from 'react-select'
 
@@ -37,9 +37,9 @@ const AssemblyOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedItems, setSelectedItems] = useState({})
-  const [stockData, setStockData] = useState({})
   const [formData, setFormData] = useState({
     notes: '',
+    status: '',
   })
   const [showSubmit, setShowSubmit] = useState(true)
   const TOAST_ID = 'stock-warning'
@@ -48,33 +48,28 @@ const AssemblyOrders = () => {
     fetchOrders()
   }, [])
 
+  // setiap kali order berubah, cek stock vs remaining
   useEffect(() => {
     if (!selectedOrder) return
 
     const statusOrder = selectedOrder?.status?.toLowerCase()
-
-    // completed selalu prioritas
     if (statusOrder === 'completed') {
       setShowSubmit(false)
       toast.dismiss(TOAST_ID)
       return
     }
 
-    if (!stockData || Object.keys(stockData).length === 0) return
-
     const init = {}
     const insufficient = []
 
     selectedOrder.assembly_order_items?.forEach((item) => {
       const remaining = Number(item.qty_remaining ?? 0)
-      const stock = Number(stockData[item.product_id] ?? 0)
+      const stock = Number(item.quantity_stok ?? 0)
 
       if (item.required) {
         if (remaining > 0 && stock < remaining) {
           init[item.id] = { checked: true, qty: stock }
-          insufficient.push(
-            `${item.product_name} (Available Stock: ${stock} < Remaining Qty: ${remaining})`,
-          )
+          insufficient.push(`${item.product_name} (Available: ${stock} < Remaining: ${remaining})`)
         } else {
           init[item.id] = { checked: true, qty: remaining }
         }
@@ -88,25 +83,21 @@ const AssemblyOrders = () => {
     if (insufficient.length > 0) {
       if (toast.isActive(TOAST_ID)) {
         toast.update(TOAST_ID, {
-          render: `INSUFFICIENT STOCK FOR ${insufficient.length} item(s):\n- ${insufficient.join(
-            '\n- ',
-          )}`,
+          render: `INSUFFICIENT STOCK:\n- ${insufficient.join('\n- ')}`,
           autoClose: 10000,
-          closeOnClick: true,
-          pauseOnHover: true,
         })
       } else {
-        toast.error(
-          `INSUFFICIENT STOCK FOR ${insufficient.length} item(s):\n- ${insufficient.join('\n- ')}`,
-          { toastId: TOAST_ID, autoClose: 10000, closeOnClick: true, pauseOnHover: true },
-        )
+        toast.error(`INSUFFICIENT STOCK:\n- ${insufficient.join('\n- ')}`, {
+          toastId: TOAST_ID,
+          autoClose: 10000,
+        })
       }
       setShowSubmit(false)
     } else {
       toast.dismiss(TOAST_ID)
       setShowSubmit(true)
     }
-  }, [selectedOrder, stockData])
+  }, [selectedOrder])
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -120,67 +111,23 @@ const AssemblyOrders = () => {
     }
   }
 
-  // Fungsi reusable untuk fetch order & stock
-  const fetchOrderData = async (orderId) => {
+  const fetchOrderData = (orderId) => {
     const order = orders.find((o) => o.id === Number(orderId))
     setSelectedOrder(order || null)
     setSelectedItems({})
-
-    const statusOrder = order?.status?.toLowerCase()
-    if (statusOrder === 'completed') {
-      setShowSubmit(false)
-      return // stop biar tidak ditimpa logic stock
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        status: order?.status || '',
-        notes: '',
-      }))
-
-      if (order && order.assembly_order_items?.length > 0) {
-        const productIds = order.assembly_order_items.map((i) => i.product_id)
-
-        try {
-          const res = await backendWh.post('/stock-units/stock-by-multiple-products', {
-            product_ids: productIds,
-            warehouse_id: 1, // sesuaikan warehouse
-            include_zero_stock: true,
-          })
-
-          if (res.data.success) {
-            const map = {}
-            res.data.data.stock_by_product.forEach((s) => {
-              map[s.product_id] = s.total_quantity
-            })
-            setStockData(map)
-          }
-        } catch (err) {
-          console.error('Failed fetch stock', err)
-        }
-      } else {
-        setStockData({})
-      }
-    }
-  }
-
-  // Untuk dipanggil di onChange select
-  const handleOrderChange = (e) => {
-    fetchOrderData(e.target.value)
+    setFormData((prev) => ({
+      ...prev,
+      status: order?.status || '',
+      notes: '',
+    }))
   }
 
   const handleInput = (e) => {
-    const { name, value, type } = e.target
-
+    const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'number' ? Number(value) || 0 : value,
+      [name]: value,
     }))
-
-    //jika ingin checklist aktif berdasarkan select status
-    // setSelectedOrder((prev) => ({
-    //   ...prev,
-    //   [name]: type === 'number' ? Number(value) || 0 : value,
-    // }))
   }
 
   const handleOrderConfirmation = async () => {
@@ -196,19 +143,17 @@ const AssemblyOrders = () => {
 
       const response = await backendAssembly.post('/assembly-order-confirmations', payload)
       if (response.data.success === true) {
-        // Update state biar UI langsung ikut berubah
         setSelectedOrder((prev) => ({
           ...prev,
           status: 'in_progress',
         }))
-
         toast.success(response.data?.message || 'SUCCESS')
       } else {
         toast.error('FAILED CONFIRM ORDER!!')
       }
     } catch (error) {
       console.error(error)
-      toast.error(error.response?.data?.message || 'FAILED TO ORDER CONFRIMATION')
+      toast.error(error.response?.data?.message || 'FAILED TO ORDER CONFIRMATION')
     }
   }
 
@@ -230,7 +175,7 @@ const AssemblyOrders = () => {
 
       const payload = {
         assembly_order_id: selectedOrder.id,
-        confirmed_by: 1, // ganti id user login
+        confirmed_by: 1,
         confirmations,
       }
 
@@ -241,30 +186,11 @@ const AssemblyOrders = () => {
 
       if (response.data.success) {
         toast.success(response.data?.message || 'SUCCESS CONFIRM ORDER')
-
-        if (selectedOrder?.id) {
-          try {
-            const res = await backendAssembly.get(`/assembly-orders/${selectedOrder.id}`)
-            if (res.data.success) {
-              const updatedOrder = res.data.data
-              setSelectedOrder(updatedOrder) // update full order
-              setSelectedItems({}) // reset selection
-              // update stock
-              const productIds = updatedOrder.assembly_order_items.map((i) => i.product_id)
-              const stockRes = await backendWh.post('/stock-units/stock-by-multiple-products', {
-                product_ids: productIds,
-                warehouse_id: 1,
-                include_zero_stock: true,
-              })
-              const map = {}
-              stockRes.data.data.stock_by_product.forEach((s) => {
-                map[s.product_id] = s.total_quantity
-              })
-              setStockData(map)
-            }
-          } catch (err) {
-            console.error('Failed to refresh order', err)
-          }
+        // refresh order detail
+        const res = await backendAssembly.get(`/assembly-orders/${selectedOrder.id}`)
+        if (res.data.success) {
+          setSelectedOrder(res.data.data)
+          setSelectedItems({})
         }
       } else {
         toast.error('FAILED CONFIRM ORDER!!')
@@ -283,38 +209,21 @@ const AssemblyOrders = () => {
           <CSpinner />
         ) : (
           <>
-            {/* Dropdown pilih order */}
             <FormRow label="Assembly Order">
               <Select
                 options={orders.map((o) => ({ value: o.id, label: o.order_number }))}
-                onChange={(selected) => handleOrderChange({ target: { value: selected.value } })}
+                onChange={(selected) => fetchOrderData(selected.value)}
                 isClearable
                 placeholder="-- Select Order --"
               />
             </FormRow>
 
             <FormRow label="Product Name">
-              <CFormInput
-                type="text"
-                placeholder=""
-                name="product_name"
-                min={1}
-                value={selectedOrder?.product_name || ''}
-                onChange={handleInput}
-                disabled
-              />
+              <CFormInput value={selectedOrder?.product_name || ''} disabled />
             </FormRow>
 
             <FormRow label="Quantity">
-              <CFormInput
-                type="number"
-                placeholder=""
-                name="quantity"
-                min={1}
-                value={selectedOrder?.quantity || ''}
-                onChange={handleInput}
-                disabled
-              />
+              <CFormInput value={selectedOrder?.quantity || ''} disabled />
             </FormRow>
 
             <FormRow label="Status">
@@ -325,54 +234,36 @@ const AssemblyOrders = () => {
                 disabled={!selectedOrder || selectedOrder.status !== 'pending'}
               >
                 <option value="">-- Select Status --</option>
-                {(selectedOrder?.status === 'pending' || !formData.status) && (
-                  <>
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="failed">Reject</option>
-                  </>
-                )}
-                {formData.status === 'in_progress' && (
-                  <option value="in_progress">In Progress</option>
-                )}
-                {formData.status === 'partial' && <option value="partial">Partial</option>}
-                {formData.status === 'completed' && <option value="completed">Completed</option>}
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="failed">Reject</option>
+                <option value="partial">Partial</option>
+                <option value="completed">Completed</option>
               </CFormSelect>
             </FormRow>
 
             <FormRow label="Notes">
               <CFormTextarea
-                type="text"
                 name="notes"
                 rows={3}
-                placeholder="Enter notes here"
                 value={formData.notes}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    notes: e.target.value,
-                  })
-                }
+                onChange={handleInput}
                 disabled={!selectedOrder || formData.status !== 'pending'}
               />
             </FormRow>
 
-            {/* Tombol tambahan sebelum Order Details */}
-            <div className="d-flex justify-content-end mt-3">
-              {selectedOrder?.status === 'pending' && (
-                <div>
-                  <CButton
-                    color="success"
-                    className="me-2 text-white"
-                    onClick={handleOrderConfirmation}
-                  >
-                    Order Confirmation
-                  </CButton>
-                </div>
-              )}
-            </div>
+            {selectedOrder?.status === 'pending' && (
+              <div className="d-flex justify-content-end mt-3">
+                <CButton
+                  color="success"
+                  className="me-2 text-white"
+                  onClick={handleOrderConfirmation}
+                >
+                  Order Confirmation
+                </CButton>
+              </div>
+            )}
 
-            {/* Detail order */}
             <div className="mt-4">
               <h6 className="fw-bold mb-3">Order Details</h6>
               <CTable
@@ -408,25 +299,20 @@ const AssemblyOrders = () => {
                       .sort((a, b) => a.product_name.localeCompare(b.product_name))
                       .map((item) => {
                         const remaining = Number(item.qty_remaining ?? 0)
-                        const stock = Number(stockData[item.product_id] ?? 0)
+                        const stock = Number(item.quantity_stok ?? 0)
+                        const maxAllowed = Math.min(remaining, stock)
 
-                        const safeRemaining = isNaN(remaining) ? 0 : remaining
-                        const safeStock = isNaN(stock) ? 0 : stock
-
-                        const maxAllowed = Math.min(safeRemaining, safeStock)
                         return (
                           <CTableRow key={item.id}>
-                            {/* Checkbox */}
                             <CTableDataCell>
                               <CFormCheck
-                                id={`check-${item.id}`}
                                 checked={item.required ? true : !!selectedItems[item.id]?.checked}
                                 disabled={
                                   item.required ||
                                   selectedOrder.status === 'pending' ||
                                   selectedOrder.status === 'failed' ||
-                                  safeRemaining === 0 ||
-                                  safeStock === 0
+                                  remaining === 0 ||
+                                  stock === 0
                                 }
                                 onChange={(e) =>
                                   setSelectedItems((prev) => ({
@@ -434,39 +320,26 @@ const AssemblyOrders = () => {
                                     [item.id]: {
                                       ...prev[item.id],
                                       checked: item.required ? true : e.target.checked,
-                                      qty:
-                                        item.required || e.target.checked
-                                          ? prev[item.id]?.qty || 0
-                                          : 0,
+                                      qty: e.target.checked ? prev[item.id]?.qty || 0 : 0,
                                     },
                                   }))
                                 }
-                                color="primary" // <== ini yang bikin checkbox pakai warna theme
                               />
                             </CTableDataCell>
 
-                            {/* Product Name */}
                             <CTableDataCell className="fw-medium text-start ps-3">
                               {item.product_name}
                             </CTableDataCell>
 
-                            {/* Qty Request */}
                             <CTableDataCell>{item.qty_request}</CTableDataCell>
-
-                            {/* Qty Confirmed */}
                             <CTableDataCell className="text-success fw-semibold">
                               {item.qty_fulfilled}
                             </CTableDataCell>
-
-                            {/* Remaining */}
                             <CTableDataCell className="text-danger fw-semibold">
                               {remaining}
                             </CTableDataCell>
-
-                            {/* Stock */}
                             <CTableDataCell className="fw-semibold">{stock}</CTableDataCell>
 
-                            {/* Input Confirm Qty */}
                             <CTableDataCell>
                               <input
                                 type="number"
@@ -475,7 +348,7 @@ const AssemblyOrders = () => {
                                 max={String(maxAllowed)}
                                 value={selectedItems[item.id]?.qty || ''}
                                 disabled={
-                                  item.required || // 🔥 jika required maka otomatis disable
+                                  item.required ||
                                   !selectedItems[item.id]?.checked ||
                                   selectedOrder.status === 'pending' ||
                                   selectedOrder.status === 'failed' ||
@@ -483,13 +356,9 @@ const AssemblyOrders = () => {
                                   stock <= 0
                                 }
                                 onChange={(e) => {
-                                  let value = e.target.value.replace(/\D/g, '')
-                                  value = Number(value)
-
-                                  if (value > remaining && value > stock) value = stock
-                                  if (value > remaining && value < stock) value = remaining
+                                  let value = Number(e.target.value.replace(/\D/g, '')) || 0
+                                  if (value > remaining) value = remaining
                                   if (value > stock) value = stock
-                                  if (value < 0) value = 0
                                   setSelectedItems((prev) => ({
                                     ...prev,
                                     [item.id]: {
@@ -514,17 +383,16 @@ const AssemblyOrders = () => {
                 </CTableBody>
               </CTable>
 
-              {/* Tombol submit */}
-              <div className="d-flex justify-content-end mt-3">
-                {selectedOrder &&
-                  selectedOrder.status !== 'pending' &&
-                  selectedOrder.status !== 'failed' &&
-                  showSubmit && (
+              {selectedOrder &&
+                selectedOrder.status !== 'pending' &&
+                selectedOrder.status !== 'failed' &&
+                showSubmit && (
+                  <div className="d-flex justify-content-end mt-3">
                     <CButton color="primary" onClick={handleSubmit}>
                       Submit Product Confirmation
                     </CButton>
-                  )}
-              </div>
+                  </div>
+                )}
             </div>
           </>
         )}
