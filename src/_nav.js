@@ -266,6 +266,11 @@ const _nav = [
         name: 'QC Calibration Test',
         to: '/production/serialnoaql/QC-CT006/Calibration Test',
       },
+      {
+        component: CNavItem,
+        name: 'QC Calibration 2 Test',
+        to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
+      },
     ],
   },
   {
