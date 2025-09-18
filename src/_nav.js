@@ -414,7 +414,7 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Warehouse Stock (Opname)',
+    name: 'WH Stock (Opname)',
     to: '/warehouse/stock/WarehouseStock',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
