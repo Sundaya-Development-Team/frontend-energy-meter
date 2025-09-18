@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   CCard,
   CCardBody,
@@ -16,11 +16,12 @@ import {
   CPagination,
   CPaginationItem,
   CButton,
+  CButtonGroup,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { backendWh } from '../../api/axios'
-import { CounterCard6, CounterCard12 } from '../components/CounterCard'
+import { backendWhNew } from '../../api/axios'
+import { CounterCard6 } from '../components/CounterCard'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -33,58 +34,60 @@ const FormRow = ({ label, children }) => (
 
 const WarehouseScanUI = () => {
   const [serialNumber, setSerialNumber] = useState('')
-  const [summary, setSummary] = useState(null)
+  const [processedTransaction, setProcessed] = useState(null)
   const [serials, setSerials] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
+  const [mode, setMode] = useState('incoming') // default: incoming
   const itemsPerPage = 5
-  const [receivingItemId, setReceivingItemId] = useState(null)
+  const scanPrev = useRef('')
+  const inputRef = useRef(null) // ref untuk input serial
+
+  // fokus otomatis waktu pertama kali load page
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
 
   // scan serial
   const handleSerial = async () => {
     if (!serialNumber.trim()) return
-    try {
-      const scanRes = await backendWh.post('/stock-transactions/scan', {
-        serial_number: serialNumber,
-        performed_by: 1,
-      })
 
-      if (scanRes.data.success) {
-        toast.success(scanRes.data.message ?? 'Serial scanned successfully')
-        const itemId = scanRes.data.data?.stock_unit?.receiving_item_id
-        setReceivingItemId(itemId)
+    if (scanPrev.current !== serialNumber) {
+      scanPrev.current = serialNumber
+      try {
+        const endpoint =
+          mode === 'incoming'
+            ? '/stock-transactions/update-from-pending'
+            : '/stock-transactions/scan-out-reserved'
 
-        // fetch staging setelah scan
-        fetchStaging(itemId)
-      } else {
-        toast.error(scanRes.data.message ?? 'Scan failed')
+        const scanRes = await backendWhNew.post(endpoint, {
+          serial_number: serialNumber,
+          performed_by: 1,
+        })
+
+        if (scanRes.data.success) {
+          toast.success(scanRes.data.message ?? 'Serial scanned successfully')
+
+          const summaryData =
+            mode === 'incoming'
+              ? scanRes.data.data.processed_transaction
+              : scanRes.data.data.out_transaction
+
+          setProcessed(summaryData)
+          setSerials(scanRes.data.data.latest_transactions || [])
+        } else {
+          toast.error(scanRes.data.message ?? 'Scan failed')
+        }
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Scan failed')
+      } finally {
+        setSerialNumber('')
+        inputRef.current?.focus()
       }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Scan failed')
-    } finally {
-      setSerialNumber('')
+    } else {
+      toast.error('Serial Number Has Been Scanned')
     }
   }
 
-  // fetch staging data
-  const fetchStaging = useCallback(async (itemId) => {
-    if (!itemId) return
-    try {
-      const res = await backendWh.get('/stock-units/zero-quantity-staging', {
-        params: { receiving_item_id: itemId },
-      })
-
-      if (res.data.success) {
-        setSummary(res.data.data.summary)
-        setSerials(res.data.data.serial_numbers || [])
-      } else {
-        toast.error(res.data.message ?? 'Failed to fetch staging')
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Error fetching staging')
-    }
-  }, [])
-
-  // pagination serials
   const paginatedSerials = serials.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
@@ -92,15 +95,48 @@ const WarehouseScanUI = () => {
 
   return (
     <CRow>
-      {/* Scan + Counter */}
-      <CCol md={6}>
-        <CCard className="mb-4 h-100">
+      {/* Pilihan Mode */}
+      <CCol md={12} className="mb-4">
+        <CButtonGroup>
+          <CButton
+            color={mode === 'incoming' ? 'primary' : 'secondary'}
+            onClick={() => {
+              setMode('incoming')
+              setSerials([])
+              setProcessed(null)
+              setSerialNumber('')
+              scanPrev.current = ''
+              inputRef.current?.focus()
+            }}
+          >
+            Incoming
+          </CButton>
+          <CButton
+            color={mode === 'outgoing' ? 'primary' : 'secondary'}
+            onClick={() => {
+              setMode('outgoing')
+              setSerials([])
+              setProcessed(null)
+              setSerialNumber('')
+              scanPrev.current = ''
+              inputRef.current?.focus()
+            }}
+          >
+            Outgoing
+          </CButton>
+        </CButtonGroup>
+      </CCol>
+
+      {/* Scan */}
+      <CCol md={12} className="mb-4">
+        <CCard className="h-100">
           <CCardHeader>
-            <strong>Warehouse Scan</strong>
+            <strong>Warehouse Scan ({mode})</strong>
           </CCardHeader>
           <CCardBody>
             <FormRow label="Serial Number">
               <CFormInput
+                ref={inputRef}
                 value={serialNumber}
                 onChange={(e) => setSerialNumber(e.target.value)}
                 onKeyDown={(e) => {
@@ -109,46 +145,75 @@ const WarehouseScanUI = () => {
                     handleSerial()
                   }
                 }}
-                placeholder="Scan Serial Number"
+                placeholder={`Scan Serial Number (${mode})`}
               />
-              {/* <CButton
-                color="primary"
-                className="mt-2"
-                onClick={handleSerial}
-                disabled={!serialNumber.trim()}
-              >
-                Scan
-              </CButton> */}
             </FormRow>
+          </CCardBody>
+        </CCard>
+      </CCol>
 
+      {/* Summary */}
+      <CCol md={12} className="mb-4">
+        <CCard className="h-100">
+          <CCardHeader>
+            <strong>Scan Summary</strong>
+          </CCardHeader>
+          <CCardBody>
             <div className="mt-3">
-              <FormRow label="Counter Remaining" />
-              {summary ? (
-                <CRow className="mb-3">
-                  <CounterCard12 title="Total Found" value={summary.total_found} />
-                  <CounterCard12 title="Displayed" value={summary.displayed} />
-                  {/* <CounterCard6 title="Serial Retrieved" value={summary.serial_retrieved} />
-                  <CounterCard6 title="Missing Serials" value={summary.missing_serials} /> */}
-                </CRow>
+              {mode === 'incoming' ? (
+                <>
+                  <FormRow label="Counter (Incoming)" />
+                  {processedTransaction ? (
+                    <CRow className="mb-3">
+                      <CounterCard6
+                        title="Processed Quantity"
+                        value={processedTransaction.quantity_processed}
+                      />
+                      <CounterCard6
+                        title="Remaining Quantity"
+                        value={processedTransaction.remaining_pending_quantity}
+                      />
+                    </CRow>
+                  ) : (
+                    <CRow className="mb-3">
+                      <CounterCard6 title="Processed Quantity" value={'No Data'} />
+                      <CounterCard6 title="Remaining Quantity" value={'No Data'} />
+                    </CRow>
+                  )}
+                </>
               ) : (
-                <CRow className="mb-3">
-                  <CounterCard12 title="Total Found" value={'No Data'} />
-                  <CounterCard12 title="Displayed" value={'No Data'} />
-                  {/* <CounterCard6 title="Serial Retrieved" value={'No Data'} />
-                  <CounterCard6 title="Missing Serials" value={'No Data'} /> */}
-                </CRow>
+                <>
+                  <FormRow label="Counter (Outgoing)" />
+                  {processedTransaction ? (
+                    <CRow className="mb-3">
+                      <CounterCard6
+                        title="Current Quantity"
+                        value={processedTransaction.current_quantity}
+                      />
+                      <CounterCard6
+                        title="Current Reserved"
+                        value={processedTransaction.current_reserved}
+                      />
+                    </CRow>
+                  ) : (
+                    <CRow className="mb-3">
+                      <CounterCard6 title="Current Quantity" value={'No Data'} />
+                      <CounterCard6 title="Current Reserved" value={'No Data'} />
+                    </CRow>
+                  )}
+                </>
               )}
             </div>
           </CCardBody>
         </CCard>
       </CCol>
 
-      {/* Tabel Serial Numbers */}
-      <CCol md={6}>
-        <CCard className="mb-4 h-100">
+      {/* Tabel Transactions */}
+      <CCol md={12}>
+        <CCard className="h-100">
           <CCardHeader>
             <strong>
-              List of Remaining Serial Numbers {summary ? `|| Total: ${serials.length}` : ''}
+              Latest Transactions {serials.length > 0 ? `|| Total: ${serials.length}` : ''}
             </strong>
           </CCardHeader>
           <CCardBody className="d-flex flex-column">
@@ -158,24 +223,30 @@ const WarehouseScanUI = () => {
                   <CTableRow>
                     <CTableHeaderCell>No</CTableHeaderCell>
                     <CTableHeaderCell>Serial Number</CTableHeaderCell>
-                    <CTableHeaderCell>Staged At</CTableHeaderCell>
+                    <CTableHeaderCell>Movement Type</CTableHeaderCell>
+                    <CTableHeaderCell>Quantity</CTableHeaderCell>
+                    <CTableHeaderCell>Movement Date</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
                   {paginatedSerials.length > 0 ? (
-                    paginatedSerials.map((sn, idx) => (
-                      <CTableRow key={idx}>
+                    paginatedSerials.map((txn, idx) => (
+                      <CTableRow key={txn.id}>
                         <CTableDataCell>
                           {(currentPage - 1) * itemsPerPage + idx + 1}
                         </CTableDataCell>
-                        <CTableDataCell>{sn.serial_number}</CTableDataCell>
-                        <CTableDataCell>{new Date(sn.created_at).toLocaleString()}</CTableDataCell>
+                        <CTableDataCell>{txn.serial_number}</CTableDataCell>
+                        <CTableDataCell>{txn.movement_type}</CTableDataCell>
+                        <CTableDataCell>{txn.quantity}</CTableDataCell>
+                        <CTableDataCell>
+                          {new Date(txn.movement_date).toLocaleString()}
+                        </CTableDataCell>
                       </CTableRow>
                     ))
                   ) : (
                     <CTableRow>
-                      <CTableDataCell colSpan={3} className="text-center text-muted">
-                        No serials scanned yet...
+                      <CTableDataCell colSpan={5} className="text-center text-muted">
+                        No transactions yet...
                       </CTableDataCell>
                     </CTableRow>
                   )}
