@@ -42,6 +42,7 @@ const DetailNonSerialQc = () => {
   const [answers, setAnswers] = useState({})
   const [qcName, setQcName] = useState([])
   const [questionData, setQuestionData] = useState([])
+  const [isQcValid, setIsQcValid] = useState(false)
 
   //tambahan
   const [formData, setFormData] = useState({ notes: '' })
@@ -90,7 +91,7 @@ const DetailNonSerialQc = () => {
       })
 
       if (response.data.valid === true) {
-        // toast.success(response.data.message ?? 'Serial number valid')
+        setIsQcValid(true) // QC valid → tombol Submit bisa muncul
 
         // Convert object questions → array
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
@@ -98,28 +99,24 @@ const DetailNonSerialQc = () => {
           question: text,
         }))
 
-        // Simpan ke state
         setQcName(response.data.category)
         setQuestionData(convertedQuestions)
 
-        // inisialisasi semua jawaban default ke false
         const initialAnswers = {}
         convertedQuestions.forEach((q) => {
-          initialAnswers[q.id] = false
+          initialAnswers[q.id] = true
         })
         setAnswers(initialAnswers)
-
-        // Ambil product
-        // fetchProduct(serialNumber)
       } else {
+        setIsQcValid(false) // QC invalid → sembunyikan tombol
         toast.error(response.data.message ?? 'QC CANT CONTINUE')
       }
     } catch (error) {
+      setIsQcValid(false) // Error → sembunyikan tombol juga
       console.log('ERROR')
       toast.error(error.response?.data?.message || 'QCValidation Failed')
     }
   }
-
   const fetchDetail = useCallback(async () => {
     setLoading(true)
     try {
@@ -150,7 +147,25 @@ const DetailNonSerialQc = () => {
   }
 
   if (!detail) {
-    return <p>No data found.</p>
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+        <CCard className="text-center p-4 shadow-sm">
+          <CCardBody>
+            <div className="mb-3">
+              <i
+                className="bi bi-exclamation-triangle text-warning"
+                style={{ fontSize: '2rem' }}
+              ></i>
+            </div>
+            <h5 className="fw-bold">Data Not Found</h5>
+            <p className="text-muted">The requested tracking detail could not be loaded.</p>
+            <CButton color="secondary" onClick={() => navigate(-1)}>
+              Back
+            </CButton>
+          </CCardBody>
+        </CCard>
+      </div>
+    )
   }
 
   const formatDateTime = (dateString) => {
@@ -198,7 +213,7 @@ const DetailNonSerialQc = () => {
         </span>,
       )
 
-      // ✅ Reset jawaban & catatan
+      // Reset jawaban & catatan
       const resetAnswers = {}
       questionData.forEach((q) => {
         resetAnswers[q.id] = false
@@ -206,7 +221,7 @@ const DetailNonSerialQc = () => {
       setAnswers(resetAnswers)
       setFormData({ notes: '' })
 
-      // ✅ Update summary secara manual (optimistic update)
+      // Update summary secara manual (optimistic update)
       setInspectionSummary((prev) => {
         if (!prev) return prev
         return {
@@ -402,11 +417,13 @@ const DetailNonSerialQc = () => {
                   )
                 })
               )}
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">
-                  Submit
-                </CButton>
-              </div>
+              {isQcValid && (
+                <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <CButton color="primary" type="submit">
+                    Submit
+                  </CButton>
+                </div>
+              )}
             </CForm>
           </CCardBody>
         </CCard>

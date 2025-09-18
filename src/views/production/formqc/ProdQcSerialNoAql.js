@@ -91,10 +91,10 @@ const QcSerialNoAql = () => {
         setQcName(response.data.category)
         setQuestionData(convertedQuestions)
 
-        // inisialisasi semua jawaban default ke false
+        // inisialisasi semua jawaban default ke true
         const initialAnswers = {}
         convertedQuestions.forEach((q) => {
-          initialAnswers[q.id] = false
+          initialAnswers[q.id] = true
         })
         setAnswers(initialAnswers)
 

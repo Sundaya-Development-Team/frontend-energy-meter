@@ -19,9 +19,9 @@ const ReceivingNonSerialQc = () => {
     setLoading(true)
     try {
       const params = {
-        page,
-        limit,
         is_serialize: false,
+        // page,
+        // limit,
         status: 'in_progress',
       }
 
@@ -33,9 +33,16 @@ const ReceivingNonSerialQc = () => {
         params,
       })
 
-      setData(res.data.data.receiving_items || [])
-      setTotalRows(res.data.data.pagination?.total || 0)
+      const items = res.data.data.receiving_items || []
+      const total =
+        res.data.data.pagination?.total ||
+        res.data.data.summary?.total_receiving_items ||
+        items.length
+
+      setData(items)
+      setTotalRows(total)
     } catch (error) {
+      console.error(error)
       toast.error('Failed to fetch tracking data')
     } finally {
       setLoading(false)
@@ -60,11 +67,16 @@ const ReceivingNonSerialQc = () => {
     setPage(1)
   }
 
-  const handleSelectDetail = (trackingId) => {
-    navigate(`/receiving/detailnonserialqc/${trackingId}`)
+  const handleSelectDetail = (receivingItemId) => {
+    navigate(`/receiving/detailnonserialqc/${receivingItemId}`)
   }
 
   const columns = [
+    {
+      name: 'No.',
+      cell: (row, index) => (page - 1) * limit + (index + 1),
+      width: '70px',
+    },
     { name: 'Product', selector: (row) => row.product_name, sortable: true },
     { name: 'Batch', selector: (row) => row.batch, sortable: true },
     { name: 'QC Code', selector: (row) => row.qc_standard, sortable: true },
@@ -72,29 +84,26 @@ const ReceivingNonSerialQc = () => {
     {
       name: 'Progress',
       selector: (row) => row.aql_info?.progress ?? '0%',
-      sortable: false,
     },
     {
       name: 'Samples (Pass/Fail)',
-      selector: (row) => `${row.items_summary.samples_passed}/${row.items_summary.samples_failed}`,
-      sortable: false,
+      selector: (row) =>
+        row.items_summary
+          ? `${row.items_summary.samples_passed}/${row.items_summary.samples_failed}`
+          : '0/0',
     },
-    { name: 'Next Action', selector: (row) => row.next_action, sortable: false },
+    { name: 'Next Action', selector: (row) => row.next_action },
     {
       name: 'Action',
-      cell: (row) => {
-        const trackingId = row.tracking_items?.[0]?.tracking_id
-        return (
-          <CButton
-            size="sm"
-            color="primary"
-            disabled={!trackingId}
-            onClick={() => handleSelectDetail(trackingId)}
-          >
-            Inspect
-          </CButton>
-        )
-      },
+      cell: (row) => (
+        <CButton
+          size="sm"
+          color="primary"
+          onClick={() => handleSelectDetail(row.receiving_item_id)}
+        >
+          Inspect
+        </CButton>
+      ),
     },
   ]
 
@@ -109,7 +118,7 @@ const ReceivingNonSerialQc = () => {
             onChange={handleSearchChange}
             className="form-control w-25"
           />
-        </div>{' '}
+        </div>
         {loading ? (
           <div
             className="d-flex justify-content-center align-items-center"
@@ -118,21 +127,7 @@ const ReceivingNonSerialQc = () => {
             <CSpinner color="primary" style={{ width: '3rem', height: '3rem' }} />
           </div>
         ) : (
-          <DataTable
-            columns={columns}
-            data={data}
-            progressPending={loading}
-            // progressComponent={
-            //   <CSpinner color="primary" style={{ width: '3rem', height: '3rem' }} />
-            // }
-            pagination
-            paginationServer
-            paginationTotalRows={totalRows}
-            onChangePage={handlePageChange}
-            onChangeRowsPerPage={handlePerRowsChange}
-            highlightOnHover
-            persistTableHead
-          />
+          <DataTable columns={columns} data={data} pagination highlightOnHover persistTableHead />
         )}
       </CCardBody>
     </CCard>

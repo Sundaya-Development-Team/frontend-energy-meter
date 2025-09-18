@@ -90,10 +90,10 @@ const ReceivingSerialQc = () => {
         setQcName(response.data.category)
         setQuestionData(convertedQuestions)
 
-        // inisialisasi semua jawaban default ke false
+        // inisialisasi semua jawaban default ke true
         const initialAnswers = {}
         convertedQuestions.forEach((q) => {
-          initialAnswers[q.id] = false
+          initialAnswers[q.id] = true
         })
         setAnswers(initialAnswers)
 
@@ -101,10 +101,17 @@ const ReceivingSerialQc = () => {
         fetchProduct(serialNumber)
       } else {
         toast.error(response.data.message ?? 'Serial number already scan')
+        setQuestionData([])
+        setAnswers({})
+        setFormData({ serialNumber: '', notes: '' })
       }
     } catch (error) {
       console.log('ERROR')
       toast.error(error.response?.data?.message || 'Serial Number Validation Failed')
+
+      setQuestionData([])
+      setAnswers({})
+      setFormData({ serialNumber: '', notes: '' })
     }
   }
 
