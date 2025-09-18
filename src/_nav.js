@@ -183,63 +183,63 @@ const _nav = [
       // },
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'On Test',
-    to: '/production/on',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/on/before',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Quality Control',
-      //   to: '/production/on/qc',
-      // },
-      {
-        component: CNavItem,
-        name: 'QC Test ON',
-        to: '/production/serialnoaql/QC-OT004/Test ON',
-      },
+  // {
+  //   component: CNavGroup,
+  //   name: 'On Test',
+  //   to: '/production/on',
+  //   icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+  //   items: [
+  //     // {
+  //     //   component: CNavItem,
+  //     //   name: 'Scan Before',
+  //     //   to: '/production/on/before',
+  //     // },
+  //     // {
+  //     //   component: CNavItem,
+  //     //   name: 'Quality Control',
+  //     //   to: '/production/on/qc',
+  //     // },
+  //     {
+  //       component: CNavItem,
+  //       name: 'QC Test ON',
+  //       to: '/production/serialnoaql/QC-OT004/Test ON',
+  //     },
 
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan After',
-      //   to: '/production/on/after',
-      // },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Hipot Test',
-    to: '/production/hipot',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/hipot/before',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Quality Control',
-      //   to: '/production/hipot/qc',
-      // },
-      {
-        component: CNavItem,
-        name: 'QC Hipot Test',
-        to: '/production/serialnoaql/QC-HT005/Hipot Test',
-      },
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan After',
-      //   to: '/production/hipot/after',
-      // },
-    ],
-  },
+  //     // {
+  //     //   component: CNavItem,
+  //     //   name: 'Scan After',
+  //     //   to: '/production/on/after',
+  //     // },
+  //   ],
+  // },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Hipot Test',
+  //   to: '/production/hipot',
+  //   icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+  //   items: [
+  //     // {
+  //     //   component: CNavItem,
+  //     //   name: 'Scan Before',
+  //     //   to: '/production/hipot/before',
+  //     // },
+  //     // {
+  //     //   component: CNavItem,
+  //     //   name: 'Quality Control',
+  //     //   to: '/production/hipot/qc',
+  //     // },
+  //     {
+  //       component: CNavItem,
+  //       name: 'QC Hipot Test',
+  //       to: '/production/serialnoaql/QC-HT005/Hipot Test',
+  //     },
+  //     // {
+  //     //   component: CNavItem,
+  //     //   name: 'Scan After',
+  //     //   to: '/production/hipot/after',
+  //     // },
+  //   ],
+  // },
   {
     component: CNavGroup,
     name: 'Calibration Test',
