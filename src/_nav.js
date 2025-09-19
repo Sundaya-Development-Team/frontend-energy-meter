@@ -263,12 +263,17 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Calibration Test',
+        name: 'QC Calibration 1',
         to: '/production/serialnoaql/QC-CT006/Calibration Test',
       },
       {
         component: CNavItem,
-        name: 'QC Calibration 2 Test',
+        name: 'QC Ultrasonic',
+        to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
+      },
+      {
+        component: CNavItem,
+        name: 'QC Calibration 2',
         to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
       },
     ],
@@ -304,6 +309,19 @@ const _nav = [
       //   name: 'Scan After',
       //   to: '/production/aging/after',
       // },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Ref. Meter Test',
+    to: '/production/refmeter',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'QC Ref. Meter',
+        to: '/production/serialaql/QC-RN013/Ref. Meter Test',
+      },
     ],
   },
   {
