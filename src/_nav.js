@@ -367,6 +367,16 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Print Laser Post 1',
+        to: '/production/finishing/printlaser/post1',
+      },
+      {
+        component: CNavItem,
+        name: 'Print Laser Post 2',
+        to: '/production/finishing/printlaser/post2',
+      },
+      {
+        component: CNavItem,
         name: 'Check Side & Cover Serial',
         to: '/production/finishing/comparePlnSerial',
       },
