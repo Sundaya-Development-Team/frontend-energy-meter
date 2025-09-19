@@ -313,7 +313,7 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Ref. Meter Test',
+    name: 'Ref. Meter',
     to: '/production/refmeter',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
@@ -345,26 +345,21 @@ const _nav = [
       //   name: 'Scan After',
       //   to: '/production/clearzero/after',
       // },
-      {
-        component: CNavItem,
-        name: 'QC Clear Zero 1',
-        to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
-      },
-      {
-        component: CNavItem,
-        name: 'Closing Cover',
-        to: '/production/serialnoaql/QC-CC009/Closing Cover',
-      },
-      {
-        component: CNavItem,
-        name: 'QC Clear Zero 2',
-        to: '/production/serialnoaql/QC-CZ2010/Clear Zero 2',
-      },
-      {
-        component: CNavItem,
-        name: 'QC Ref. Meter',
-        to: '/production/serialnoaql/QC-RM013/Reference Meter',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Clear Zero 1',
+      //   to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Closing Cover',
+      //   to: '/production/serialnoaql/QC-CC009/Closing Cover',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Clear Zero 2',
+      //   to: '/production/serialnoaql/QC-CZ2010/Clear Zero 2',
+      // },
       {
         component: CNavItem,
         name: 'SCAN PLN Serial',
