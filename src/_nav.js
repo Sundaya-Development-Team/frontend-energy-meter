@@ -242,7 +242,7 @@ const _nav = [
   // },
   {
     component: CNavGroup,
-    name: 'Calibration Test',
+    name: 'Calibration & Ultrasonic',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
@@ -264,7 +264,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Calibration 1',
-        to: '/production/serialnoaql/QC-CT006/Calibration Test',
+        to: '/production/serialnoaql/QC-CT006/Calibration 1 Test',
       },
       {
         component: CNavItem,
@@ -301,8 +301,8 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Aging Test',
-        to: '/production/serialaql/QC-AT007/Aging Test',
+        name: 'QC Aging',
+        to: '/production/serialaql/QC-AT007/Aging',
       },
       // {
       //   component: CNavItem,
@@ -320,7 +320,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Ref. Meter',
-        to: '/production/serialaql/QC-RN013/Ref. Meter Test',
+        to: '/production/serialaql/QC-RN013/QC Ref. Meter',
       },
     ],
   },
