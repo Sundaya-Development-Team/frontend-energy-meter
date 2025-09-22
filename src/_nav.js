@@ -133,12 +133,12 @@ const _nav = [
   //   to: '/production/nonAqlUnits',
   //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   // },
-  {
-    component: CNavItem,
-    name: 'Batch Production',
-    to: '/production/batch',
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Batch Production',
+  //   to: '/production/batch',
+  //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  // },
 
   {
     component: CNavGroup,
