@@ -79,7 +79,7 @@ const PlnSerialComparator = () => {
               <CRow className="mb-3">
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
-                    src={`/src/assets/images/assembly/pcb_serial_number.jpeg`}
+                    src={`/src/assets/images/assembly/kwhm_pln_serial_side.jpeg`}
                     alt="Side Cover Preview"
                     fluid
                     className="mt-2"
@@ -121,7 +121,7 @@ const PlnSerialComparator = () => {
               <CRow className="mb-3">
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
-                    src={`/src/assets/images/assembly/side_cover_serial_number.jpeg`}
+                    src={`/src/assets/images/assembly/tutup_cover.jpeg`}
                     alt="Front Cover Preview"
                     fluid
                     className="mt-2"
