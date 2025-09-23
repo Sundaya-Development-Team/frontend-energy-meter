@@ -38,6 +38,10 @@ export const backendProductTypes = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/master-data/product-types`,
 })
 
+export const backendLevelInspection = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/master-datalevel-inspections`,
+})
+
 //Receiving
 export const backendReceiving = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/receiving`,

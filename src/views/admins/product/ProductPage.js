@@ -16,6 +16,13 @@ import {
   CModalTitle,
   CRow,
   CSpinner,
+  CImage,
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { toast, ToastContainer } from 'react-toastify'
@@ -58,6 +65,15 @@ const ProductPage = () => {
   const [totalRows, setTotalRows] = useState(0)
   const [searchKeyword, setSearchKeyword] = useState('')
 
+  const [inspectionModalVisible, setInspectionModalVisible] = useState(false)
+  const [editInspection, setEditInspection] = useState(null)
+  const [inspectionForm, setInspectionForm] = useState({
+    aql_critical: '',
+    aql_major: '',
+    used_defects: '',
+    notes: '',
+  })
+
   const fetchProducts = useCallback(async () => {
     setLoading(true)
     try {
@@ -71,6 +87,7 @@ const ProductPage = () => {
           include_details: true,
           include_categories: true,
           include_components: true,
+          include_level_inspections: true,
         },
       })
       setProducts(res.data.data || [])
@@ -187,6 +204,18 @@ const ProductPage = () => {
     setModalVisible(true)
   }
 
+  // Handler buka modal edit inspection
+  const handleEditInspection = (inspection) => {
+    setEditInspection(inspection)
+    setInspectionForm({
+      aql_critical: inspection.aql_critical || '',
+      aql_major: inspection.aql_major || '',
+      used_defects: inspection.used_defects || '',
+      notes: inspection.notes || '',
+    })
+    setInspectionModalVisible(true)
+  }
+
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return
     try {
@@ -197,6 +226,23 @@ const ProductPage = () => {
       resetForm()
     } catch {
       toast.error('Failed to delete product')
+    }
+  }
+
+  // Handler submit update inspection
+  const handleUpdateInspection = async (e) => {
+    e.preventDefault()
+    try {
+      const res = await backendProduct.put(
+        `/level-inspections/${editInspection.id}`,
+        inspectionForm,
+      )
+      toast.success(res.data?.message || 'Inspection updated')
+      setInspectionModalVisible(false)
+      setEditInspection(null)
+      fetchProducts() // refresh data
+    } catch {
+      toast.error('Failed to update inspection')
     }
   }
 
@@ -230,6 +276,8 @@ const ProductPage = () => {
 
   const ExpandedComponent = ({ data }) => (
     <div className="p-3 border-top bg-light rounded">
+      {/* Info produk */}
+      <strong>Product Info</strong>
       <CRow className="mb-2">
         <CCol md={6}>
           <strong>Name:</strong> {data.name}
@@ -238,6 +286,7 @@ const ProductPage = () => {
           <strong>SAP Code:</strong> {data.sap_code}
         </CCol>
       </CRow>
+
       <CRow className="mb-2">
         <CCol md={6}>
           <strong>Type:</strong> {data.type?.name || '-'}
@@ -246,6 +295,8 @@ const ProductPage = () => {
           <strong>Supplier:</strong> {data.supplier?.name || '-'}
         </CCol>
       </CRow>
+
+      {/* Image */}
       <CRow>
         <CCol>
           <strong>Image:</strong>
@@ -258,6 +309,47 @@ const ProductPage = () => {
           </div>
         </CCol>
       </CRow>
+
+      {/* Level inspections */}
+      {data.level_inspections && data.level_inspections.length > 0 && (
+        <div className="mt-4">
+          <strong>Level Inspections</strong>
+          <CTable striped bordered responsive>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell>Level</CTableHeaderCell>
+                <CTableHeaderCell>AQL Critical</CTableHeaderCell>
+                <CTableHeaderCell>AQL Major</CTableHeaderCell>
+                <CTableHeaderCell>AQL Minor</CTableHeaderCell>
+                <CTableHeaderCell>Used Defects</CTableHeaderCell>
+                <CTableHeaderCell>Notes</CTableHeaderCell>
+                <CTableHeaderCell>Actions</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {data.level_inspections.map((inspection) => (
+                <CTableRow key={inspection.id}>
+                  <CTableDataCell>{inspection.level}</CTableDataCell>
+                  <CTableDataCell>{inspection.aql_critical}</CTableDataCell>
+                  <CTableDataCell>{inspection.aql_major}</CTableDataCell>
+                  <CTableDataCell>{inspection.aql_minor}</CTableDataCell>
+                  <CTableDataCell>{inspection.used_defects}</CTableDataCell>
+                  <CTableDataCell>{inspection.notes}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton
+                      size="sm"
+                      color="info"
+                      onClick={() => handleEditInspection(inspection)}
+                    >
+                      Update
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
+        </div>
+      )}
     </div>
   )
 
@@ -399,6 +491,56 @@ const ProductPage = () => {
               </CButton>
               <CButton type="submit" color="primary">
                 {editData ? 'Update' : 'Create'}
+              </CButton>
+            </CModalFooter>
+          </CForm>
+        </CModal>
+
+        {/* Modal Update Inspection */}
+        <CModal visible={inspectionModalVisible} onClose={() => setInspectionModalVisible(false)}>
+          <CModalHeader>
+            <CModalTitle>Update Inspection Level</CModalTitle>
+          </CModalHeader>
+          <CForm onSubmit={handleUpdateInspection}>
+            <CModalBody>
+              <CFormLabel>AQL Critical</CFormLabel>
+              <CFormInput
+                type="number"
+                step="0.1"
+                value={inspectionForm.aql_critical}
+                onChange={(e) => setInspectionForm((p) => ({ ...p, aql_critical: e.target.value }))}
+                required
+              />
+
+              <CFormLabel className="mt-2">AQL Major</CFormLabel>
+              <CFormInput
+                type="number"
+                step="0.1"
+                value={inspectionForm.aql_major}
+                onChange={(e) => setInspectionForm((p) => ({ ...p, aql_major: e.target.value }))}
+                required
+              />
+
+              <CFormLabel className="mt-2">Used Defects</CFormLabel>
+              <CFormInput
+                type="text"
+                value={inspectionForm.used_defects}
+                onChange={(e) => setInspectionForm((p) => ({ ...p, used_defects: e.target.value }))}
+              />
+
+              <CFormLabel className="mt-2">Notes</CFormLabel>
+              <CFormInput
+                type="text"
+                value={inspectionForm.notes}
+                onChange={(e) => setInspectionForm((p) => ({ ...p, notes: e.target.value }))}
+              />
+            </CModalBody>
+            <CModalFooter>
+              <CButton color="secondary" onClick={() => setInspectionModalVisible(false)}>
+                Cancel
+              </CButton>
+              <CButton type="submit" color="primary">
+                Update
               </CButton>
             </CModalFooter>
           </CForm>
