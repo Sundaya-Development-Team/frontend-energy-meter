@@ -125,7 +125,7 @@ const SidePlnSerial = () => {
               <CRow className="mb-3">
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
-                    src={`/src/assets/images/assembly/side_cover_serial_number.jpeg`}
+                    src={`/src/assets/images/assembly/kwhm_product_serial_side.jpeg`}
                     alt="Side Product Serial Number"
                     fluid
                     className="mt-2"
@@ -173,7 +173,7 @@ const SidePlnSerial = () => {
               <CRow className="mb-3">
                 <CCol sm={12} className="d-flex justify-content-center">
                   <CImage
-                    src={`/src/assets/images/assembly/tutup_cover.jpeg`}
+                    src={`/src/assets/images/assembly/kwhm_pln_serial_side.jpeg`}
                     alt="Side PLN Serial Serial Number"
                     fluid
                     className="mt-2"
