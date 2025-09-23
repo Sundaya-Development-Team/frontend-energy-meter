@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow, CImage } from '@coreui/react'
+import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow } from '@coreui/react'
 import { toast } from 'react-toastify'
+import ImageContainer from '../../../components/common/ImageContainer' // ✅ Import komponen reusable
 
 const PlnSerialComparator = () => {
   const [formData, setFormData] = useState({
@@ -31,8 +32,8 @@ const PlnSerialComparator = () => {
     if (e.key === 'Enter') {
       e.preventDefault()
       if (formData.sidePlnSerial.trim() !== '') {
-        setSideDisabled(true) //disable side cover
-        setFrontDisabled(false) //enable front cover
+        setSideDisabled(true) // disable side cover
+        setFrontDisabled(false) // enable front cover
         setTimeout(() => {
           frontInputRef.current?.focus()
         }, 100)
@@ -77,13 +78,11 @@ const PlnSerialComparator = () => {
           <CCardBody>
             <CForm>
               <CRow className="mb-3">
-                <CCol sm={12} className="d-flex justify-content-center">
-                  <CImage
+                <CCol sm={12}>
+                  <ImageContainer
                     src={`/src/assets/images/assembly/kwhm_pln_serial_side.jpeg`}
                     alt="Side Cover Preview"
-                    fluid
-                    className="mt-2"
-                    style={{ width: '60%' }}
+                    height="300px"
                   />
                 </CCol>
               </CRow>
@@ -119,13 +118,11 @@ const PlnSerialComparator = () => {
           <CCardBody>
             <CForm>
               <CRow className="mb-3">
-                <CCol sm={12} className="d-flex justify-content-center">
-                  <CImage
+                <CCol sm={12}>
+                  <ImageContainer
                     src={`/src/assets/images/assembly/tutup_cover.jpeg`}
                     alt="Front Cover Preview"
-                    fluid
-                    className="mt-2"
-                    style={{ width: '60%' }}
+                    height="300px"
                   />
                 </CCol>
               </CRow>
