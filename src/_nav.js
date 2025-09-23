@@ -133,12 +133,12 @@ const _nav = [
   //   to: '/production/nonAqlUnits',
   //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
   // },
-  {
-    component: CNavItem,
-    name: 'Batch Production',
-    to: '/production/batch',
-    icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavItem,
+  //   name: 'Batch Production',
+  //   to: '/production/batch',
+  //   icon: <CIcon icon={cilFactory} customClassName="nav-icon" />,
+  // },
 
   {
     component: CNavGroup,
@@ -242,7 +242,7 @@ const _nav = [
   // },
   {
     component: CNavGroup,
-    name: 'Calibration Test',
+    name: 'Calibration & Ultrasonic',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
@@ -263,12 +263,17 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Calibration Test',
-        to: '/production/serialnoaql/QC-CT006/Calibration Test',
+        name: 'QC Calibration 1',
+        to: '/production/serialnoaql/QC-CT006/Calibration 1 Test',
       },
       {
         component: CNavItem,
-        name: 'QC Calibration 2 Test',
+        name: 'QC Ultrasonic',
+        to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
+      },
+      {
+        component: CNavItem,
+        name: 'QC Calibration 2',
         to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
       },
     ],
@@ -296,14 +301,27 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Aging Test',
-        to: '/production/serialaql/QC-AT007/Aging Test',
+        name: 'QC Aging',
+        to: '/production/serialaql/QC-AT007/Aging',
       },
       // {
       //   component: CNavItem,
       //   name: 'Scan After',
       //   to: '/production/aging/after',
       // },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Ref. Meter',
+    to: '/production/refmeter',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'QC Ref. Meter',
+        to: '/production/serialaql/QC-RN013/QC Ref. Meter',
+      },
     ],
   },
   {
@@ -327,30 +345,35 @@ const _nav = [
       //   name: 'Scan After',
       //   to: '/production/clearzero/after',
       // },
-      {
-        component: CNavItem,
-        name: 'QC Clear Zero 1',
-        to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
-      },
-      {
-        component: CNavItem,
-        name: 'Closing Cover',
-        to: '/production/serialnoaql/QC-CC009/Closing Cover',
-      },
-      {
-        component: CNavItem,
-        name: 'QC Clear Zero 2',
-        to: '/production/serialnoaql/QC-CZ2010/Clear Zero 2',
-      },
-      {
-        component: CNavItem,
-        name: 'QC Ref. Meter',
-        to: '/production/serialnoaql/QC-RM013/Reference Meter',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Clear Zero 1',
+      //   to: '/production/serialnoaql/QC-CZ1008/Clear Zero 1',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'Closing Cover',
+      //   to: '/production/serialnoaql/QC-CC009/Closing Cover',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Clear Zero 2',
+      //   to: '/production/serialnoaql/QC-CZ2010/Clear Zero 2',
+      // },
       {
         component: CNavItem,
         name: 'SCAN PLN Serial',
         to: '/production/finishing/scansidepln',
+      },
+      {
+        component: CNavItem,
+        name: 'Print Laser Post 1',
+        to: '/production/finishing/printlaser/post1',
+      },
+      {
+        component: CNavItem,
+        name: 'Print Laser Post 2',
+        to: '/production/finishing/printlaser/post2',
       },
       {
         component: CNavItem,

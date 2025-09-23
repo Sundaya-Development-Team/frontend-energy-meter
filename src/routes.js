@@ -103,6 +103,7 @@ const ScanAfterZeroClear = React.lazy(
 const PlnSerialComparator = React.lazy(
   () => import('./views/production/finishing/PlnSerialComparator'),
 )
+const PrintLaser = React.lazy(() => import('./views/production/finishing/PrintLaser'))
 
 // Closing Cover (tidak terpakai)
 // const ScanBeforeClosingCover = React.lazy(
@@ -355,7 +356,7 @@ const routes = [
   },
   {
     path: '/production/finishing/scansidepln',
-    name: 'Quality Control Clear Zero',
+    name: 'SCAN PLN & Production Barcode',
     element: SidePlnSerial,
   },
   {
@@ -378,6 +379,8 @@ const routes = [
     name: 'Check Side & Cover Serial',
     element: PlnSerialComparator,
   },
+  { path: '/production/finishing/printlaser/post1', name: 'Post 1', element: PrintLaser },
+  { path: '/production/finishing/printlaser/post2', name: 'Post 2', element: PrintLaser },
 
   // {
   //   path: '/production/closingcover',
