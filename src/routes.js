@@ -20,6 +20,7 @@ const GeneratePlnSerial = React.lazy(() => import('./views/admins/generate/Gener
 const ConfirmSerialLassered = React.lazy(
   () => import('./views/admins/generate/ConfirmSerialLassered'),
 )
+const Supplier = React.lazy(() => import('./views/admins/supplier/SupplierPage'))
 
 //Receiving
 const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder'))
@@ -196,6 +197,7 @@ const routes = [
   { path: '/admin/incoming', name: 'Incoming', element: Incoming },
   { path: '/admin/partner', name: 'Partner', element: Partner },
   { path: '/admin/product', name: 'Product', element: Product },
+  { path: '/admin/supplier', name: 'Supplier', element: Supplier },
   { path: '/admin/semiproduct', name: 'Semi Product', element: SemiProductPage },
   { path: '/admin/warehouse', name: 'Warehouse', element: WarehousesPage, exact: true },
   {
