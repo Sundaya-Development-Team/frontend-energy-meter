@@ -474,6 +474,13 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Req. Assembly to WH',
+    to: '/warehouse/assemblywhrequest',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+
+  {
+    component: CNavItem,
     name: 'Serial Stock Confirm',
     to: '/warehouse/serialstockconfirm',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,

@@ -24,7 +24,7 @@ const FormRow = ({ label, children }) => (
   </CRow>
 )
 
-const ReceivingWhRequest = () => {
+const AssemblyWhRequest = () => {
   const [warehouses, setWarehouses] = useState([])
   const [selectedWarehouse, setSelectedWarehouse] = useState('')
   const [data, setData] = useState([])
@@ -48,7 +48,7 @@ const ReceivingWhRequest = () => {
     async (page = 1) => {
       try {
         setLoading(true)
-        const res = await backendTracking.get(`/status/completed/summary/receiving_item_id`, {
+        const res = await backendTracking.get(`/status/completed/summary/assembly_id`, {
           params: { page, limit: pagination.limit },
         })
         if (res.data.success) {
@@ -87,7 +87,7 @@ const ReceivingWhRequest = () => {
     }
 
     const payload = {
-      items: selectedRows.map((id) => ({ receiving_item_id: id })),
+      items: selectedRows.map((id) => ({ assembly_id: id })),
       warehouse_id: Number(selectedWarehouse),
     }
 
@@ -113,7 +113,7 @@ const ReceivingWhRequest = () => {
 
   const handleSelectAll = (checked) => {
     if (checked) {
-      setSelectedRows(data.map((row) => row.receiving_item_id))
+      setSelectedRows(data.map((row) => row.assembly_id))
     } else {
       setSelectedRows([])
     }
@@ -143,8 +143,8 @@ const ReceivingWhRequest = () => {
       cell: (row) => (
         <input
           type="checkbox"
-          checked={selectedRows.includes(row.receiving_item_id)}
-          onChange={(e) => handleRowSelect(row.receiving_item_id, e.target.checked)}
+          checked={selectedRows.includes(row.assembly_id)}
+          onChange={(e) => handleRowSelect(row.assembly_id, e.target.checked)}
         />
       ),
       width: '120px',
@@ -221,4 +221,4 @@ const ReceivingWhRequest = () => {
   )
 }
 
-export default ReceivingWhRequest
+export default AssemblyWhRequest
