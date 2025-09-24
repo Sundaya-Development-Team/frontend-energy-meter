@@ -214,6 +214,27 @@ const ReceivingHeader = () => {
     }
   }
 
+  const addAllProducts = () => {
+    if (!productsData || productsData.length === 0) {
+      toast.warn('Tidak ada product master untuk ditambahkan.')
+      return
+    }
+
+    const newDetails = productsData.map((p) => ({
+      sap_code: p.sap_code,
+      name: p.name,
+      product_id: p.id,
+      product_type: p.type?.name || '',
+      ref_quantity: '', // default kosong
+      serialize: p.is_serialize ?? false,
+    }))
+
+    setFormData((prev) => ({
+      ...prev,
+      details: newDetails,
+    }))
+  }
+
   return (
     <CRow>
       <CCol md={12}>
@@ -277,9 +298,19 @@ const ReceivingHeader = () => {
 
               <CFormLabel className="fw-bold mt-3">List of Product</CFormLabel>
               <br />
-              <CButton color="primary" type="button" onClick={addProduct} className="mb-2">
-                + Add Product
-              </CButton>
+              <div className="d-flex gap-2 mb-2">
+                <CButton color="primary" type="button" onClick={addProduct}>
+                  + Add Product
+                </CButton>
+                <CButton
+                  color="success"
+                  type="button"
+                  onClick={addAllProducts}
+                  className="text-white"
+                >
+                  + Add All Products
+                </CButton>
+              </div>
 
               {!isSmallScreen ? (
                 // TABLE VIEW for Desktop / Tablet
