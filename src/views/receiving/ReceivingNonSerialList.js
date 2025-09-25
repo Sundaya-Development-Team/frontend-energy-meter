@@ -67,8 +67,8 @@ const ReceivingNonSerialQc = () => {
     setPage(1)
   }
 
-  const handleSelectDetail = (receivingItemId) => {
-    navigate(`/receiving/detailnonserialqc/${receivingItemId}`)
+  const handleSelectDetail = (tracking_id) => {
+    navigate(`/receiving/detailnonserialqc/${tracking_id}`)
   }
 
   const columns = [
