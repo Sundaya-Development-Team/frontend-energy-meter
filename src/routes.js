@@ -20,6 +20,7 @@ const GeneratePlnSerial = React.lazy(() => import('./views/admins/generate/Gener
 const ConfirmSerialLassered = React.lazy(
   () => import('./views/admins/generate/ConfirmSerialLassered'),
 )
+const Supplier = React.lazy(() => import('./views/admins/supplier/SupplierPage'))
 
 //Receiving
 const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder'))
@@ -122,6 +123,7 @@ const IncomingWarehouse = React.lazy(() => import('./views/warehouse/IncomingWar
 const OutcomingWarehouse = React.lazy(() => import('./views/warehouse/OutcomingWarehouse'))
 const WarehouseMaster = React.lazy(() => import('./views/warehouse/WarehouseMaster'))
 const ReceivingWhRequest = React.lazy(() => import('./views/warehouse/ReceivingWhRequest'))
+const AssemblyWhRequest = React.lazy(() => import('./views/warehouse/AssemblyWhRequest'))
 const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStockConfirm'))
 const AssemblyOrderConfirmation = React.lazy(
   () => import('./views/warehouse/AssemblyOrderConfirmation'),
@@ -196,6 +198,7 @@ const routes = [
   { path: '/admin/incoming', name: 'Incoming', element: Incoming },
   { path: '/admin/partner', name: 'Partner', element: Partner },
   { path: '/admin/product', name: 'Product', element: Product },
+  { path: '/admin/supplier', name: 'Supplier', element: Supplier },
   { path: '/admin/semiproduct', name: 'Semi Product', element: SemiProductPage },
   { path: '/admin/warehouse', name: 'Warehouse', element: WarehousesPage, exact: true },
   {
@@ -522,6 +525,11 @@ const routes = [
     path: '/warehouse/receivingwhrequest',
     name: 'Receiving WH Request',
     element: ReceivingWhRequest,
+  },
+  {
+    path: '/warehouse/assemblywhrequest',
+    name: 'Assembly WH Request',
+    element: AssemblyWhRequest,
   },
   {
     path: '/warehouse/serialstockconfirm',

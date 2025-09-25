@@ -415,6 +415,12 @@ const _nav = [
     to: '/admin/product',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'SAP Supplier',
+    to: '/admin/supplier',
+    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+  },
   // {
   //   component: CNavTitle,
   //   name: 'Inventory',
@@ -466,6 +472,13 @@ const _nav = [
     to: '/warehouse/receivingwhrequest',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'Req. Assembly to WH',
+    to: '/warehouse/assemblywhrequest',
+    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+  },
+
   {
     component: CNavItem,
     name: 'Serial Stock Confirm',
