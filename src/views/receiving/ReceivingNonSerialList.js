@@ -99,7 +99,7 @@ const ReceivingNonSerialQc = () => {
         <CButton
           size="sm"
           color="primary"
-          onClick={() => handleSelectDetail(row.receiving_item_id)}
+          onClick={() => handleSelectDetail(row.tracking_items?.[0]?.tracking_id)}
         >
           Inspect
         </CButton>
