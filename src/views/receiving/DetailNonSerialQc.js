@@ -134,7 +134,7 @@ const DetailNonSerialQc = () => {
     } finally {
       setLoading(false)
     }
-  }, [trackingId, fetchTrackingSumary]) // 👈 dependensi ditambah
+  }, [trackingId, fetchTrackingSumary]) // dependensi ditambah
 
   useEffect(() => {
     fetchDetail()
@@ -198,6 +198,7 @@ const DetailNonSerialQc = () => {
       inspector_name: 'Inspector A',
       qc_name: qcName,
       qc_id: qcIdReceivingSerial,
+      receiving_item_id: detail.receiving_item_id,
       qc_place: 'Receiving',
       tracking_id: detail.id,
       notes: formData.notes,
@@ -223,7 +224,7 @@ const DetailNonSerialQc = () => {
       setAnswers(resetAnswers)
       setFormData({ notes: '' })
 
-      // 🔄 Fetch ulang summary agar data remaining sample selalu up to date
+      // Fetch ulang summary agar data remaining sample selalu up to date
       fetchTrackingSumary(detail.receiving_item_id, detail.product.qc_product)
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || 'Failed to submit QC')
