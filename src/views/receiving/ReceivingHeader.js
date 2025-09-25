@@ -27,6 +27,7 @@ const fetchMasters = () =>
       search: '',
       sortBy: 'name',
       sortOrder: 'asc',
+      is_active: true,
       include_details: true,
       include_categories: true,
       include_components: true,
