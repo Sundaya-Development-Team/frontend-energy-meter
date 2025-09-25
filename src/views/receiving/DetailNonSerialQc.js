@@ -68,9 +68,11 @@ const DetailNonSerialQc = () => {
         if (summary.remaining_samples <= 0) {
           toast.error(
             <span>
-              <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
+              <span style={{ color: 'red', fontWeight: 'bold' }}>NO MORE SAMPLES REQUIRED !</span>
             </span>,
           )
+          setQuestionData([])
+          setIsQcValid(false)
         } else {
           fetchValidationQc(trackingId, qcId)
         }
@@ -187,7 +189,7 @@ const DetailNonSerialQc = () => {
     e.preventDefault()
 
     if (!detail) {
-      toast.error('Data produk tidak ditemukan')
+      toast.error('Product data not found')
       return
     }
 
@@ -221,21 +223,10 @@ const DetailNonSerialQc = () => {
       setAnswers(resetAnswers)
       setFormData({ notes: '' })
 
-      // Update summary secara manual (optimistic update)
-      setInspectionSummary((prev) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          remaining_samples: Math.max(prev.remaining_samples - 1, 0),
-          inspected_samples: (prev.inspected_samples ?? 0) + 1,
-          fail_count:
-            payload.answers && Object.values(payload.answers).includes(false)
-              ? (prev.fail_count ?? 0) + 1
-              : prev.fail_count,
-        }
-      })
+      // 🔄 Fetch ulang summary agar data remaining sample selalu up to date
+      fetchTrackingSumary(detail.receiving_item_id, detail.product.qc_product)
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
+      toast.error(error.response?.data?.message || error.message || 'Failed to submit QC')
     }
   }
 
