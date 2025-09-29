@@ -83,6 +83,8 @@ const AssemblySerialList = () => {
     try {
       await backendGenerate.patch('/production/print-by-ids', { ids })
       toast.success('Print status updated successfully!')
+
+      fetchRecords()
     } catch (error) {
       console.error('Error update print status:', error)
       toast.error(error.response?.data?.message || 'Failed to update print status')
