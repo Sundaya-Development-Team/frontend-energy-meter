@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -15,27 +15,46 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked } from '@coreui/icons'
+import { backendAuth } from '../../../api/axios'
+import { useAuth } from '../../../context/AuthContext'
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  })
+  const [formData, setFormData] = useState({ emailOrUsername: '', password: '' })
+  const navigate = useNavigate()
+  const { login } = useAuth()
+
+  // Hapus localStorage setiap kali halaman login dibuka
+  useEffect(() => {
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    localStorage.removeItem('expiresIn')
+  }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!formData.email || !formData.password) {
-      alert('Email dan Password wajib diisi!')
-      return
-    }
+    try {
+      const res = await backendAuth.post('/login', {
+        emailOrUsername: formData.emailOrUsername, // bisa email atau username
+        password: formData.password,
+      })
 
-    // TODO: Ganti dengan fungsi login atau request ke backend
-    console.log('Logging in with:', formData)
+      if (res.data.success) {
+        const { user, token, expiresIn } = res.data.data
+        login({ user, token })
+        localStorage.setItem('expiresIn', expiresIn)
+        navigate('/dashboard')
+      } else {
+        alert(res.data.message || 'Login gagal')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Login gagal, periksa kembali email/username dan password')
+    }
   }
 
   return (
@@ -53,12 +72,11 @@ const Login = () => {
                     <CInputGroup className="mb-3">
                       <CInputGroupText>@</CInputGroupText>
                       <CFormInput
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="Email"
+                        type="text"
+                        name="emailOrUsername"
+                        placeholder="Email Or Username"
                         autoComplete="username"
-                        value={formData.email}
+                        value={formData.emailOrUsername}
                         onChange={handleChange}
                         required
                       />
@@ -70,7 +88,6 @@ const Login = () => {
                       </CInputGroupText>
                       <CFormInput
                         type="password"
-                        id="password"
                         name="password"
                         placeholder="Password"
                         autoComplete="current-password"
@@ -85,11 +102,6 @@ const Login = () => {
                         <CButton type="submit" color="primary" className="px-4">
                           Login
                         </CButton>
-                      </CCol>
-                      <CCol xs={6} className="text-end">
-                        <Link to="/forgot-password" className="btn btn-link px-0">
-                          Forgot password?
-                        </Link>
                       </CCol>
                     </CRow>
                   </CForm>

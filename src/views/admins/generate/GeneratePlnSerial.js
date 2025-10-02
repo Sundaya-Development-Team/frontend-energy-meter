@@ -80,6 +80,9 @@ const GeneratePlnSerial = () => {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+
+    // tampilkan toast setelah download
+    toast.success('Download success!')
   }
 
   // definisi kolom untuk DataTable
@@ -109,7 +112,7 @@ const GeneratePlnSerial = () => {
 
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
-                <FormRow label="Reference PO AO / PO">
+                <FormRow label="Reference AO / PO">
                   <CFormInput
                     name="referencePO"
                     value={formData.referencePO}

@@ -1,6 +1,5 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-
 import {
   CCloseButton,
   CImage,
@@ -10,30 +9,27 @@ import {
   CSidebarHeader,
   CSidebarToggler,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
 
 import { AppSidebarNav } from './AppSidebarNav'
 
-import { logo } from 'src/assets/brand/logo'
-import { sygnet } from 'src/assets/brand/sygnet'
-
 // sidebar nav config
 import navigation from '../_nav'
+import { useAuth } from '../context/AuthContext'
+import { filterNavByPermissions } from '../utils/FilterNav'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
-  const customVars = {
-    '--cui-sidebar-bg': '#e55353',
-    '--cui-sidebar-color': '#eee',
-  }
+
+  // ambil user dari AuthContext
+  const { user } = useAuth()
+  const filteredNav = filterNavByPermissions(navigation, user?.permissions || [])
 
   return (
     <CSidebar
       className="border-end"
       colorScheme="dark"
-      // style={customVars}
       position="fixed"
       unfoldable={unfoldable}
       visible={sidebarShow}
@@ -55,8 +51,6 @@ const AppSidebar = () => {
             thumbnail
             src="/src/assets/images/white_logo.PNG"
           />
-          {/* <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} /> */}
-          {/* <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} /> */}
         </CSidebarBrand>
         <CCloseButton
           className="d-lg-none"
@@ -64,7 +58,10 @@ const AppSidebar = () => {
           onClick={() => dispatch({ type: 'set', sidebarShow: false })}
         />
       </CSidebarHeader>
-      <AppSidebarNav items={navigation} />
+
+      {/* 🔥 pakai nav hasil filter */}
+      <AppSidebarNav items={filteredNav} />
+
       <CSidebarFooter className="border-top d-none d-lg-flex">
         <CSidebarToggler
           onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}

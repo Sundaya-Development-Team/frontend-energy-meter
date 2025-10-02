@@ -80,6 +80,11 @@ export const backendUploadFile = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v1/upload-service`,
 })
 
+//auth
+export const backendAuth = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/auth`,
+})
+
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,
 // })
