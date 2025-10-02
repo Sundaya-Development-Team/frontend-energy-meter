@@ -1,14 +1,14 @@
 import React from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 
-const DefaultLayout = () => {
+const DefaultLayout = ({ children }) => {
   return (
-    <div>
+    <div className="app d-flex">
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
         <AppHeader />
         <div className="body flex-grow-1">
-          <AppContent />
+          <div className="container-lg">{children ? children : <AppContent />}</div>
         </div>
         <AppFooter />
       </div>
