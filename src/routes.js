@@ -58,6 +58,19 @@ const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
 //MAster Supplier
 const Supplier = React.lazy(() => import('./views/admins/supplier/SupplierPage'))
 
+// Warehouse
+const AssemblyOrderConfirmation = React.lazy(
+  () => import('./views/warehouse/AssemblyOrderConfirmation'),
+)
+const WarehouseStock = React.lazy(() => import('./views/warehouse/WarehouseStock'))
+const WarehouseMaster = React.lazy(() => import('./views/warehouse/WarehouseMaster'))
+const ReceivingWhRequest = React.lazy(() => import('./views/warehouse/ReceivingWhRequest'))
+const AssemblyWhRequest = React.lazy(() => import('./views/warehouse/AssemblyWhRequest'))
+const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStockConfirm'))
+
+//Admin Generate Serial PLN
+const GeneratePlnSerial = React.lazy(() => import('./views/admins/generate/GeneratePlnSerial'))
+
 const routes = [
   //Dashboard
   {
@@ -365,6 +378,96 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <Supplier />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
+  //Warehouse
+  { path: '/warehouse', name: 'Warehouse' },
+
+  //Warehouse Outgoing
+  { path: '/warehouse/outgoing', name: 'Outgoing' },
+  {
+    path: '/warehouse/outgoing/assemblyorder',
+    name: 'Acc. Assembly order',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <AssemblyOrderConfirmation />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
+  //Warehouse Stock
+  { path: '/warehouse/stock', name: 'Stock' },
+  {
+    path: '/warehouse/stock/warehouseStock',
+    name: 'Stock Opname',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <WarehouseStock />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/warehouseMaster',
+    name: 'Warehouse Data Master',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <WarehouseMaster />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/receivingwhrequest',
+    name: 'Receiving to WH Request List',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ReceivingWhRequest />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/assemblywhrequest',
+    name: 'Assembly to WH Request',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <AssemblyWhRequest />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/serialstockconfirm',
+    name: 'Assembly Order Confirmation',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <SerialStockConfirm />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  //Admin
+  { path: '/admin', name: 'Admin' },
+  //Generate
+  { path: '/admin/generate', name: 'Generate' },
+  {
+    path: '/admin/generate/plnserial',
+    name: 'Geneare PLN Serial',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <GeneratePlnSerial />
         </DefaultLayout>
       </PrivateRoutes>
     ),
