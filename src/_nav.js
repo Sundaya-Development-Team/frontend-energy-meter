@@ -307,18 +307,18 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'Product',
+    name: 'Master Data',
   },
   {
     component: CNavItem,
-    name: 'SAP Product',
-    to: '/admin/product',
+    name: 'Master Product',
+    to: '/masterdata/product',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
-    name: 'SAP Supplier',
-    to: '/admin/supplier',
+    name: 'Master Supplier',
+    to: '/masterdata/supplier',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
   },
   {
