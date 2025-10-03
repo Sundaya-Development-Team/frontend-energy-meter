@@ -334,7 +334,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'WH Stock (Opname)',
-    to: '/warehouse/stock/WarehouseStock',
+    to: '/warehouse/stock/warehouseStock',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
   {
@@ -363,34 +363,34 @@ const _nav = [
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
   },
 
-  {
-    component: CNavTitle,
-    name: 'Delivery',
-  },
-  {
-    component: CNavGroup,
-    name: 'Packing',
-    to: '/delivery/packing',
-    icon: <CIcon icon={cilShareBoxed} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Scan Packing 1',
-        to: '/delivery/packing/before',
-      },
-      {
-        component: CNavItem,
-        name: 'Scan Packing 2',
-        to: '/delivery/packing/after',
-      },
-    ],
-  },
-  {
-    component: CNavItem,
-    name: 'Scan',
-    to: '/delivery/scan',
-    icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
-  },
+  // {
+  //   component: CNavTitle,
+  //   name: 'Delivery',
+  // },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Packing',
+  //   to: '/delivery/packing',
+  //   icon: <CIcon icon={cilShareBoxed} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Scan Packing 1',
+  //       to: '/delivery/packing/before',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'Scan Packing 2',
+  //       to: '/delivery/packing/after',
+  //     },
+  //   ],
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Scan',
+  //   to: '/delivery/scan',
+  //   icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
+  // },
   {
     component: CNavTitle,
     name: 'Admins',
