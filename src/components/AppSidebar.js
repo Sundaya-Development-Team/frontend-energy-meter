@@ -15,7 +15,7 @@ import { AppSidebarNav } from './AppSidebarNav'
 // sidebar nav config
 import navigation from '../_nav'
 import { useAuth } from '../context/AuthContext'
-import { filterNavByPermissions } from '../utils/FilterNav'
+import { filterNavByPermissions } from '../utils/FilterNavEdit'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
