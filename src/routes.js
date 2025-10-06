@@ -1,5 +1,5 @@
 import React, { lazy } from 'react'
-import PrivateRoutes from './privateRoutes'
+import PrivateRoutes from './PrivateRoutes'
 
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'))
 const Dashboard = lazy(() => import('./views/dashboard/Dashboard'))
