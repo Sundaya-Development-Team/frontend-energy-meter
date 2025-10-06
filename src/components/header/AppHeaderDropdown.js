@@ -19,12 +19,22 @@ import {
   cilSettings,
   cilTask,
   cilUser,
+  cilPowerStandby,
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-
+import { useNavigate } from 'react-router-dom' // 🔑 import navigate
+import { useAuth } from '../../context/AuthContext'
 import avatar8 from './../../assets/images/avatars/8.jpg'
 
 const AppHeaderDropdown = () => {
+  const { logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout() // clear user & token
+    navigate('/login') // redirect ke login
+  }
+
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
@@ -60,6 +70,7 @@ const AppHeaderDropdown = () => {
             42
           </CBadge>
         </CDropdownItem>
+
         <CDropdownHeader className="bg-body-secondary fw-semibold my-2">Settings</CDropdownHeader>
         <CDropdownItem href="#">
           <CIcon icon={cilUser} className="me-2" />
@@ -83,10 +94,19 @@ const AppHeaderDropdown = () => {
             42
           </CBadge>
         </CDropdownItem>
+
         <CDropdownDivider />
-        <CDropdownItem href="#">
-          <CIcon icon={cilLockLocked} className="me-2" />
-          Lock Account
+
+        {/* 🔴 Ubah Lock Account jadi Logout */}
+        <CDropdownItem
+          href="#"
+          onClick={(e) => {
+            e.preventDefault()
+            handleLogout()
+          }}
+        >
+          <CIcon icon={cilPowerStandby} className="me-2" />
+          Logout
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>
