@@ -300,7 +300,7 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Check Side & Cover Serial',
+        name: 'Matching PLN Serial',
         to: '/production/finishing/comparePlnSerial',
       },
     ],
