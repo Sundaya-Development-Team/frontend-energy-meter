@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import { backendReceiving } from '../../api/axios'
