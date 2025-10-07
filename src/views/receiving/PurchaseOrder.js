@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import { backendReceiving } from '../../api/axios'
 import { useAuth } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 import {
   CButton,
@@ -25,6 +26,7 @@ const getTodayJakarta = () => {
 
 const ReceivingHeader = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     po_number: '',
     order_date: getTodayJakarta(),
@@ -47,6 +49,7 @@ const ReceivingHeader = () => {
     //login validation
     if (!user?.id || !user?.username) {
       toast.error('You must be logged in to submit a Purchase Order.')
+      setTimeout(() => navigate('/login'), 1500)
       return
     }
 

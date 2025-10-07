@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react'
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
@@ -33,7 +33,7 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <HashRouter>
+      <BrowserRouter>
         <Suspense
           fallback={
             <div className="pt-3 text-center">
@@ -54,7 +54,7 @@ const App = () => {
             <Route path="*" element={<Login />} />
           </Routes>
         </Suspense>
-      </HashRouter>
+      </BrowserRouter>
     </AuthProvider>
   )
 }
