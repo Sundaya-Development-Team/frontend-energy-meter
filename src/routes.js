@@ -318,17 +318,6 @@ const routes = [
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
-          <PlnSerialComparator />
-        </DefaultLayout>
-      </PrivateRoutes>
-    ),
-  },
-  {
-    path: '/production/finishing/printlaser/post2',
-    name: 'Post 2',
-    element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
-        <DefaultLayout>
           <PrintLaser />
         </DefaultLayout>
       </PrivateRoutes>
@@ -351,7 +340,7 @@ const routes = [
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
-          <PrintLaser />
+          <PlnSerialComparator />
         </DefaultLayout>
       </PrivateRoutes>
     ),
