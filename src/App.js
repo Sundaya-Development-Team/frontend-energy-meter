@@ -8,6 +8,8 @@ import './scss/examples.scss'
 import { AuthProvider } from './context/AuthContext'
 
 import routes from './routes'
+//ToastContainer
+import ToastContainerWrapper from './components/ToastContainerWrapper'
 
 // Pages
 const Login = React.lazy(() => import('./views/pages/login/Login'))
@@ -34,6 +36,7 @@ const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ToastContainerWrapper />
         <Suspense
           fallback={
             <div className="pt-3 text-center">
