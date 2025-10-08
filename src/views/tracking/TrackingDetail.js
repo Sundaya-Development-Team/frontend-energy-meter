@@ -18,6 +18,7 @@ import {
   CBadge,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
+const VITE_SERVER_DATA = import.meta.env.VITE_SERVER_DATA
 
 const TrackingDetail = () => {
   const { trackingId } = useParams()
@@ -65,20 +66,44 @@ const TrackingDetail = () => {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
   }
 
-  const handleReport = async (qc) => {
-    try {
-      const res = await backendUploadFile.get(`/qc-test-report/stream`, {
-        params: { path: qc.file_path },
-        responseType: 'blob',
-      })
+  // const handleReport = async (qc) => {
+  //   try {
+  //     const res = await backendUploadFile.get(`/qc-test-report/stream`, {
+  //       params: { path: qc.file_path },
+  //       responseType: 'blob',
+  //     })
 
-      // buat URL blob
-      const fileURL = window.URL.createObjectURL(new Blob([res.data]))
-      // buka di tab baru
-      window.open(fileURL, '_blank')
+  //     // buat URL blob
+  //     const fileURL = window.URL.createObjectURL(new Blob([res.data]))
+  //     // buka di tab baru
+  //     window.open(fileURL, '_blank')
+  //   } catch (err) {
+  //     console.error(err)
+  //     toast.error('Failed to download file')
+  //   }
+  // }
+
+  const handleReport = (qc) => {
+    if (!qc?.file_path) {
+      toast.error('Path file tidak tersedia')
+      return
+    }
+
+    const fileUrl = `${VITE_SERVER_DATA}/api/v1/upload-service/qc-test-report/stream?path=${encodeURIComponent(
+      qc.file_path,
+    )}`
+
+    try {
+      const newTab = window.open(fileUrl, '_blank')
+
+      if (newTab) {
+        toast.success('File berhasil dibuka di tab baru')
+      } else {
+        toast.error('Tidak dapat membuka tab baru — periksa popup blocker browser kamu')
+      }
     } catch (err) {
-      console.error(err)
-      toast.error('Failed to download file')
+      console.error('Error membuka file:', err)
+      toast.error('Terjadi kesalahan saat membuka file')
     }
   }
 
