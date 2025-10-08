@@ -23,12 +23,26 @@ const Login = () => {
   const navigate = useNavigate()
   const { login } = useAuth()
 
-  // Hapus localStorage setiap kali halaman login dibuka
+  // Cek apakah token masih valid
   useEffect(() => {
-    localStorage.removeItem('user')
-    localStorage.removeItem('token')
-    localStorage.removeItem('expiresIn')
-  }, [])
+    const token = localStorage.getItem('token')
+    const expiresAt = localStorage.getItem('expiresAt') // timestamp expiry
+    console.log('expired_at : ', expiresAt)
+    if (token && expiresAt) {
+      const now = Date.now()
+      if (now < Number(expiresAt)) {
+        navigate('/dashboard')
+        console.log('Auto Login')
+        return
+      } else {
+        console.log('Expired Login')
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+        localStorage.removeItem('expiresIn')
+        localStorage.removeItem('expiresAt')
+      }
+    }
+  }, [navigate])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -39,14 +53,23 @@ const Login = () => {
     e.preventDefault()
     try {
       const res = await backendAuth.post('/login', {
-        emailOrUsername: formData.emailOrUsername, // bisa email atau username
+        emailOrUsername: formData.emailOrUsername,
         password: formData.password,
       })
 
       if (res.data.success) {
         const { user, token, expiresIn } = res.data.data
+
+        // Simpan waktu kedaluwarsa dalam milidetik
+        let expiresAt = Date.now()
+        if (expiresIn === '24h') {
+          expiresAt += 24 * 60 * 60 * 1000
+        }
+
         login({ user, token })
         localStorage.setItem('expiresIn', expiresIn)
+        localStorage.setItem('expiresAt', expiresAt.toString())
+
         navigate('/dashboard')
       } else {
         alert(res.data.message || 'Login gagal')

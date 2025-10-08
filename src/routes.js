@@ -1,5 +1,5 @@
 import React, { lazy } from 'react'
-import PrivateRoutes from './privateRoutes'
+import PrivateRoutes from './PrivateRoutes'
 
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'))
 const Dashboard = lazy(() => import('./views/dashboard/Dashboard'))
@@ -8,10 +8,11 @@ const Dashboard = lazy(() => import('./views/dashboard/Dashboard'))
 const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder'))
 const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHeader'))
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
-const ReceivingSerialQc = React.lazy(() => import('./views/receiving/ReceivingSerialQc'))
 const ReceivingNonSerialList = React.lazy(
   () => import('./views/receiving/ReceivingNonSerialList.js'),
 )
+//QC Receiving
+const ReceivingSerialQc = React.lazy(() => import('./views/receiving/ReceivingSerialQc'))
 const DetailNonSerialQc = React.lazy(() => import('./views/receiving/DetailNonSerialQc.js'))
 
 //Tracking
@@ -19,9 +20,56 @@ const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
 const TrackingDetail = React.lazy(() => import('./views/tracking/TrackingDetail'))
 const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingFinalProduct'))
 
+//QCProd
+const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql.js'))
+const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql.js'))
+
 // Assembly
 const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder.js'))
 const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder.js'))
+const AssemblySerialList = React.lazy(
+  () => import('./views/production/assembly/AssemblySerialList.js'),
+)
+const ScanBeforeAssembly = React.lazy(
+  () => import('./views/production/assembly/ScanBeforeAssembly.js'),
+)
+
+//Aging
+const ScanBeforeAging = React.lazy(() => import('./views/production/agingtest/ScanBeforeAging'))
+
+//Finishing
+const ScanBeforeClearZero = React.lazy(
+  () => import('./views/production/finishing/ScanBeforeClearZero'),
+)
+const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
+const ScanAfterZeroClear = React.lazy(
+  () => import('./views/production/finishing/ScanAfterClearZero.js'),
+)
+const SidePlnSerial = React.lazy(() => import('./views/production/finishing/SidePlnSerial'))
+const PlnSerialComparator = React.lazy(
+  () => import('./views/production/finishing/PlnSerialComparator'),
+)
+const PrintLaser = React.lazy(() => import('./views/production/finishing/PrintLaser'))
+
+//Master Data
+//Master Product
+const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
+
+//MAster Supplier
+const Supplier = React.lazy(() => import('./views/admins/supplier/SupplierPage'))
+
+// Warehouse
+const AssemblyOrderConfirmation = React.lazy(
+  () => import('./views/warehouse/AssemblyOrderConfirmation'),
+)
+const WarehouseStock = React.lazy(() => import('./views/warehouse/WarehouseStock'))
+const WarehouseMaster = React.lazy(() => import('./views/warehouse/WarehouseMaster'))
+const ReceivingWhRequest = React.lazy(() => import('./views/warehouse/ReceivingWhRequest'))
+const AssemblyWhRequest = React.lazy(() => import('./views/warehouse/AssemblyWhRequest'))
+const SerialStockConfirm = React.lazy(() => import('./views/warehouse/SerialStockConfirm'))
+
+//Admin Generate Serial PLN
+const GeneratePlnSerial = React.lazy(() => import('./views/admins/generate/GeneratePlnSerial'))
 
 const routes = [
   //Dashboard
@@ -152,7 +200,6 @@ const routes = [
       </PrivateRoutes>
     ),
   },
-
   //Production
   { path: '/production', name: 'Production' },
 
@@ -176,6 +223,240 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <AssemblyOrder />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/production/assembly/assemblyseriallist',
+    name: 'Assembly Serial List',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <AssemblySerialList />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/production/assembly/before',
+    name: 'Scan Before',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ScanBeforeAssembly />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
+  //QC Production Aql Serial
+  { path: '/production/serialaql', name: '' },
+  {
+    path: '/production/serialaql/:qcIdParams/:qcNameParams',
+    name: 'Scan Before',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ProdQcSerialAql />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  //QC Production No Aql Serial
+  { path: '/production/serialnoaql', name: 'QC Serial No AQL' },
+  {
+    path: '/production/serialnoaql/:qcIdParams/:qcNameParams',
+    name: '',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ProdQcSerialNoAql />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/production/serialnoaql/:qcIdParams/:qcNameParams',
+    name: '',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ProdQcSerialNoAql />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  { path: '/production/aging', name: 'Aging Test' },
+  {
+    path: '/production/aging/before',
+    name: 'Scan Before Aging Test',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ScanBeforeAging />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  //Finishing Assembly
+  { path: '/production/finishing', name: 'Finishing' },
+  {
+    path: '/production/finishing/scansidepln',
+    name: 'SCAN PLN & Production Barcode',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <SidePlnSerial />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/production/finishing/printlaser/post1',
+    name: 'Post 1',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <PrintLaser />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/production/finishing/printlaser/post2',
+    name: 'Post 2',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <PrintLaser />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/production/finishing/comparePlnSerial',
+    name: 'Check Side & Cover Serial',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <PlnSerialComparator />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  //Master Data
+  { path: '/masterdata', name: 'Master Data' },
+  //Product
+  {
+    path: '/masterdata/product',
+    name: 'Product',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <Product />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  //Supplier
+  {
+    path: '/masterdata/supplier',
+    name: 'Supplier',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <Supplier />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
+  //Warehouse
+  { path: '/warehouse', name: 'Warehouse' },
+
+  //Warehouse Outgoing
+  { path: '/warehouse/outgoing', name: 'Outgoing' },
+  {
+    path: '/warehouse/outgoing/assemblyorder',
+    name: 'Acc. Assembly order',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <AssemblyOrderConfirmation />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
+  //Warehouse Stock
+  { path: '/warehouse/stock', name: 'Stock' },
+  {
+    path: '/warehouse/stock/warehouseStock',
+    name: 'Stock Opname',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <WarehouseStock />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/warehouseMaster',
+    name: 'Warehouse Data Master',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <WarehouseMaster />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/receivingwhrequest',
+    name: 'Receiving to WH Request List',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ReceivingWhRequest />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/assemblywhrequest',
+    name: 'Assembly to WH Request',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <AssemblyWhRequest />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/warehouse/serialstockconfirm',
+    name: 'Assembly Order Confirmation',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <SerialStockConfirm />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  //Admin
+  { path: '/admin', name: 'Admin' },
+  //Generate
+  { path: '/admin/generate', name: 'Generate' },
+  {
+    path: '/admin/generate/plnserial',
+    name: 'Geneare PLN Serial',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <GeneratePlnSerial />
         </DefaultLayout>
       </PrivateRoutes>
     ),

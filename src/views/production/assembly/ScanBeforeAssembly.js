@@ -116,14 +116,14 @@ const ScanBeforeAssembly = () => {
       <CCol xs={6}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Side Cover Serial Number</strong>
+            <strong>Side Cover Assembly Serial Number</strong>
           </CCardHeader>
           <CCardBody>
             <CForm>
               <CRow className="mb-3">
                 <CCol sm={12}>
                   <ImageContainer
-                    src="/src/assets/images/assembly/side_cover_serial_number.jpeg"
+                    src="/src/assets/images/assembly/kwhm_product_serial_side.jpeg"
                     alt="Side Cover Preview"
                     height="300px"
                   />
@@ -131,7 +131,7 @@ const ScanBeforeAssembly = () => {
               </CRow>
 
               <CRow className="mb-3 text-center">
-                <strong>SCAN SERIAL NUMBER</strong>
+                <strong>SCAN Assembly SERIAL NUMBER</strong>
                 <CCol sm={12} className="d-flex justify-content-center mt-2">
                   <CFormInput
                     type="text"

@@ -1,7 +1,8 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import { backendReceiving } from '../../api/axios'
+import { useAuth } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 import {
   CButton,
@@ -24,6 +25,8 @@ const getTodayJakarta = () => {
 }
 
 const ReceivingHeader = () => {
+  const { user } = useAuth()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     po_number: '',
     order_date: getTodayJakarta(),
@@ -42,18 +45,21 @@ const ReceivingHeader = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
 
-    const jakartaDate = new Date(
-      new Date(formData.order_date).toLocaleString('en-US', {
-        timeZone: 'Asia/Jakarta',
-      }),
-    )
+    //login validation
+    if (!user?.id || !user?.username) {
+      toast.error('You must be logged in to submit a Purchase Order.')
+      setTimeout(() => navigate('/login'), 1500)
+      return
+    }
+
+    setLoading(true)
 
     const payload = {
       po_number: formData.po_number,
       order_date: formData.order_date,
       notes: formData.notes,
+      user_id: user?.id,
     }
 
     // console.log('payload :', payload)

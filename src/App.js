@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react'
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { CSpinner, useColorModes } from '@coreui/react'
 import './scss/style.scss'
@@ -8,6 +8,8 @@ import './scss/examples.scss'
 import { AuthProvider } from './context/AuthContext'
 
 import routes from './routes'
+//ToastContainer
+import ToastContainerWrapper from './components/ToastContainerWrapper'
 
 // Pages
 const Login = React.lazy(() => import('./views/pages/login/Login'))
@@ -33,7 +35,8 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <HashRouter>
+      <BrowserRouter>
+        <ToastContainerWrapper />
         <Suspense
           fallback={
             <div className="pt-3 text-center">
@@ -54,7 +57,7 @@ const App = () => {
             <Route path="*" element={<Login />} />
           </Routes>
         </Suspense>
-      </HashRouter>
+      </BrowserRouter>
     </AuthProvider>
   )
 }
