@@ -23,6 +23,7 @@ import {
 import { backendReceiving } from '../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard12 } from '../components/CounterCard'
+import { useAuth } from '../../context/AuthContext'
 
 // Komponen FormRow
 const FormRow = ({ label, labelCols = '2', children }) => (
@@ -33,6 +34,7 @@ const FormRow = ({ label, labelCols = '2', children }) => (
 )
 
 const ReceivingDetail = () => {
+  const { user } = useAuth()
   const { receivingHeaderId } = useParams()
   const [loading, setLoading] = useState(true)
   const [header, setHeader] = useState(null)
@@ -151,9 +153,17 @@ const ReceivingDetail = () => {
   const handleAccept = async () => {
     console.log('Accept Handle')
 
+    //login validation
+    if (!user?.id || !user?.username) {
+      toast.error('You must be logged in to submit a Purchase Order.')
+      setTimeout(() => navigate('/login'), 1500)
+      return
+    }
+
     try {
       const payload = {
         status: 'accept',
+        user_id: user?.id,
       }
 
       const response = await backendReceiving.put(
