@@ -18,6 +18,7 @@ import CIcon from '@coreui/icons-react'
 import { cilX } from '@coreui/icons'
 import Select from 'react-select'
 import { backendProduct, backendReceiving } from '../../api/axios'
+import { useAuth } from '../../context/AuthContext'
 
 const fetchMasters = () =>
   backendProduct.get('/', {
@@ -43,6 +44,7 @@ const fetchPOs = () =>
   })
 
 const ReceivingHeader = () => {
+  const { user } = useAuth()
   const [productsData, setProductsData] = useState([])
   const [poOptions, setPoOptions] = useState([])
   const [loading, setLoading] = useState(false)
@@ -148,6 +150,13 @@ const ReceivingHeader = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    //login validation
+    if (!user?.id || !user?.username) {
+      toast.error('You must be logged in to submit a Purchase Order.')
+      setTimeout(() => navigate('/login'), 1500)
+      return
+    }
+
     try {
       if (!formData.reference_po) {
         alert('Reference PO is required.')
@@ -175,7 +184,7 @@ const ReceivingHeader = () => {
         gr_number: formData.reference_gr,
         notes: formData.notes,
         received_date: formData.receiving_date,
-        received_by: 5,
+        // received_by: user?.id,
         batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`,
         location: 'Receiving Area',
         receiving_items: formData.details.map((d) => ({

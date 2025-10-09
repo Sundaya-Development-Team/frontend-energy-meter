@@ -8,6 +8,7 @@ const Dashboard = lazy(() => import('./views/dashboard/Dashboard'))
 const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder'))
 const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHeader'))
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
+const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDetail'))
 const ReceivingNonSerialList = React.lazy(
   () => import('./views/receiving/ReceivingNonSerialList.js'),
 )
@@ -23,6 +24,7 @@ const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingF
 //QCProd
 const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql.js'))
 const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql.js'))
+const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc.js'))
 
 // Assembly
 const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder.js'))
@@ -128,6 +130,17 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <ReceivingList />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/receiving/receivingDetail/:receivingHeaderId',
+    name: 'Receiving Detail',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ReceivingDetail />
         </DefaultLayout>
       </PrivateRoutes>
     ),
@@ -341,6 +354,18 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <PlnSerialComparator />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  { path: '/repair', name: 'Repair' },
+  {
+    path: '/repair/:qcIdParams/:qcNameParams',
+    name: '',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ProdQcRepair />
         </DefaultLayout>
       </PrivateRoutes>
     ),
