@@ -8,6 +8,7 @@ const Dashboard = lazy(() => import('./views/dashboard/Dashboard'))
 const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder'))
 const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHeader'))
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
+const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDetail'))
 const ReceivingNonSerialList = React.lazy(
   () => import('./views/receiving/ReceivingNonSerialList.js'),
 )
@@ -128,6 +129,17 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <ReceivingList />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/receiving/receivingDetail/:receivingHeaderId',
+    name: 'Receiving Detail',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ReceivingDetail />
         </DefaultLayout>
       </PrivateRoutes>
     ),
