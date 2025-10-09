@@ -184,7 +184,7 @@ const ReceivingHeader = () => {
         gr_number: formData.reference_gr,
         notes: formData.notes,
         received_date: formData.receiving_date,
-        received_by: 5,
+        received_by: user?.id,
         batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`,
         location: 'Receiving Area',
         receiving_items: formData.details.map((d) => ({
@@ -193,11 +193,11 @@ const ReceivingHeader = () => {
           quantity: Number(d.ref_quantity),
           item_type: d.product_type,
           notes: d.notes || '',
-          user_id: user?.id,
         })),
       }
 
       const response = await backendReceiving.post('/receiving-headers', payload)
+
       const message =
         response?.data?.message || 'Failed to submit Receiving. See console for details.'
 
