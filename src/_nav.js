@@ -307,6 +307,16 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Repair',
+  },
+  {
+    component: CNavItem,
+    name: 'QC Repair',
+    to: '/repair/QC-R015/QC Repair',
+    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
     name: 'Master Data',
   },
   {

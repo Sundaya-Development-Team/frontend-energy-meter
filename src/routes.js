@@ -24,6 +24,7 @@ const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingF
 //QCProd
 const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql.js'))
 const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql.js'))
+const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc.js'))
 
 // Assembly
 const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder.js'))
@@ -353,6 +354,18 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <PlnSerialComparator />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  { path: '/repair', name: 'Repair' },
+  {
+    path: '/repair/:qcIdParams/:qcNameParams',
+    name: '',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ProdQcRepair />
         </DefaultLayout>
       </PrivateRoutes>
     ),
