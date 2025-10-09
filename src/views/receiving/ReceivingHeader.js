@@ -18,6 +18,7 @@ import CIcon from '@coreui/icons-react'
 import { cilX } from '@coreui/icons'
 import Select from 'react-select'
 import { backendProduct, backendReceiving } from '../../api/axios'
+import { useAuth } from '../../context/AuthContext'
 
 const fetchMasters = () =>
   backendProduct.get('/', {
@@ -43,6 +44,7 @@ const fetchPOs = () =>
   })
 
 const ReceivingHeader = () => {
+  const { user } = useAuth()
   const [productsData, setProductsData] = useState([])
   const [poOptions, setPoOptions] = useState([])
   const [loading, setLoading] = useState(false)
@@ -148,6 +150,13 @@ const ReceivingHeader = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    //login validation
+    if (!user?.id || !user?.username) {
+      toast.error('You must be logged in to submit a Purchase Order.')
+      setTimeout(() => navigate('/login'), 1500)
+      return
+    }
+
     try {
       if (!formData.reference_po) {
         alert('Reference PO is required.')
@@ -184,11 +193,11 @@ const ReceivingHeader = () => {
           quantity: Number(d.ref_quantity),
           item_type: d.product_type,
           notes: d.notes || '',
+          user_id: user?.id,
         })),
       }
 
       const response = await backendReceiving.post('/receiving-headers', payload)
-
       const message =
         response?.data?.message || 'Failed to submit Receiving. See console for details.'
 
