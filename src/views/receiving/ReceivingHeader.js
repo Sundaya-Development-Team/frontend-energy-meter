@@ -184,7 +184,7 @@ const ReceivingHeader = () => {
         gr_number: formData.reference_gr,
         notes: formData.notes,
         received_date: formData.receiving_date,
-        received_by: user?.id,
+        // received_by: user?.id,
         batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`,
         location: 'Receiving Area',
         receiving_items: formData.details.map((d) => ({

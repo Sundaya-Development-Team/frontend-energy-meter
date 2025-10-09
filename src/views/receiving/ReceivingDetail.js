@@ -163,7 +163,8 @@ const ReceivingDetail = () => {
     try {
       const payload = {
         status: 'accept',
-        user_id: user?.id,
+        received_by: user?.id,
+        received_date: new Date().toISOString(),
       }
 
       const response = await backendReceiving.put(
