@@ -84,3 +84,17 @@ body {
   min-height: 38px !important;
   height: 38px !important;
 }
+
+.sidebar-thumbnail {
+  border: 0px solid rgba(255, 255, 255, 0.2); /* garis halus */
+  border-radius: 8px; /* sedikit melengkung */
+  padding: 4px; /* jarak dalam */
+  // background-color: rgba(255, 255, 255, 0.05); /* efek latar lembut */
+  // box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); /* bayangan lembut */
+  transition: all 0.3s ease;
+}
+
+.sidebar-thumbnail:hover {
+  transform: scale(1.03);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}

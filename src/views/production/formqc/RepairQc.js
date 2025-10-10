@@ -197,6 +197,7 @@ const QcAqlSerial = () => {
       qc_id: qcCodeSerial,
       qc_place: 'Workshop Repair',
       tracking_id: productData.id,
+      batch: productData.batch,
       notes: formData.notes,
       fail_qc_id: repairInfo.fail_qc_id,
       fail_qc_name: repairInfo.fail_qc_name,
