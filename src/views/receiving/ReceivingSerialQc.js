@@ -257,6 +257,7 @@ const ReceivingSerialQc = () => {
       qc_id: qcIdReceivingSerial,
       qc_place: 'Workshop A', // sementara hardcode
       tracking_id: productData.id,
+      batch: productData.batch,
       notes: formData.notes,
       answers,
     }

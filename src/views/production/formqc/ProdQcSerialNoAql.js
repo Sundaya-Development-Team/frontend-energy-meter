@@ -226,11 +226,12 @@ const QcSerialNoAql = () => {
       qc_id: qcCodeSerial,
       qc_place: 'Workshop A', // sementara hardcode
       tracking_id: productData.id,
+      batch: productData.batch,
       notes: formData.notes,
       answers,
     }
 
-    console.log('Submit payload:', payload)
+    // console.log('Submit payload:', payload)
 
     try {
       const res = await backendQc.post('/submit', payload)

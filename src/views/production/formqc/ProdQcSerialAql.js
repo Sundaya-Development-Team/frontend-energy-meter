@@ -258,6 +258,7 @@ const QcAqlSerial = () => {
       qc_id: qcCodeSerial,
       qc_place: 'Workshop A', // sementara hardcode
       tracking_id: productData.id,
+      batch: productData.batch,
       notes: formData.notes,
       answers,
     }

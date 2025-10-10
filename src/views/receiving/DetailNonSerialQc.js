@@ -201,10 +201,12 @@ const DetailNonSerialQc = () => {
       receiving_item_id: detail.receiving_item_id,
       qc_place: 'Receiving',
       tracking_id: detail.id,
+      batch: detail.batch,
       notes: formData.notes,
       answers,
     }
 
+    // console.log('payload : ', payload)
     try {
       const res = await backendQc.post('/submit/noserial', payload)
       const qcStatus = res.data?.data?.qcStatus ?? ''
