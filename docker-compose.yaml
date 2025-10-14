@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
   frontend-kwhmeter:
@@ -13,4 +13,4 @@ services:
       - .env
     # Expose the port
     ports:
-      - "${PORT}:${PORT}"
+      - '${PORT}:${PORT}'

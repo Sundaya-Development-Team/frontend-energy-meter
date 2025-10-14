@@ -1,17 +1,32 @@
-# pull image node 18.14 alpine
-FROM node:18.14-alpine
+# ---------- BUILD STAGE ----------
+FROM node:18.14-alpine AS build
 
-# create working directory
 WORKDIR /usr/src/app
 
-# copy all files to working directory
-COPY . .
-
-# install dependencies
+# Copy dependency file terlebih dahulu (untuk efisiensi cache)
+COPY package*.json ./
 RUN npm install --silent
 
-# expose port
-EXPOSE 3000
+# Copy semua source project
+COPY . .
 
-# run the app
-CMD ["npm", "run", "start"]
+# Build React app untuk production
+RUN npm run build
+
+# ---------- PRODUCTION STAGE ----------
+FROM nginx:alpine
+
+# Hapus default config Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy konfigurasi nginx custom
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy hasil build dari stage pertama ke folder html Nginx
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
+# Expose port 3001
+EXPOSE 3001
+
+# Jalankan Nginx
+CMD ["nginx", "-g", "daemon off;"]
