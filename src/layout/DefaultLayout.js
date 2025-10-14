@@ -7,9 +7,12 @@ const DefaultLayout = ({ children }) => {
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
         <AppHeader />
-        <div className="body flex-grow-1">
-          <div className="container-lg">{children ? children : <AppContent />}</div>
+
+        {/* Body utama */}
+        <div className="body flex-grow-1 d-flex flex-column">
+          <div className="container-lg flex-grow-1">{children ? children : <AppContent />}</div>
         </div>
+
         <AppFooter />
       </div>
     </div>
