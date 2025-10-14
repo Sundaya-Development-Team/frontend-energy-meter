@@ -2,16 +2,17 @@ version: '3.8'
 
 services:
   frontend-kwhmeter:
+    image: frontend-kwhmeter:latest
+    container_name: frontend-kwhmeter
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
-    container_name: frontend-kwhmeter
     restart: always
     env_file:
       - .env
     ports:
-      - '3001:8001'
+      - '3001:8001' # host:container
+    working_dir: /usr/src/app
     volumes:
-      - ./build:/usr/share/nginx/html
-    command: /bin/sh -c "npm install && npm run build && nginx -g 'daemon off;'"
+      - ./:/usr/src/app
+    command: /bin/sh -c "npm install && npm run build && cp -r build/* /usr/share/nginx/html && nginx -g 'daemon off;'"

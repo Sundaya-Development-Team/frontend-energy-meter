@@ -6,9 +6,8 @@ RUN rm /etc/nginx/conf.d/default.conf
 # Copy konfigurasi nginx custom
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy folder build (akan di-mount dari docker-compose)
-COPY ./build /usr/share/nginx/html
-
+# Expose port Nginx
 EXPOSE 8001
 
+# Jalankan Nginx
 CMD ["nginx", "-g", "daemon off;"]
