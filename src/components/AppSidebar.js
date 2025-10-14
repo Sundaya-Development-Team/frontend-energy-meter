@@ -36,27 +36,39 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
-          {/* ✅ Optimized main logo for LCP */}
+          {/*Logo utama (LCP) */}
           <CImage
             className="sidebar-brand-full sidebar-thumbnail"
             src="/images/white.webp"
             alt="Sundaya Logo"
             width={200}
             height={50}
-            loading="eager" // langsung load, bukan lazy
-            priority="true" // hint tambahan (non-standar tapi didukung sebagian browser)
-            decoding="sync" // paksa decode cepat
+            loading="eager" // load secepat mungkin
+            decoding="sync" // segera decode
+            fetchpriority="high" //modern browser hint
+            style={{
+              display: 'block',
+              width: '200px',
+              height: '50px',
+              objectFit: 'contain',
+            }}
           />
 
-          {/* logo kecil (untuk mode collapse) */}
+          {/* logo kecil untuk sidebar collapse */}
           <CImage
             className="sidebar-brand-narrow"
             src="/images/white_logo.webp"
             alt="Sundaya Logo Narrow"
             width={40}
             height={40}
-            loading="lazy" // ini boleh lazy karena bukan LCP
+            loading="lazy"
             decoding="async"
+            style={{
+              display: 'block',
+              width: '40px',
+              height: '40px',
+              objectFit: 'contain',
+            }}
           />
         </CSidebarBrand>
 
@@ -67,7 +79,7 @@ const AppSidebar = () => {
         />
       </CSidebarHeader>
 
-      {/* 🔥 pakai nav hasil filter */}
+      {/* Navigasi yang difilter berdasarkan permission */}
       <AppSidebarNav items={filteredNav} />
 
       <CSidebarFooter className="border-top d-none d-lg-flex">
