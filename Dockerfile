@@ -1,13 +1,17 @@
-FROM nginx:alpine
+# pull image node 18.14 alpine
+FROM node:18.14-alpine
 
-# Hapus default config Nginx
-RUN rm /etc/nginx/conf.d/default.conf
+# create working directory
+WORKDIR /usr/src/app
 
-# Copy konfigurasi nginx custom
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# copy all files to working directory
+COPY . .
 
-# Expose port Nginx
-EXPOSE 8001
+# install dependencies
+RUN npm install --silent
 
-# Jalankan Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# expose port
+EXPOSE 3000
+
+# run the app
+CMD ["npm", "run", "start"]
