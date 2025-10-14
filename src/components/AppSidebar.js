@@ -37,7 +37,7 @@ const AppSidebar = () => {
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
           {/*Logo utama (LCP) */}
-          {/* <CImage
+          <CImage
             className="sidebar-brand-full sidebar-thumbnail"
             src="/images/white.webp"
             alt="Sundaya Logo"
@@ -52,10 +52,10 @@ const AppSidebar = () => {
               height: '50px',
               objectFit: 'contain',
             }}
-          /> */}
+          />
 
           {/* logo kecil untuk sidebar collapse */}
-          <CImage
+          {/* <CImage
             className="sidebar-brand-narrow"
             src="/images/white_logo.webp"
             alt="Sundaya Logo Narrow"
@@ -69,7 +69,7 @@ const AppSidebar = () => {
               height: '40px',
               objectFit: 'contain',
             }}
-          />
+          /> */}
         </CSidebarBrand>
 
         <CCloseButton
