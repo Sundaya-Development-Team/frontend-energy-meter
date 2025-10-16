@@ -98,3 +98,29 @@ body {
   transform: scale(1.03);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
+
+/* ==========================
+   Layout Stabilizer (Anti-CLS)
+   ========================== */
+
+.wrapper {
+  transition: none !important;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: calc(100vh - 120px); // 70 header + 40 breadcrumb + 10 buffer
+  transition: none !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-lg {
+  transition: none !important;
+  min-height: 100%;
+  flex-grow: 1;
+}
+
+/* ==========================
+   END Layout Stabilizer (Anti-CLS)
+   ========================== */

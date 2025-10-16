@@ -11,8 +11,6 @@ import {
 } from '@coreui/react'
 
 import { AppSidebarNav } from './AppSidebarNav'
-
-// sidebar nav config
 import navigation from '../_nav'
 import { useAuth } from '../context/AuthContext'
 import { filterNavByPermissions } from '../utils/FilterNavPermission'
@@ -21,9 +19,8 @@ const AppSidebar = () => {
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
-
-  // ambil user dari AuthContext
   const { user } = useAuth()
+
   const filteredNav = filterNavByPermissions(navigation, user?.permissions || [])
 
   return (
@@ -39,21 +36,42 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
-          {/* <CImage
-            className="sidebar-brand-full"
-            thumbnail
-            src="/public/images/white.webp"
-            width={200}
-            height={200}
-          /> */}
+          {/*Logo utama (LCP) */}
           <CImage
             className="sidebar-brand-full sidebar-thumbnail"
             src="/images/white.webp"
+            alt="Sundaya Logo"
             width={200}
             height={50}
+            loading="eager" // load secepat mungkin
+            decoding="sync" // segera decode
+            fetchpriority="high" //modern browser hint
+            style={{
+              display: 'block',
+              width: '200px',
+              height: '50px',
+              objectFit: 'contain',
+            }}
           />
-          <CImage className="sidebar-brand-narrow" thumbnail src="/images/white_logo.webp" />
+
+          {/* logo kecil untuk sidebar collapse */}
+          {/* <CImage
+            className="sidebar-brand-narrow"
+            src="/images/white_logo.webp"
+            alt="Sundaya Logo Narrow"
+            width={40}
+            height={40}
+            loading="lazy"
+            decoding="async"
+            style={{
+              display: 'block',
+              width: '40px',
+              height: '40px',
+              objectFit: 'contain',
+            }}
+          /> */}
         </CSidebarBrand>
+
         <CCloseButton
           className="d-lg-none"
           dark
@@ -61,7 +79,7 @@ const AppSidebar = () => {
         />
       </CSidebarHeader>
 
-      {/* 🔥 pakai nav hasil filter */}
+      {/* Navigasi yang difilter berdasarkan permission */}
       <AppSidebarNav items={filteredNav} />
 
       <CSidebarFooter className="border-top d-none d-lg-flex">
