@@ -32,8 +32,8 @@ const AssemblyOrder = React.lazy(() => import('./views/production/assembly/Assem
 const AssemblySerialList = React.lazy(
   () => import('./views/production/assembly/AssemblySerialList.js'),
 )
-const ScanBeforeAssembly = React.lazy(
-  () => import('./views/production/assembly/ScanBeforeAssembly.js'),
+const MatchingAssemblyPcbSerial = React.lazy(
+  () => import('./views/production/assembly/MatchingAssemblyPcb.js'),
 )
 
 //Aging
@@ -252,12 +252,12 @@ const routes = [
     ),
   },
   {
-    path: '/production/assembly/before',
-    name: 'Scan Before',
+    path: '/production/assembly/matchingassypcb',
+    name: 'Matching Assy & PCB Serial',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
-          <ScanBeforeAssembly />
+          <MatchingAssemblyPcbSerial />
         </DefaultLayout>
       </PrivateRoutes>
     ),

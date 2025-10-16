@@ -115,8 +115,8 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/assembly/before',
+        name: 'Matching Assy & PCB',
+        to: '/production/assembly/matchingassypcb',
       },
       // {
       //   component: CNavItem,
