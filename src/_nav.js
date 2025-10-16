@@ -115,6 +115,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'QC Sub Assembly',
+        to: '/production/serialnoaql/QC-SA002/Sub Assembly',
+      },
+      {
+        component: CNavItem,
         name: 'Matching Assy & PCB',
         to: '/production/assembly/matchingassypcb',
       },
