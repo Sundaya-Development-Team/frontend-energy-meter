@@ -337,6 +337,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'QC Laser & Gripping',
+        to: '/production/serialnoaql/QC-LG016/QC Laser And Gripping',
+      },
+      {
+        component: CNavItem,
         name: 'Matching PLN Serial',
         to: '/production/finishing/comparePlnSerial',
       },
