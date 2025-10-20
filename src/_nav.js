@@ -222,7 +222,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Calibration 1',
-        to: '/production/serialnoaql/QC-CT006/Calibration 1 Test',
+        to: '/production/serialnoaql/QC-CT1006/Calibration 1 Test',
       },
       // {
       //   component: CNavItem,
