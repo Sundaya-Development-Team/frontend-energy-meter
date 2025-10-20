@@ -200,7 +200,7 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Calibration & Ultrasonic',
+    name: 'Calibration 1',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
@@ -224,11 +224,55 @@ const _nav = [
         name: 'QC Calibration 1',
         to: '/production/serialnoaql/QC-CT006/Calibration 1 Test',
       },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Ultrasonic',
+      //   to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Ref. Meter',
+      //   to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Calibration 2',
+      //   to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
+      // },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Ultrasonic',
+    to: '/production/ultrasonic',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
       {
         component: CNavItem,
         name: 'QC Ultrasonic',
         to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
       },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Ref. Meter',
+    to: '/production/refmeter',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'QC Ref. Meter',
+        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Calibration 2',
+    to: '/production/calibration',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
       {
         component: CNavItem,
         name: 'QC Calibration 2',
@@ -269,19 +313,7 @@ const _nav = [
       // },
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Ref. Meter',
-    to: '/production/refmeter',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'QC Ref. Meter',
-        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
-      },
-    ],
-  },
+
   {
     component: CNavGroup,
     name: 'Finishing',
