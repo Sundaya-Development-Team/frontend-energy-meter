@@ -115,6 +115,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'QC Sub Assembly',
+        to: '/production/serialnoaql/QC-SA002/Sub Assembly',
+      },
+      {
+        component: CNavItem,
         name: 'Matching Assy & PCB',
         to: '/production/assembly/matchingassypcb',
       },
@@ -195,7 +200,7 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Calibration & Ultrasonic',
+    name: 'Calibration 1',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
@@ -217,13 +222,57 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Calibration 1',
-        to: '/production/serialnoaql/QC-CT006/Calibration 1 Test',
+        to: '/production/serialnoaql/QC-CT1006/Calibration 1 Test',
       },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Ultrasonic',
+      //   to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Ref. Meter',
+      //   to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
+      // },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Calibration 2',
+      //   to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
+      // },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Ultrasonic',
+    to: '/production/ultrasonic',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
       {
         component: CNavItem,
         name: 'QC Ultrasonic',
         to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
       },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Ref. Meter',
+    to: '/production/refmeter',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'QC Ref. Meter',
+        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Calibration 2',
+    to: '/production/calibration',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
       {
         component: CNavItem,
         name: 'QC Calibration 2',
@@ -264,19 +313,7 @@ const _nav = [
       // },
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Ref. Meter',
-    to: '/production/refmeter',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'QC Ref. Meter',
-        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
-      },
-    ],
-  },
+
   {
     component: CNavGroup,
     name: 'Finishing',
@@ -297,6 +334,11 @@ const _nav = [
         component: CNavItem,
         name: 'Print Laser Post 2',
         to: '/production/finishing/printlaser/post2',
+      },
+      {
+        component: CNavItem,
+        name: 'QC Laser & Gripping',
+        to: '/production/serialnoaql/QC-LG016/QC Laser And Gripping',
       },
       {
         component: CNavItem,
