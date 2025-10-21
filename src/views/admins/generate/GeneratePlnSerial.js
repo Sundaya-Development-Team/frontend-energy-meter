@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CButton,
   CCard,
@@ -12,7 +12,8 @@ import {
   CSpinner,
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
-import { backendGenerate } from '../../../api/axios'
+import Select from 'react-select'
+import { backendGenerate, backendAssembly } from '../../../api/axios'
 import { toast } from 'react-toastify'
 
 const GeneratePlnSerial = () => {
@@ -25,10 +26,33 @@ const GeneratePlnSerial = () => {
 
   const [loading, setLoading] = useState(false)
   const [serialNumbers, setSerialNumbers] = useState([])
+  const [orders, setOrders] = useState([])
+
+  // Fetch Assembly Orders
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await backendAssembly.get('/assembly-orders')
+        const data = res.data?.data || []
+        setOrders(data)
+      } catch (err) {
+        console.error(err)
+        toast.error('Failed to fetch Assembly Orders')
+      }
+    }
+    fetchOrders()
+  }, [])
 
   const handleInput = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleOrderSelect = (selected) => {
+    setFormData((prev) => ({
+      ...prev,
+      referencePO: selected ? selected.value : '',
+    }))
   }
 
   const handleSubmit = async (e) => {
@@ -40,26 +64,24 @@ const GeneratePlnSerial = () => {
       stsId: formData.stsId,
       quantity: Number(formData.generateQty),
     }
-    console.log('payload : ', payload)
+
     try {
       const res = await backendGenerate.post('/generate', payload)
       setSerialNumbers(res.data?.data?.serialNumbers || [])
       toast.success(res.data?.message || 'Generate success!')
     } catch (err) {
-      alert(err.response?.data?.message || err.message)
+      toast.error(err.response?.data?.message || 'Failed to generate serial numbers')
     } finally {
       setLoading(false)
     }
   }
 
-  // download CSV handler
   const downloadCSV = () => {
     if (serialNumbers.length === 0) {
       toast.error('No data to export!')
       return
     }
 
-    // header
     const headers = ['No', 'Serial Number', 'PLN Raw', 'STS ID', 'Batch', 'Status']
     const rows = serialNumbers.map((row) => [
       row.id,
@@ -70,7 +92,7 @@ const GeneratePlnSerial = () => {
       row.status,
     ])
 
-    let csvContent =
+    const csvContent =
       'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(',')).join('\n')
 
     const encodedUri = encodeURI(csvContent)
@@ -81,18 +103,11 @@ const GeneratePlnSerial = () => {
     link.click()
     document.body.removeChild(link)
 
-    // tampilkan toast setelah download
     toast.success('Download success!')
   }
 
-  // definisi kolom untuk DataTable
   const columns = [
-    {
-      name: 'No',
-      selector: (row, index) => index + 1, // nomor urut
-      sortable: false,
-      width: '70px',
-    },
+    { name: 'No', selector: (row, index) => index + 1, width: '70px' },
     { name: 'Serial Number', selector: (row) => row.serialCode, sortable: true },
     { name: 'PLN Raw', selector: (row) => row.plnRaw, sortable: true },
     { name: 'STS ID', selector: (row) => row.stsId, sortable: true },
@@ -102,22 +117,29 @@ const GeneratePlnSerial = () => {
 
   return (
     <>
-      {/* Form Generate */}
       <CRow>
         <CCol md={12}>
           <CCard className="mb-4">
             <CCardHeader>
               <strong>Generate PLN Serial</strong>
             </CCardHeader>
-
             <CCardBody>
               <CForm onSubmit={handleSubmit}>
+                {/* Reference AO/PO pakai Select */}
                 <FormRow label="Reference AO / PO">
-                  <CFormInput
-                    name="referencePO"
-                    value={formData.referencePO}
-                    onChange={handleInput}
-                    required
+                  <Select
+                    options={orders.map((o) => ({
+                      value: o.order_number, // kirim order_number
+                      label: o.order_number, // tampilkan order_number juga
+                    }))}
+                    onChange={(selected) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        referencePO: selected ? selected.value : '', // ambil order_number (string)
+                      }))
+                    }
+                    isClearable
+                    placeholder="-- Select Assembly Order --"
                   />
                 </FormRow>
 
@@ -156,7 +178,6 @@ const GeneratePlnSerial = () => {
         </CCol>
       </CRow>
 
-      {/* Tabel Hasil Generate */}
       {serialNumbers.length > 0 && (
         <CRow>
           <CCol md={12}>
@@ -183,7 +204,7 @@ const GeneratePlnSerial = () => {
   )
 }
 
-/* FormRow helper */
+/* Helper FormRow */
 const FormRow = ({ label, children, labelCols = '3' }) => (
   <CRow className="mb-3">
     <CFormLabel className={`col-sm-${labelCols} col-form-label`}>{label}</CFormLabel>

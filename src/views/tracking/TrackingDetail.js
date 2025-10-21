@@ -124,9 +124,16 @@ const TrackingDetail = () => {
                 <div className="fw-semibold">ID</div>
                 <div>{detail.id}</div>
               </CCol>
+            </CRow>
+
+            <CRow className="mb-3">
               <CCol md={6}>
-                <div className="fw-semibold">Serial Number</div>
+                <div className="fw-semibold">Production Serial Number</div>
                 <div>{detail.serial_number || '-'}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">PLN Serial Number</div>
+                <div>{detail.pln_code || '-'}</div>
               </CCol>
             </CRow>
 

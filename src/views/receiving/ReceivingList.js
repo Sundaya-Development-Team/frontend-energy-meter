@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import {
   CCard,
   CCardBody,
@@ -38,9 +38,12 @@ const ReceivingList = () => {
 
   const navigate = useNavigate()
 
-  const handleDetailClick = (id) => {
-    navigate(`/receiving/receivingDetail/${id}`)
-  }
+  const handleDetailClick = useCallback(
+    (id) => {
+      navigate(`/receiving/receivingDetail/${id}`)
+    },
+    [navigate],
+  )
 
   // Fetch receiving data
   const fetchReceiving = useCallback(async () => {
@@ -65,7 +68,7 @@ const ReceivingList = () => {
   }, [page, limit, searchKeyword])
 
   useEffect(() => {
-    const debounceDelay = 10
+    const debounceDelay = 400
     const delayDebounce = setTimeout(() => {
       fetchReceiving()
     }, debounceDelay)
@@ -74,36 +77,41 @@ const ReceivingList = () => {
   }, [fetchReceiving])
 
   // DataTable columns
-  const columns = [
-    {
-      name: 'No',
-      width: '60px',
-      cell: (row, index) => <div className="text-center">{(page - 1) * limit + index + 1}</div>,
-    },
-    { name: 'GR Number', selector: (row) => row.gr_number, sortable: true },
-    { name: 'PO Number', selector: (row) => row.purchase_order?.po_number || '-', sortable: true },
-    { name: 'Batch', selector: (row) => row.batch },
-    {
-      name: 'Received Date',
-      selector: (row) =>
-        row.received_date ? new Date(row.received_date).toLocaleDateString() : '-',
-    },
-    { name: 'Location', selector: (row) => row.location },
-    { name: 'Status', selector: (row) => row.status || '-' },
-    {
-      name: 'Actions',
-      cell: (row) => (
-        <div className="d-flex gap-2">
-          <CButton size="sm" color="info" onClick={() => handleDetailClick(row.id)}>
-            Detail
-          </CButton>
-        </div>
-      ),
-      ignoreRowClick: true,
-      // allowOverflow: true,
-      // button: true,
-    },
-  ]
+  const columns = useMemo(
+    () => [
+      {
+        name: 'No',
+        width: '60px',
+        cell: (row, index) => <div className="text-center">{(page - 1) * limit + index + 1}</div>,
+      },
+      { name: 'GR Number', selector: (row) => row.gr_number, sortable: true },
+      {
+        name: 'PO Number',
+        selector: (row) => row.purchase_order?.po_number || '-',
+        sortable: true,
+      },
+      { name: 'Batch', selector: (row) => row.batch },
+      {
+        name: 'Received Date',
+        selector: (row) =>
+          row.received_date ? new Date(row.received_date).toLocaleDateString() : '-',
+      },
+      { name: 'Location', selector: (row) => row.location },
+      { name: 'Status', selector: (row) => row.status || '-' },
+      {
+        name: 'Actions',
+        cell: (row) => (
+          <div className="d-flex gap-2">
+            <CButton size="sm" color="info" onClick={() => handleDetailClick(row.id)}>
+              Detail
+            </CButton>
+          </div>
+        ),
+        ignoreRowClick: true,
+      },
+    ],
+    [page, limit, handleDetailClick],
+  )
 
   return (
     <CRow>
@@ -120,6 +128,7 @@ const ReceivingList = () => {
                 setPage(1)
               }}
             />
+
             {loading ? (
               <div
                 className="d-flex justify-content-center align-items-center"
@@ -127,6 +136,8 @@ const ReceivingList = () => {
               >
                 <CSpinner color="primary" style={{ width: '3rem', height: '3rem' }} />
               </div>
+            ) : data.length === 0 ? (
+              <div className="text-center text-muted my-3">No data found.</div>
             ) : (
               <DataTable
                 columns={columns}

@@ -113,15 +113,16 @@ const _nav = [
         name: 'Assembly Serial List',
         to: '/production/assembly/assemblyseriallist',
       },
-      {
-        component: CNavItem,
-        name: 'QC Sub Assembly',
-        to: '/production/serialnoaql/QC-SA002/Sub Assembly',
-      },
+
       {
         component: CNavItem,
         name: 'Matching Assy & PCB',
         to: '/production/assembly/matchingassypcb',
+      },
+      {
+        component: CNavItem,
+        name: 'QC Sub Assembly',
+        to: '/production/serialnoaql/QC-SA002/Sub Assembly',
       },
       // {
       //   component: CNavItem,
