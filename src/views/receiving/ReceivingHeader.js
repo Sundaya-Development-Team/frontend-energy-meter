@@ -29,9 +29,9 @@ const fetchMasters = () =>
       sortBy: 'name',
       sortOrder: 'asc',
       is_active: true,
-      include_details: true,
-      include_categories: true,
-      include_components: true,
+      include_details: false,
+      include_categories: false,
+      include_components: false,
     },
   })
 
@@ -116,7 +116,7 @@ const ReceivingHeader = () => {
   const handleDeleteRow = (index) => {
     setFormData((prev) => {
       if (prev.details.length <= 1) {
-        toast.warn('Minimal 1 product harus ada.')
+        toast.warn('At least one product is required.')
         return prev
       }
       const updated = prev.details.filter((_, i) => i !== index)
@@ -152,19 +152,19 @@ const ReceivingHeader = () => {
 
     //login validation
     if (!user?.id || !user?.username) {
-      toast.error('You must be logged in to submit a Purchase Order.')
+      toast.warn('You must be logged in to submit a Purchase Order.')
       setTimeout(() => navigate('/login'), 1500)
       return
     }
 
     try {
       if (!formData.reference_po) {
-        alert('Reference PO is required.')
+        toast.warn('Reference PO is required.')
         return
       }
 
       if (formData.details.length === 0) {
-        alert('Please add at least one product.')
+        toast.warn('Please add at least one product.')
         return
       }
 
@@ -173,7 +173,7 @@ const ReceivingHeader = () => {
       )
 
       if (hasMissingProduct) {
-        alert('Ensure each product is selected and quantity is more than 0.')
+        toast.warn('Ensure each product is selected and quantity is more than 0.')
         return
       }
 
@@ -184,7 +184,7 @@ const ReceivingHeader = () => {
         gr_number: formData.reference_gr,
         notes: formData.notes,
         received_date: formData.receiving_date,
-        // received_by: user?.id,
+        received_by: user?.id,
         batch: `BATCH-${String(formData.receiving_batch).padStart(3, '0')}`,
         location: 'Receiving Area',
         receiving_items: formData.details.map((d) => ({
