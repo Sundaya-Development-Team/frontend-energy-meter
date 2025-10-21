@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   CRow,
   CCol,
@@ -48,6 +48,20 @@ const ReceivingSerialQc = () => {
   const inspected_by = 'ADMIN_RECEIVING'
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
+  const serialNumberInputRef = useRef(null)
+  const resetStates = () => {
+    setProductData(null)
+    setTrackingProduct(null)
+    setQuestionData([])
+    setAnswers({})
+    setFormData({ serialNumber: '', notes: '' })
+  }
+
+  useEffect(() => {
+    resetStates()
+    serialNumberInputRef.current.focus()
+    console.clear()
+  }, [qcIdReceivingSerial])
 
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -278,6 +292,7 @@ const ReceivingSerialQc = () => {
       )
 
       toast.success(messageShow)
+      serialNumberInputRef.current.focus()
     } catch (error) {
       console.error('QC submit error:', error)
       toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
@@ -313,6 +328,7 @@ const ReceivingSerialQc = () => {
                         handleSerial()
                       }
                     }}
+                    ref={serialNumberInputRef}
                     disabled={isFormLocked}
                   />
                 </FormRow>
