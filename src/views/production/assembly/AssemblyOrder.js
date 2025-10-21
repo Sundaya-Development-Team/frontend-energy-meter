@@ -252,7 +252,7 @@ const OrderForm = () => {
                             label: plnOrders.find((o) => o.id === formData.pln_order_id)
                               ?.order_number,
                             quantity: plnOrders.find((o) => o.id === formData.pln_order_id)
-                              ?.quantity, // 🔹 ambil quantity juga
+                              ?.quantity, // ambil quantity juga
                           }
                         : null
                     }
@@ -260,7 +260,7 @@ const OrderForm = () => {
                       setFormData((prev) => ({
                         ...prev,
                         pln_order_id: opt ? opt.value : '',
-                        qty: opt ? opt.quantity : 1, // 🔹 otomatis isi Qty
+                        qty: opt ? opt.quantity : 1, // otomatis isi Qty
                       }))
                     }
                     isClearable
@@ -305,9 +305,28 @@ const OrderForm = () => {
                   min={1}
                   name="qty"
                   value={formData.qty}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, qty: Number(e.target.value) || 1 }))
-                  }
+                  onChange={(e) => {
+                    // ambil nilai input user
+                    let value = Number(e.target.value.replace(/\D/g, '')) || 0
+
+                    // nilai maksimum sesuai qty PLN order
+                    const maxVal = formData.pln_order_id
+                      ? plnOrders.find((o) => o.id === formData.pln_order_id)?.quantity ||
+                        formData.qty
+                      : formData.qty
+
+                    // batasi nilainya agar tidak lebih besar dari maksimum
+                    if (value > maxVal) {
+                      value = maxVal
+                      toast.info(`Maximum quantity is ${maxVal}`)
+                    }
+                    if (value < 1) value = 1
+
+                    setFormData((prev) => ({
+                      ...prev,
+                      qty: value,
+                    }))
+                  }}
                   required
                 />
               </FormRow>
