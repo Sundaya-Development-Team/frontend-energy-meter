@@ -375,7 +375,7 @@ const ReceivingDetail = () => {
               </CTableBody>
             </CTable>
 
-            {header?.status !== 'completed' && (
+            {header?.status !== 'completed' && header?.status !== 'accept' && (
               <div className="d-flex justify-content-between mt-3">
                 <CCol md={12} className="d-flex justify-content-end align-items-end">
                   <CButton color="danger" className="me-2 text-white" onClick={handleReject}>
