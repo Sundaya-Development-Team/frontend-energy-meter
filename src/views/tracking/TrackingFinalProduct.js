@@ -11,6 +11,7 @@ import {
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { backendTracking } from '../../api/axios'
 
 const TrackingFinalProduct = () => {
@@ -18,6 +19,8 @@ const TrackingFinalProduct = () => {
   const [searchKeyword, setSearchKeyword] = useState('')
   const [data, setData] = useState([])
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const navigate = useNavigate()
 
   const handleDetail = (row) => {
@@ -31,29 +34,33 @@ const TrackingFinalProduct = () => {
     'QC-OT004': '',
     'QC-HT005': '',
     'QC-AT007': '',
-    'QC-CZ1008': '',
-    'QC-CZ2010': '',
   })
 
-  // === FETCH DATA FROM API ===
-  // === FETCH DATA FROM API ===
+  // === FETCH DATA ===
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllData = async () => {
       setLoading(true)
       try {
-        const res = await backendTracking.post('/qc-results/history', {
-          page: 1,
-          limit: 50,
-          is_serial: true,
-        })
+        let allRecords = []
+        let page = 1
+        const limit = 100
+        let hasMore = true
 
-        console.log('API response:', res.data) // cek dulu struktur
+        while (hasMore) {
+          const res = await backendTracking.post('/qc-results/history', {
+            page,
+            limit,
+            is_serial: true,
+          })
 
-        // sesuaikan dengan struktur response
-        // const result = res.data?.data?.items ?? res.data?.data ?? []
-        const result = res.data?.data?.records
+          const result = res.data?.data?.records ?? []
+          allRecords = [...allRecords, ...result]
 
-        setData(Array.isArray(result) ? result : [])
+          hasMore = result.length === limit
+          page++
+        }
+
+        setData(allRecords)
       } catch (err) {
         console.error('Gagal fetch data:', err)
         setData([])
@@ -62,7 +69,7 @@ const TrackingFinalProduct = () => {
       }
     }
 
-    fetchData()
+    fetchAllData()
   }, [])
 
   // === FILTER LOGIC ===
@@ -86,6 +93,64 @@ const TrackingFinalProduct = () => {
     })
   }, [data, searchKeyword, filters])
 
+  // === GET DATA YANG SEDANG TAMPIL DI PAGE ===
+  const currentPageData = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage
+    const end = start + rowsPerPage
+    return filteredData.slice(start, end)
+  }, [filteredData, currentPage, rowsPerPage])
+
+  // === DOWNLOAD CSV ===
+  const exportToCSV = (exportData, filenameSuffix) => {
+    if (!exportData || exportData.length === 0) {
+      toast.error('No data to export!')
+      return
+    }
+
+    const headers = [
+      'No',
+      'Serial Number',
+      'PLN Serial',
+      'Receiving Test',
+      'Assembly Test',
+      'ON Test',
+      'Hippot Test',
+      'Aging Test',
+    ]
+
+    const rows = exportData.map((row, index) => [
+      index + 1,
+      row.serial_number,
+      row.pln_code || '-',
+      row.qc_history?.['QC-SPS-PCBA-001']?.status || '-',
+      row.qc_history?.['QC-AT003']?.status || '-',
+      row.qc_history?.['QC-OT004']?.status || '-',
+      row.qc_history?.['QC-HT005']?.status || '-',
+      row.qc_history?.['QC-AT007']?.status || '-',
+    ])
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(',')).join('\n')
+
+    const encodedUri = encodeURI(csvContent)
+    const link = document.createElement('a')
+    link.setAttribute('href', encodedUri)
+    link.setAttribute('download', `tracking_${filenameSuffix}_${Date.now()}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast.success(`Exported ${exportData.length} rows successfully!`)
+  }
+
+  const handleDownloadPage = () => {
+    exportToCSV(currentPageData, 'page')
+  }
+
+  const handleDownloadAll = () => {
+    exportToCSV(filteredData, 'all')
+  }
+
   const columns = [
     { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
     { name: 'PLN Serial', selector: (row) => row.pln_code || '-', sortable: true },
@@ -99,21 +164,19 @@ const TrackingFinalProduct = () => {
       selector: (row) => row.qc_history?.['QC-AT003']?.status,
       sortable: true,
     },
-    { name: 'ON Test', selector: (row) => row.qc_history?.['QC-OT004']?.status, sortable: true },
+    {
+      name: 'ON Test',
+      selector: (row) => row.qc_history?.['QC-OT004']?.status,
+      sortable: true,
+    },
     {
       name: 'Hippot Test',
       selector: (row) => row.qc_history?.['QC-HT005']?.status,
       sortable: true,
     },
-    { name: 'Aging Test', selector: (row) => row.qc_history?.['QC-AT007']?.status, sortable: true },
     {
-      name: 'Clear Zero1',
-      selector: (row) => row.qc_history?.['QC-CZ1008']?.status,
-      sortable: true,
-    },
-    {
-      name: 'Clear Zero2',
-      selector: (row) => row.qc_history?.['QC-CZ2010']?.status,
+      name: 'Aging Test',
+      selector: (row) => row.qc_history?.['QC-AT007']?.status,
       sortable: true,
     },
     {
@@ -147,8 +210,8 @@ const TrackingFinalProduct = () => {
   return (
     <CCard>
       <CCardBody>
-        {/* Search */}
-        <CRow className="mb-3">
+        {/* Search + Download */}
+        <CRow className="mb-3 align-items-center">
           <CCol md={4} sm={6}>
             <CFormInput
               type="text"
@@ -157,6 +220,25 @@ const TrackingFinalProduct = () => {
               onChange={(e) => setSearchKeyword(e.target.value)}
               size="sm"
             />
+          </CCol>
+          <CCol md={8} sm={6} className="text-end">
+            <CButton
+              color="success"
+              size="sm"
+              className="me-2"
+              onClick={handleDownloadPage}
+              disabled={loading || currentPageData.length === 0}
+            >
+              Download Page
+            </CButton>
+            <CButton
+              color="primary"
+              size="sm"
+              onClick={handleDownloadAll}
+              disabled={loading || filteredData.length === 0}
+            >
+              Download All
+            </CButton>
           </CCol>
         </CRow>
 
@@ -174,8 +256,6 @@ const TrackingFinalProduct = () => {
           <CCol md={6}>
             <CRow className="g-2">
               <CCol xs={6}>{renderFilterSelect('QC-AT007', 'Aging')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('QC-CZ1008', 'Clear Zero1')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('QC-CZ2010', 'Clear Zero2')}</CCol>
             </CRow>
           </CCol>
         </CRow>
@@ -190,6 +270,9 @@ const TrackingFinalProduct = () => {
           highlightOnHover
           persistTableHead
           noDataComponent="No data available"
+          paginationPerPage={rowsPerPage}
+          onChangePage={(page) => setCurrentPage(page)}
+          onChangeRowsPerPage={(newPerPage) => setRowsPerPage(newPerPage)}
         />
       </CCardBody>
     </CCard>
