@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import {
   CCard,
   CCardBody,
+  CCardHeader,
   CSpinner,
   CFormSelect,
   CFormInput,
@@ -328,6 +329,9 @@ const TrackingFinalProduct = () => {
 
   return (
     <CCard>
+      <CCardHeader>
+        <strong>Tracking QC Final Product</strong>
+      </CCardHeader>
       <CCardBody>
         {/* Search + Download */}
         <CRow className="mb-3 align-items-center">
