@@ -9,7 +9,6 @@ import {
   CListGroupItem,
   CSpinner,
   CRow,
-  CFormSelect,
 } from '@coreui/react'
 import { backendTracking } from '../../api/axios'
 import { CounterCard6 } from '../components/CounterCard'
@@ -58,7 +57,7 @@ const DashboardPLN = () => {
     }))
   }
 
-  // helper: badge warna dan teks
+  // helper badge status
   const getStatusBadge = (status) => {
     let color = 'secondary'
     let text = status
@@ -101,7 +100,7 @@ const DashboardPLN = () => {
           <CCard key={order.pln_order_id} className="mb-3 shadow-sm">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>PLN Order Code: {order.pln_order_details.order_number}</strong>
-              {/* 🔄 Ubah dari Total Quantity ke Status Progress */}
+              {/* Ubah dari Total Quantity ke Status Progress */}
               {getStatusBadge(order.pln_order_status)}
             </CCardHeader>
 
@@ -117,15 +116,22 @@ const DashboardPLN = () => {
                   value={new Date(order.pln_order_details.deadline).toLocaleDateString()}
                 />
                 <CounterCard6 title="Quantity" value={order.pln_order_details.quantity} />
+
+                {/* Days Remaining -> jika complete ubah menjadi "Completed" */}
                 <CounterCard6
                   title="Days Remaining"
-                  value={order.pln_order_details.deadline_info.days_remaining}
+                  value={
+                    order.pln_order_status === 'completed' ? (
+                      <span className="text-success fw-bold">Completed</span>
+                    ) : (
+                      order.pln_order_details.deadline_info.days_remaining
+                    )
+                  }
                 />
               </CRow>
 
               {/* Assemblies */}
               {order.assemblies.map((asm, idx) => {
-                // 🔧 Jika order sudah completed, batch juga dianggap completed
                 const isCompleted =
                   order.pln_order_status === 'completed' || asm.assembly_status === 'completed'
 
