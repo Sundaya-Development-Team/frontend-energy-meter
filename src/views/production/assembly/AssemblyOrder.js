@@ -242,27 +242,29 @@ const OrderForm = () => {
                   <Select
                     options={plnOrders.map((o) => ({
                       value: o.id,
-                      label: `${o.order_number} (Qty: ${o.quantity})`,
-                      quantity: o.quantity, // 🔹 simpan quantity di option
+                      label: `${o.order_number} (Qty: ${o.remaining_quantity})`,
                     }))}
                     value={
                       formData.pln_order_id
-                        ? {
-                            value: formData.pln_order_id,
-                            label: plnOrders.find((o) => o.id === formData.pln_order_id)
-                              ?.order_number,
-                            quantity: plnOrders.find((o) => o.id === formData.pln_order_id)
-                              ?.quantity, // ambil quantity juga
-                          }
+                        ? (() => {
+                            const selected = plnOrders.find((o) => o.id === formData.pln_order_id)
+                            return selected
+                              ? {
+                                  value: selected.id,
+                                  label: `${selected.order_number} (Qty: ${selected.remaining_quantity})`,
+                                }
+                              : null
+                          })()
                         : null
                     }
-                    onChange={(opt) =>
+                    onChange={(opt) => {
+                      const selected = plnOrders.find((o) => o.id === opt?.value)
                       setFormData((prev) => ({
                         ...prev,
                         pln_order_id: opt ? opt.value : '',
-                        qty: opt ? opt.quantity : 1, // otomatis isi Qty
+                        qty: selected ? selected.remaining_quantity : '', // ⬅️ ambil dari remaining_quantity
                       }))
-                    }
+                    }}
                     isClearable
                     placeholder="Select PLN Order"
                   />
@@ -311,14 +313,14 @@ const OrderForm = () => {
 
                     // nilai maksimum sesuai qty PLN order
                     const maxVal = formData.pln_order_id
-                      ? plnOrders.find((o) => o.id === formData.pln_order_id)?.quantity ||
+                      ? plnOrders.find((o) => o.id === formData.pln_order_id)?.remaining_quantity ||
                         formData.qty
                       : formData.qty
 
                     // batasi nilainya agar tidak lebih besar dari maksimum
                     if (value > maxVal) {
                       value = maxVal
-                      toast.info(`Maximum quantity is ${maxVal}`)
+                      toast.info(`Maximum remaining_quantity is ${maxVal}`)
                     }
                     if (value < 1) value = 1
 
