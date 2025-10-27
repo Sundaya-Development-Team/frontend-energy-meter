@@ -9,7 +9,6 @@ import {
   CListGroupItem,
   CSpinner,
   CRow,
-  CFormSelect,
 } from '@coreui/react'
 import { backendTracking } from '../../api/axios'
 import { CounterCard6 } from '../components/CounterCard'
@@ -58,6 +57,32 @@ const DashboardPLN = () => {
     }))
   }
 
+  // helper badge status
+  const getStatusBadge = (status) => {
+    let color = 'secondary'
+    let text = status
+
+    switch (status) {
+      case 'in_progress':
+        color = 'info'
+        text = 'Running'
+        break
+      case 'completed':
+        color = 'success'
+        text = 'Completed'
+        break
+      case 'scheduled':
+        color = 'warning'
+        text = 'Scheduled'
+        break
+      default:
+        color = 'secondary'
+        text = status || 'Unknown'
+    }
+
+    return <span className={`badge bg-${color} fs-6`}>{text}</span>
+  }
+
   if (loading) {
     return (
       <div className="text-center p-5">
@@ -74,8 +99,9 @@ const DashboardPLN = () => {
         orders.map((order) => (
           <CCard key={order.pln_order_id} className="mb-3 shadow-sm">
             <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>PLN Order Code: {order.pln_order_details.order_number} </strong>
-              <span className="badge bg-primary fs-6">Total Quantity : {order.total_records}</span>
+              <strong>PLN Order Code: {order.pln_order_details.order_number}</strong>
+              {/* Ubah dari Total Quantity ke Status Progress */}
+              {getStatusBadge(order.pln_order_status)}
             </CCardHeader>
 
             <CCardBody>
@@ -90,35 +116,53 @@ const DashboardPLN = () => {
                   value={new Date(order.pln_order_details.deadline).toLocaleDateString()}
                 />
                 <CounterCard6 title="Quantity" value={order.pln_order_details.quantity} />
+
+                {/* Days Remaining -> jika complete ubah menjadi "Completed" */}
                 <CounterCard6
                   title="Days Remaining"
-                  value={order.pln_order_details.deadline_info.days_remaining}
+                  value={
+                    order.pln_order_status === 'completed' ? (
+                      <span className="text-success fw-bold">Completed</span>
+                    ) : (
+                      order.pln_order_details.deadline_info.days_remaining
+                    )
+                  }
                 />
               </CRow>
 
               {/* Assemblies */}
-              {order.assemblies.map((asm, idx) => (
-                <div key={asm.assembly_id} className="mb-2 mt-3">
-                  <CButton
-                    color="light"
-                    className="d-flex justify-content-between align-items-center w-100"
-                    onClick={() => toggleExpand(asm.assembly_id)}
-                  >
-                    <span>Batch {idx + 1}</span>
-                    <span className="badge bg-info">Quantity : {asm.current_quantity}</span>
-                  </CButton>
+              {order.assemblies.map((asm, idx) => {
+                const isCompleted =
+                  order.pln_order_status === 'completed' || asm.assembly_status === 'completed'
 
-                  <CCollapse visible={expanded[asm.assembly_id]}>
-                    <CListGroup>
-                      {asm.qc_status_breakdown.map((qc) => (
-                        <CListGroupItem key={qc.qc_id}>
-                          {qc.qc_name} : <strong>{qc.count}</strong>
-                        </CListGroupItem>
-                      ))}
-                    </CListGroup>
-                  </CCollapse>
-                </div>
-              ))}
+                return (
+                  <div key={asm.assembly_id} className="mb-2 mt-3">
+                    <CButton
+                      color="light"
+                      className="d-flex justify-content-between align-items-center w-100"
+                      onClick={() => toggleExpand(asm.assembly_id)}
+                    >
+                      <span>Batch {idx + 1}</span>
+
+                      {isCompleted ? (
+                        <span className="badge bg-success text-white">Completed</span>
+                      ) : (
+                        <span className="badge bg-info">Quantity : {asm.current_quantity}</span>
+                      )}
+                    </CButton>
+
+                    <CCollapse visible={expanded[asm.assembly_id]}>
+                      <CListGroup>
+                        {asm.qc_status_breakdown.map((qc) => (
+                          <CListGroupItem key={qc.qc_id}>
+                            {qc.qc_name} : <strong>{qc.count}</strong>
+                          </CListGroupItem>
+                        ))}
+                      </CListGroup>
+                    </CCollapse>
+                  </div>
+                )
+              })}
             </CCardBody>
           </CCard>
         ))
@@ -137,21 +181,6 @@ const DashboardPLN = () => {
         <CButton disabled={!pagination.hasNext} onClick={() => setPage((p) => p + 1)}>
           Next
         </CButton>
-
-        {/* Dropdown untuk pilih limit */}
-        {/* <CFormSelect
-          value={limit}
-          onChange={(e) => {
-            setLimit(Number(e.target.value))
-            setPage(1) // reset ke page 1 tiap ganti limit
-          }}
-          style={{ width: '120px' }}
-        >
-          <option value="5">5 / page</option>
-          <option value="10">10 / page</option>
-          <option value="20">20 / page</option>
-          <option value="50">50 / page</option>
-        </CFormSelect> */}
       </div>
     </div>
   )

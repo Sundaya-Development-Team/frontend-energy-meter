@@ -36,28 +36,28 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
-          {/*Logo utama (LCP) */}
+          {/* ⚡ LOGO UTAMA (LCP) */}
           <CImage
             className="sidebar-brand-full sidebar-thumbnail"
             src="/images/white.webp"
             alt="Sundaya Logo"
-            width={200}
-            height={50}
-            loading="eager" // load secepat mungkin
-            decoding="sync" // segera decode
-            fetchpriority="high" //modern browser hint
+            width={192}
+            height={42}
+            fetchpriority="high"
+            loading="eager"
+            decoding="async"
             style={{
               display: 'block',
-              width: '200px',
-              height: '50px',
+              width: '192px',
+              height: '42px',
               objectFit: 'contain',
             }}
           />
 
-          {/* logo kecil untuk sidebar collapse */}
-          {/* <CImage
-            className="sidebar-brand-narrow"
-            src="/images/white_logo.webp"
+          {/*Logo kecil (hanya muncul saat sidebar collapse) */}
+          <CImage
+            className="sidebar-brand-narrow d-none"
+            src="http://192.168.100.226:3000/images/white_logo.webp"
             alt="Sundaya Logo Narrow"
             width={40}
             height={40}
@@ -69,7 +69,7 @@ const AppSidebar = () => {
               height: '40px',
               objectFit: 'contain',
             }}
-          /> */}
+          />
         </CSidebarBrand>
 
         <CCloseButton
