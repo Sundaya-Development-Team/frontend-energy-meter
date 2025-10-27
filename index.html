@@ -4,7 +4,7 @@
 * @version v5.4.0
 * @link https://coreui.io/product/free-react-admin-template/
 * Copyright (c) 2025 creativeLabs Łukasz Holeczek
-* Licensed under MIT (https://github.com/coreui/coreui-free-react-admin-template/blob/main/LICENSE)
+* Licensed under MIT
 -->
 <html lang="en">
   <head>
@@ -18,23 +18,35 @@
       content="Bootstrap,Admin,Template,Open,Source,CSS,SCSS,HTML,RWD,Dashboard,React"
     />
 
-    <!-- PRELOAD untuk percepatan render logo -->
-    <link rel="preload" as="image" href="/images/white.webp" />
-    <link rel="preload" as="image" href="/images/white_logo.webp" />
-    <!-- Jika kamu pakai font online, tambahkan ini -->
+    <title>kwH Meter Production</title>
+
+    <!-- 🖼️ PRELOAD LOGO UTAMA (LCP) DENGAN PRIORITAS TINGGI -->
+    <link
+      rel="preload"
+      as="image"
+      href="/images/white.webp"
+      fetchpriority="high"
+      importance="high"
+    />
+    <link rel="preload" as="image" href="/images/white_logo.webp" fetchpriority="high" />
+
+    <!-- 🌐 OPTIMISASI FONT ONLINE -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <title>kwH Meter Production</title>
-
+    <!-- ✅ CACHE CONTROL TAMBAHAN (untuk PWA / offline) -->
     <link rel="manifest" href="/manifest.json" />
     <link rel="shortcut icon" href="/favicon.ico" />
+
+    <!-- ⚡ PASTIKAN CSS DIMUAT SEBELUM JS -->
+    <link rel="stylesheet" href="/static/css/main.css" />
+
+    <!-- 💡 Gunakan 'defer' agar JS tidak blokir rendering awal -->
+    <script type="module" src="/src/index.js" defer></script>
   </head>
 
   <body>
     <noscript> You need to enable JavaScript to run this app </noscript>
     <div id="root"></div>
-    <script type="module" src="/src/index.js"></script>
-    <!-- built files will be auto injected -->
   </body>
 </html>
