@@ -27,14 +27,24 @@ const TrackingFinalProduct = () => {
     navigate(`/tracking/detail/${row.tracking_id}`)
   }
 
+  // Daftar kolom QC sesuai tabel (Unut download CSV dan Filter)
+  const qcColumns = [
+    { code: 'QC-SA002', label: 'Sub Assembly' },
+    { code: 'QC-AT003', label: 'Assembly' },
+    { code: 'QC-OT004', label: 'ON Test' },
+    { code: 'QC-HT005', label: 'Hippot' },
+    { code: 'QC-CT1006', label: 'Calibration 1' },
+    { code: 'QC-U015', label: 'Ultrasonic' },
+    { code: 'QC-RM013', label: 'Ref. Meter' },
+    { code: 'QC-CT2014', label: 'Calibration 2' },
+    { code: 'QC-AT007', label: 'Aging' },
+    { code: 'QC-LG016', label: 'Laser & Gripping' },
+  ]
+
   // === FILTER STATE PER KOLOM ===
-  const [filters, setFilters] = useState({
-    'QC-SPS-PCBA-001': '',
-    'QC-AT003': '',
-    'QC-OT004': '',
-    'QC-HT005': '',
-    'QC-AT007': '',
-  })
+  const [filters, setFilters] = useState(
+    qcColumns.reduce((acc, qc) => ({ ...acc, [qc.code]: '' }), {}),
+  )
 
   // === FETCH DATA ===
   useEffect(() => {
@@ -51,6 +61,7 @@ const TrackingFinalProduct = () => {
             page,
             limit,
             is_serial: true,
+            is_pln_code: true,
             tracking_type: 'assembly',
           })
 
@@ -108,31 +119,22 @@ const TrackingFinalProduct = () => {
       return
     }
 
-    const headers = [
-      'No',
-      'Serial Number',
-      'PLN Serial',
-      'Receiving Test',
-      'Assembly Test',
-      'ON Test',
-      'Hippot Test',
-      'Aging Test',
-    ]
+    // Header CSV
+    const headers = ['No', 'Serial Number', 'PLN Serial', ...qcColumns.map((qc) => qc.label)]
 
+    // Isi baris CSV
     const rows = exportData.map((row, index) => [
       index + 1,
-      row.serial_number,
+      row.serial_number || '-',
       row.pln_code || '-',
-      row.qc_history?.['QC-SPS-PCBA-001']?.status || '-',
-      row.qc_history?.['QC-AT003']?.status || '-',
-      row.qc_history?.['QC-OT004']?.status || '-',
-      row.qc_history?.['QC-HT005']?.status || '-',
-      row.qc_history?.['QC-AT007']?.status || '-',
+      ...qcColumns.map((qc) => row.qc_history?.[qc.code]?.status || '-'),
     ])
 
+    // Gabung jadi string CSV
     const csvContent =
       'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(',')).join('\n')
 
+    // Download otomatis
     const encodedUri = encodeURI(csvContent)
     const link = document.createElement('a')
     link.setAttribute('href', encodedUri)
@@ -152,32 +154,101 @@ const TrackingFinalProduct = () => {
     exportToCSV(filteredData, 'all')
   }
 
+  const renderStatusBadge = (status) => {
+    if (!status) return '-'
+    const badgeStyle = {
+      PASS: { color: 'white', backgroundColor: '#28a745' },
+      FAIL: { color: 'white', backgroundColor: '#dc3545' },
+      PENDING: { color: 'black', backgroundColor: '#ffc107' },
+      on_progress: { color: 'white', backgroundColor: '#17a2b8' },
+    }
+
+    const style = badgeStyle[status] || { backgroundColor: '#6c757d', color: 'white' }
+
+    return (
+      <span
+        style={{
+          ...style,
+          padding: '2px 8px',
+          borderRadius: '12px',
+          fontSize: '0.75rem',
+          textTransform: 'uppercase',
+          fontWeight: 600,
+        }}
+      >
+        {status}
+      </span>
+    )
+  }
+
   const columns = [
     // { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
     { name: 'PLN Serial', selector: (row) => row.pln_code || '-', sortable: true },
+    // {
+    //   name: 'Receiving Test',
+    //   selector: (row) => row.qc_history?.['QC-SPS-PCBA-001']?.status,
+    //   cell: (row) => renderStatusBadge(row.qc_history?.['QC-SPS-PCBA-001']?.status),
+    //   sortable: true,
+    // },
+
     {
-      name: 'Receiving Test',
-      selector: (row) => row.qc_history?.['QC-SPS-PCBA-001']?.status,
+      name: 'Sub Assembly',
+      selector: (row) => row.qc_history?.['QC-SA002']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-SA002']?.status),
       sortable: true,
     },
     {
-      name: 'Assembly Test',
+      name: 'Assembly',
       selector: (row) => row.qc_history?.['QC-AT003']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-AT003']?.status),
       sortable: true,
     },
     {
       name: 'ON Test',
       selector: (row) => row.qc_history?.['QC-OT004']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-OT004']?.status),
       sortable: true,
     },
     {
-      name: 'Hippot Test',
+      name: 'Hippot',
       selector: (row) => row.qc_history?.['QC-HT005']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-HT005']?.status),
       sortable: true,
     },
     {
-      name: 'Aging Test',
+      name: 'Calibration 1',
+      selector: (row) => row.qc_history?.['QC-CT1006']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-CT1006']?.status),
+      sortable: true,
+    },
+    {
+      name: 'Ultrasonic',
+      selector: (row) => row.qc_history?.['QC-U015']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-U015']?.status),
+      sortable: true,
+    },
+    {
+      name: 'Ref. Meter',
+      selector: (row) => row.qc_history?.['QC-RM013']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-RM013']?.status),
+      sortable: true,
+    },
+    {
+      name: 'Calibration 2',
+      selector: (row) => row.qc_history?.['QC-CT2014']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-CT2014']?.status),
+      sortable: true,
+    },
+    {
+      name: 'Aging',
       selector: (row) => row.qc_history?.['QC-AT007']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-AT007']?.status),
+      sortable: true,
+    },
+    {
+      name: 'Laser & Gripping',
+      selector: (row) => row.qc_history?.['QC-LG016']?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.['QC-LG016']?.status),
       sortable: true,
     },
     {
@@ -245,20 +316,22 @@ const TrackingFinalProduct = () => {
 
         {/* Filter Dropdowns */}
         <CRow className="mb-3">
-          <CCol md={6}>
-            <CRow className="g-2">
-              <CCol xs={6}>{renderFilterSelect('QC-SPS-PCBA-001', 'Receiving')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('QC-AT003', 'Assembly')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('QC-OT004', 'ON Test')}</CCol>
-              <CCol xs={6}>{renderFilterSelect('QC-HT005', 'Hippot')}</CCol>
-            </CRow>
-          </CCol>
-
-          <CCol md={6}>
-            <CRow className="g-2">
-              <CCol xs={6}>{renderFilterSelect('QC-AT007', 'Aging')}</CCol>
-            </CRow>
-          </CCol>
+          {qcColumns.map((qc) => (
+            <CCol key={qc.code} xs={6} md={3} className="mb-2">
+              <small>{qc.label}</small>
+              <CFormSelect
+                size="sm"
+                value={filters[qc.code]}
+                onChange={(e) => setFilters({ ...filters, [qc.code]: e.target.value })}
+              >
+                <option value="">All</option>
+                <option value="PASS">PASS</option>
+                <option value="FAIL">FAIL</option>
+                <option value="PENDING">PENDING</option>
+                <option value="on_progress">on_progress</option>
+              </CFormSelect>
+            </CCol>
+          ))}
         </CRow>
 
         {/* Data Table */}
