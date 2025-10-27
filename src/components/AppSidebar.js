@@ -39,7 +39,7 @@ const AppSidebar = () => {
           {/* ⚡ LOGO UTAMA (LCP) */}
           <CImage
             className="sidebar-brand-full sidebar-thumbnail"
-            src="http://192.168.100.226:3000/images/white.webp"
+            src="/images/white.webp"
             alt="Sundaya Logo"
             width={192}
             height={42}
