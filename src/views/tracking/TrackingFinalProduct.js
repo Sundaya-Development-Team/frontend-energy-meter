@@ -187,7 +187,20 @@ const TrackingFinalProduct = () => {
       index + 1,
       row.serial_number || '-',
       row.pln_code || '-',
-      ...qcColumns.map((qc) => row.qc_history?.[qc.code]?.status || '-'),
+      ...qcColumns.map((qc) => {
+        const status = row.qc_history?.[qc.code]?.status || '-'
+        const date = row.qc_history?.[qc.code]?.inspection_date
+        let formattedDate = '-'
+
+        if (date) {
+          const d = new Date(date)
+          // Tambahkan 7 jam untuk WIB
+          d.setHours(d.getHours() + 7)
+          formattedDate = d.toISOString().slice(0, 19).replace('T', ' ')
+        }
+
+        return formattedDate !== '-' ? `${status} (${formattedDate})` : status
+      }),
     ])
 
     // Gabung jadi string CSV
