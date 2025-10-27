@@ -51,6 +51,7 @@ const TrackingFinalProduct = () => {
             page,
             limit,
             is_serial: true,
+            tracking_type: 'assembly',
           })
 
           const result = res.data?.data?.records ?? []
@@ -152,7 +153,7 @@ const TrackingFinalProduct = () => {
   }
 
   const columns = [
-    { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
+    // { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
     { name: 'PLN Serial', selector: (row) => row.pln_code || '-', sortable: true },
     {
       name: 'Receiving Test',
