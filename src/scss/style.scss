@@ -125,40 +125,40 @@ body {
    END Layout Stabilizer (Anti-CLS)
    ========================== */
 
-/* ==========================
-   Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
-   ========================== */
+// /* ==========================
+//    Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
+//    ========================== */
 
-/* Semua cell normal dulu */
-.rdt_TableCell,
-.rdt_TableCol {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+// /* Semua cell normal dulu */
+// .rdt_TableCell,
+// .rdt_TableCol {
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+// }
 
-/* Hanya body PLN Serial (kolom pertama) bisa di-drag */
-.rdt_TableRow .rdt_TableCell:nth-child(1) {
-  resize: horizontal;
-  overflow: auto;
-  min-width: 150px;
-  max-width: 800px;
-  cursor: col-resize;
-  user-select: none;
-}
+// /* Hanya body PLN Serial (kolom pertama) bisa di-drag */
+// .rdt_TableRow .rdt_TableCell:nth-child(1) {
+//   resize: horizontal;
+//   overflow: auto;
+//   min-width: 150px;
+//   max-width: 800px;
+//   cursor: col-resize;
+//   user-select: none;
+// }
 
-/* Header PLN Serial — tidak bisa resize dan tidak ada cursor */
-.rdt_TableHead .rdt_TableCol:nth-child(1) {
-  resize: none;
-  cursor: default;
-}
+// /* Header PLN Serial — tidak bisa resize dan tidak ada cursor */
+// .rdt_TableHead .rdt_TableCol:nth-child(1) {
+//   resize: none;
+//   cursor: default;
+// }
 
-/* Transisi agar halus */
-.rdt_TableCol,
-.rdt_TableCell {
-  transition: width 0.2s ease;
-}
+// /* Transisi agar halus */
+// .rdt_TableCol,
+// .rdt_TableCell {
+//   transition: width 0.2s ease;
+// }
 
-/* ==========================
-   END Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
-   ========================== */
+// /* ==========================
+//    END Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
+//    ========================== */
