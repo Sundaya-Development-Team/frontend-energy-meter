@@ -124,3 +124,20 @@ body {
 /* ==========================
    END Layout Stabilizer (Anti-CLS)
    ========================== */
+
+/* ==========================
+   Resize Manual Komlom (Tanpa Library Baru)
+   ========================== */
+.rdt_TableCell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  resize: horizontal;
+  min-width: 100px;
+  max-width: 800px; /*ini batas maksimal */
+  cursor: col-resize;
+}
+
+/* ==========================
+   END Resize Manual Komlom (Tanpa Library Baru)
+   ========================== */

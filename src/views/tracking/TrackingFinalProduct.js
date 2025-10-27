@@ -84,6 +84,71 @@ const TrackingFinalProduct = () => {
     fetchAllData()
   }, [])
 
+  // untuk event double-click resize
+  useEffect(() => {
+    const table = document.querySelector('.rdt_Table')
+    if (!table) return
+
+    const expandedCols = new Map()
+
+    const handleDoubleClick = (e) => {
+      const cell = e.target.closest('.rdt_TableCell, .rdt_TableCol')
+      if (!cell) return
+      if (cell.querySelector('button') || cell.querySelector('span[role="button"]')) return
+
+      const columnIndex = Array.from(cell.parentNode.children).indexOf(cell)
+      if (columnIndex < 0) return
+
+      const rows = document.querySelectorAll('.rdt_TableRow')
+      const headers = document.querySelectorAll('.rdt_TableCol')
+      const allCells = [
+        ...Array.from(rows).map((r) => r.children[columnIndex]),
+        headers[columnIndex],
+      ].filter(Boolean)
+
+      const isExpanded = expandedCols.get(columnIndex) || false
+
+      // ===== Jika sedang expanded, kembalikan ke normal width =====
+      if (isExpanded) {
+        allCells.forEach((c) => {
+          c.style.width = '150px'
+          c.style.minWidth = '150px'
+          c.style.maxWidth = '800px'
+          c.style.transition = 'width 0.2s ease'
+        })
+        expandedCols.set(columnIndex, false)
+        return
+      }
+
+      // ===== Jika belum expanded, auto-fit ke konten =====
+      // Paksa browser hitung ulang layout agar scrollWidth akurat
+      allCells.forEach((c) => void c.offsetWidth)
+
+      let maxWidth = 0
+      allCells.forEach((c) => {
+        const range = document.createRange()
+        range.selectNodeContents(c)
+        const rect = range.getBoundingClientRect()
+        const contentWidth = rect.width + 48 // padding buffer
+        if (contentWidth > maxWidth) maxWidth = contentWidth
+      })
+
+      const targetWidth = Math.min(maxWidth, 800)
+
+      allCells.forEach((c) => {
+        c.style.width = `${targetWidth}px`
+        c.style.minWidth = `${targetWidth}px`
+        c.style.maxWidth = `${targetWidth}px`
+        c.style.transition = 'width 0.2s ease'
+      })
+
+      expandedCols.set(columnIndex, true)
+    }
+
+    table.addEventListener('dblclick', handleDoubleClick)
+    return () => table.removeEventListener('dblclick', handleDoubleClick)
+  }, [])
+
   // === FILTER LOGIC ===
   const filteredData = useMemo(() => {
     return data.filter((row) => {
@@ -174,6 +239,8 @@ const TrackingFinalProduct = () => {
           fontSize: '0.75rem',
           textTransform: 'uppercase',
           fontWeight: 600,
+          pointerEvents: 'none', // <==== Tambahan penting
+          display: 'inline-block', // <==== opsional, agar stabil di semua kolom
         }}
       >
         {status}
@@ -182,77 +249,19 @@ const TrackingFinalProduct = () => {
   }
 
   const columns = [
-    // { name: 'Serial Number', selector: (row) => row.serial_number, sortable: true },
-    { name: 'PLN Serial', selector: (row) => row.pln_code || '-', sortable: true },
-    // {
-    //   name: 'Receiving Test',
-    //   selector: (row) => row.qc_history?.['QC-SPS-PCBA-001']?.status,
-    //   cell: (row) => renderStatusBadge(row.qc_history?.['QC-SPS-PCBA-001']?.status),
-    //   sortable: true,
-    // },
-
     {
-      name: 'Sub Assembly',
-      selector: (row) => row.qc_history?.['QC-SA002']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-SA002']?.status),
+      name: <span title="PLN Serial">PLN Serial</span>,
+      selector: (row) => row.pln_code || '-',
       sortable: true,
     },
-    {
-      name: 'Assembly',
-      selector: (row) => row.qc_history?.['QC-AT003']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-AT003']?.status),
+    ...qcColumns.map((qc) => ({
+      name: <span title={qc.label}>{qc.label}</span>,
+      selector: (row) => row.qc_history?.[qc.code]?.status,
+      cell: (row) => renderStatusBadge(row.qc_history?.[qc.code]?.status),
       sortable: true,
-    },
+    })),
     {
-      name: 'ON Test',
-      selector: (row) => row.qc_history?.['QC-OT004']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-OT004']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Hippot',
-      selector: (row) => row.qc_history?.['QC-HT005']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-HT005']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Calibration 1',
-      selector: (row) => row.qc_history?.['QC-CT1006']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-CT1006']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Ultrasonic',
-      selector: (row) => row.qc_history?.['QC-U015']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-U015']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Ref. Meter',
-      selector: (row) => row.qc_history?.['QC-RM013']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-RM013']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Calibration 2',
-      selector: (row) => row.qc_history?.['QC-CT2014']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-CT2014']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Aging',
-      selector: (row) => row.qc_history?.['QC-AT007']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-AT007']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Laser & Gripping',
-      selector: (row) => row.qc_history?.['QC-LG016']?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.['QC-LG016']?.status),
-      sortable: true,
-    },
-    {
-      name: 'Actions',
+      name: <span title="Actions">Actions</span>,
       cell: (row) => (
         <CButton size="sm" color="primary" onClick={() => handleDetail(row)}>
           Detail
