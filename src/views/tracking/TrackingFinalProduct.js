@@ -97,7 +97,7 @@ const TrackingFinalProduct = () => {
       if (cell.querySelector('button') || cell.querySelector('span[role="button"]')) return
 
       const columnIndex = Array.from(cell.parentNode.children).indexOf(cell)
-      if (columnIndex < 0) return
+      if (columnIndex !== 0) return // hanya kolom pertama (PLN Serial)
 
       const rows = document.querySelectorAll('.rdt_TableRow')
       const headers = document.querySelectorAll('.rdt_TableCol')
@@ -108,22 +108,19 @@ const TrackingFinalProduct = () => {
 
       const isExpanded = expandedCols.get(columnIndex) || false
 
-      // ===== Jika sedang expanded, kembalikan ke normal width =====
       if (isExpanded) {
+        // kembali ke ukuran default
         allCells.forEach((c) => {
           c.style.width = '150px'
           c.style.minWidth = '150px'
           c.style.maxWidth = '800px'
-          c.style.transition = 'width 0.2s ease'
         })
         expandedCols.set(columnIndex, false)
         return
       }
 
-      // ===== Jika belum expanded, auto-fit ke konten =====
-      // Paksa browser hitung ulang layout agar scrollWidth akurat
+      // expand sesuai konten
       allCells.forEach((c) => void c.offsetWidth)
-
       let maxWidth = 0
       allCells.forEach((c) => {
         const range = document.createRange()
@@ -134,12 +131,10 @@ const TrackingFinalProduct = () => {
       })
 
       const targetWidth = Math.min(maxWidth, 800)
-
       allCells.forEach((c) => {
         c.style.width = `${targetWidth}px`
         c.style.minWidth = `${targetWidth}px`
         c.style.maxWidth = `${targetWidth}px`
-        c.style.transition = 'width 0.2s ease'
       })
 
       expandedCols.set(columnIndex, true)
