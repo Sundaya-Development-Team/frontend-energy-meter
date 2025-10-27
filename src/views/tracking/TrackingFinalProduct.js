@@ -214,8 +214,9 @@ const TrackingFinalProduct = () => {
     exportToCSV(filteredData, 'all')
   }
 
-  const renderStatusBadge = (status) => {
+  const renderStatusBadge = (status, date) => {
     if (!status) return '-'
+
     const badgeStyle = {
       PASS: { color: 'white', backgroundColor: '#28a745' },
       FAIL: { color: 'white', backgroundColor: '#dc3545' },
@@ -225,21 +226,46 @@ const TrackingFinalProduct = () => {
 
     const style = badgeStyle[status] || { backgroundColor: '#6c757d', color: 'white' }
 
+    // ✅ Format tanggal + jam ke zona waktu lokal (WIB)
+    const formattedDate = date
+      ? new Date(date).toLocaleString('id-ID', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Jakarta',
+        })
+      : null
+
     return (
-      <span
-        style={{
-          ...style,
-          padding: '2px 8px',
-          borderRadius: '12px',
-          fontSize: '0.75rem',
-          textTransform: 'uppercase',
-          fontWeight: 600,
-          pointerEvents: 'none', // <==== Tambahan penting
-          display: 'inline-block', // <==== opsional, agar stabil di semua kolom
-        }}
-      >
-        {status}
-      </span>
+      <div style={{ textAlign: 'center', lineHeight: '1.3' }}>
+        <span
+          style={{
+            ...style,
+            padding: '2px 8px',
+            borderRadius: '12px',
+            fontSize: '0.75rem',
+            textTransform: 'uppercase',
+            fontWeight: 600,
+            display: 'inline-block',
+          }}
+        >
+          {status}
+        </span>
+        {formattedDate && (
+          <div
+            style={{
+              fontSize: '0.7rem',
+              color: '#555',
+              marginTop: '3px',
+            }}
+          >
+            {formattedDate}
+          </div>
+        )}
+      </div>
     )
   }
 
@@ -252,7 +278,11 @@ const TrackingFinalProduct = () => {
     ...qcColumns.map((qc) => ({
       name: <span title={qc.label}>{qc.label}</span>,
       selector: (row) => row.qc_history?.[qc.code]?.status,
-      cell: (row) => renderStatusBadge(row.qc_history?.[qc.code]?.status),
+      cell: (row) =>
+        renderStatusBadge(
+          row.qc_history?.[qc.code]?.status,
+          row.qc_history?.[qc.code]?.inspection_date, // gunakan field waktu di sini
+        ),
       sortable: true,
     })),
     {
