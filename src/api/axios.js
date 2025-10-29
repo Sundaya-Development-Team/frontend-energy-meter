@@ -75,6 +75,11 @@ export const backendAssembly = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/assembly`,
 })
 
+//Shipping
+export const backendShipping = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/shipping`,
+})
+
 //uploadFile
 export const backendUploadFile = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v1/upload-service`,

@@ -38,11 +38,8 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="shortcut icon" href="/favicon.ico" />
 
-    <!-- PASTIKAN CSS DIMUAT SEBELUM JS -->
-    <link rel="stylesheet" href="/static/css/main.css" />
-
-    <!-- Gunakan 'defer' agar JS tidak blokir rendering awal -->
-    <script type="module" src="/src/index.js" defer></script>
+    <!-- Vite will inject CSS and JS automatically -->
+    <script type="module" src="/src/index.js"></script>
   </head>
 
   <body>

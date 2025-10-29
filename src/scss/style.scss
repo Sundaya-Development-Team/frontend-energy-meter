@@ -125,17 +125,17 @@ body {
    END Layout Stabilizer (Anti-CLS)
    ========================== */
 
-// /* ==========================
-//    Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
-//    ========================== */
+/* ==========================
+   Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
+   ========================== */
 
-// /* Semua cell normal dulu */
-// .rdt_TableCell,
-// .rdt_TableCol {
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   white-space: nowrap;
-// }
+/* Semua cell normal dulu */
+.rdt_TableCell,
+.rdt_TableCol {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 // /* Hanya body PLN Serial (kolom pertama) bisa di-drag */
 // .rdt_TableRow .rdt_TableCell:nth-child(1) {
@@ -159,6 +159,6 @@ body {
 //   transition: width 0.2s ease;
 // }
 
-// /* ==========================
-//    END Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
-//    ========================== */
+/* ==========================
+   END Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
+   ========================== */
