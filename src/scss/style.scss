@@ -162,3 +162,86 @@ body {
 /* ==========================
    END Resize Manual Hanya untuk PLN Serial (tanpa icon di header)
    ========================== */
+
+/* ==========================
+   Photo Upload Preview Styles - ReceivingDetail.js
+   ========================== */
+
+/* Container untuk gambar preview dengan padding agar tidak mentok */
+.photo-preview-container {
+  height: 150px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  padding: 10px;
+}
+
+/* Styling gambar preview agar responsive dan centered */
+.photo-preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Tombol close untuk menghapus foto dari preview */
+.photo-preview-close-btn {
+  width: 22px;
+  height: 22px;
+  padding: 2px;
+  margin: 6px;
+  border: none;
+  border-radius: 4px;
+  background-color: rgba(220, 53, 69, 0.95);
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover effect untuk tombol close */
+.photo-preview-close-btn:hover:not(:disabled) {
+  background-color: rgba(220, 53, 69, 1);
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* State disabled untuk tombol close */
+.photo-preview-close-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Text untuk nama file pada preview - ukuran kecil dan truncate */
+.photo-preview-filename {
+  font-size: 0.75rem;
+}
+
+/* Text untuk ukuran file pada preview - ukuran lebih kecil */
+.photo-preview-filesize {
+  font-size: 0.7rem;
+}
+
+/* Card untuk existing photos yang sudah tersimpan di server */
+.existing-photo-card {
+  cursor: default;
+  transition: transform 0.2s;
+}
+
+/* Hover effect untuk existing photo card - sedikit naik saat hover */
+.existing-photo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Tombol delete pada existing photo menggunakan class yang sama dengan new photo preview */
+/* .photo-preview-close-btn sudah didefinisikan di atas untuk consistency */
+
+/* ==========================
+   END Photo Upload Preview Styles
+   ========================== */

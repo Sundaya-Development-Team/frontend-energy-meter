@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CCard,
@@ -20,7 +20,9 @@ import {
   CPaginationItem,
   CFormTextarea,
 } from '@coreui/react'
-import { backendReceiving } from '../../api/axios'
+import CIcon from '@coreui/icons-react'
+import { cilPlus, cilX, cilCloudDownload } from '@coreui/icons'
+import { backendReceiving, cdnBackend } from '../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard12 } from '../components/CounterCard'
 import { useAuth } from '../../context/AuthContext'
@@ -49,6 +51,18 @@ const ReceivingDetail = () => {
   const [trackedTotal, setTrackedTotal] = useState(0)
   const [isFormLocked, setIsFormLocked] = useState(false)
 
+  // State untuk upload photo
+  const [uploadingItem, setUploadingItem] = useState(null)
+  const [selectedFiles, setSelectedFiles] = useState([])
+  const [previewUrls, setPreviewUrls] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const [existingPhotos, setExistingPhotos] = useState([]) // Array of UUIDs from documentation_uuid
+
+  // Ref untuk input file tambahan dan scroll focus
+  const addMorePhotosRef = useRef(null)
+  const scanSectionRef = useRef(null)
+  const uploadSectionRef = useRef(null)
+
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
   const fetchDetail = useCallback(async () => {
@@ -69,14 +83,31 @@ const ReceivingDetail = () => {
     fetchDetail()
   }, [fetchDetail])
 
+  // Cleanup preview URLs on unmount
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [previewUrls])
+
   const handleScan = (item) => {
     if (scanningItem?.itemId === item.id) {
       setScanningItem(null)
       setCurrentPage(1)
     } else {
+      // Tutup upload photo section jika terbuka
+      if (uploadingItem) {
+        previewUrls.forEach((url) => URL.revokeObjectURL(url))
+        setUploadingItem(null)
+        setSelectedFiles([])
+        setPreviewUrls([])
+      }
       fetchStagingItem(item)
       setCurrentPage(1)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      // Scroll ke scan section setelah render
+      setTimeout(() => {
+        scanSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
     }
   }
 
@@ -252,6 +283,241 @@ const ReceivingDetail = () => {
     }
   }
 
+  // Handler untuk membuka form upload photo
+  const handleUploadPhoto = (item) => {
+    if (uploadingItem?.id === item.id) {
+      // Cleanup preview URLs
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
+      setUploadingItem(null)
+      setSelectedFiles([])
+      setPreviewUrls([])
+      setExistingPhotos([])
+    } else {
+      // Tutup scan section jika terbuka
+      if (scanningItem) {
+        setScanningItem(null)
+        setCurrentPage(1)
+      }
+      // Cleanup previous preview URLs if any
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
+
+      // Parse documentation_uuid jika ada
+      let photoUuids = []
+      if (item.documentation_uuid && item.documentation_uuid.trim() !== '') {
+        photoUuids = item.documentation_uuid.split(',').map((uuid) => uuid.trim())
+      }
+
+      setUploadingItem(item)
+      setSelectedFiles([])
+      setPreviewUrls([])
+      setExistingPhotos(photoUuids)
+
+      // Scroll ke upload section setelah render
+      setTimeout(() => {
+        uploadSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }
+
+  // Handler untuk memilih file dengan validasi 10MB
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files)
+    const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+    const validFiles = []
+    const invalidFiles = []
+
+    files.forEach((file) => {
+      if (file.size > maxSize) {
+        invalidFiles.push(file.name)
+      } else {
+        validFiles.push(file)
+      }
+    })
+
+    if (invalidFiles.length > 0) {
+      toast.error(
+        `File berikut melebihi 10MB: ${invalidFiles.join(', ')}. File tidak akan diupload.`,
+      )
+    }
+
+    // Cleanup old preview URLs
+    previewUrls.forEach((url) => URL.revokeObjectURL(url))
+
+    // Create new preview URLs
+    const newPreviewUrls = validFiles.map((file) => URL.createObjectURL(file))
+
+    setSelectedFiles(validFiles)
+    setPreviewUrls(newPreviewUrls)
+  }
+
+  // Handler untuk menambah foto tambahan (tidak replace yang sudah ada)
+  const handleAddMorePhotos = (e) => {
+    const files = Array.from(e.target.files)
+    const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+    const validFiles = []
+    const invalidFiles = []
+
+    files.forEach((file) => {
+      if (file.size > maxSize) {
+        invalidFiles.push(file.name)
+      } else {
+        validFiles.push(file)
+      }
+    })
+
+    if (invalidFiles.length > 0) {
+      toast.error(
+        `File berikut melebihi 10MB: ${invalidFiles.join(', ')}. File tidak akan diupload.`,
+      )
+    }
+
+    // Create preview URLs untuk file baru
+    const newPreviewUrls = validFiles.map((file) => URL.createObjectURL(file))
+
+    // Gabungkan dengan file dan preview yang sudah ada
+    setSelectedFiles([...selectedFiles, ...validFiles])
+    setPreviewUrls([...previewUrls, ...newPreviewUrls])
+
+    // Reset input file
+    e.target.value = ''
+  }
+
+  // Handler untuk hapus gambar individual
+  const handleRemoveImage = (index) => {
+    // Cleanup URL yang dihapus
+    URL.revokeObjectURL(previewUrls[index])
+
+    // Remove dari array
+    const newFiles = selectedFiles.filter((_, i) => i !== index)
+    const newPreviews = previewUrls.filter((_, i) => i !== index)
+
+    setSelectedFiles(newFiles)
+    setPreviewUrls(newPreviews)
+  }
+
+  // Handler untuk submit upload
+  const handleSubmitUpload = async () => {
+    if (selectedFiles.length === 0) {
+      toast.warning('Silakan pilih file untuk diupload')
+      return
+    }
+
+    setUploading(true)
+    try {
+      // Step 1: Upload files ke CDN
+      const formData = new FormData()
+      selectedFiles.forEach((file) => {
+        formData.append('files', file)
+      })
+      formData.append('receivingItemId', uploadingItem.id)
+      formData.append('documentType', 'photo')
+
+      const uploadResponse = await cdnBackend.post('/documents/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      // Step 2: Extract UUIDs dari response
+      const uploadedDocuments = uploadResponse.data.data
+      const newDocumentUuids = uploadedDocuments.map((doc) => doc.id)
+
+      // Step 3: Gabungkan dengan existing UUIDs jika ada
+      const allUuids = [...existingPhotos, ...newDocumentUuids]
+      const documentUuidsString = allUuids.join(',')
+
+      // Step 4: Update receiving item dengan documentation_uuid
+      await backendReceiving.put(`/receiving-items/${uploadingItem.id}`, {
+        documentation_uuid: documentUuidsString,
+      })
+
+      // Success
+      toast.success(uploadResponse.data.message || `${selectedFiles.length} file berhasil diupload`)
+
+      // Cleanup preview URLs
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
+
+      // Reset state
+      setUploadingItem(null)
+      setSelectedFiles([])
+      setPreviewUrls([])
+      setExistingPhotos([])
+
+      // Refresh data
+      fetchDetail()
+    } catch (error) {
+      const message = error?.response?.data?.message || error?.message || 'Gagal mengupload file'
+      toast.error(message)
+      console.error('Error upload:', error)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // Handler untuk download semua foto
+  const handleDownloadAllPhotos = async () => {
+    if (!uploadingItem?.id) return
+
+    try {
+      const response = await cdnBackend.get(
+        `/documents/bulk-download/receiving-item/${uploadingItem.id}`,
+        {
+          responseType: 'blob', // Important untuk download file
+        },
+      )
+
+      // Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `photos-receiving-item-${uploadingItem.id}.zip`)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      toast.success('Photos downloaded successfully')
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Failed to download photos'
+      toast.error(message)
+      console.error('Error downloading photos:', error)
+    }
+  }
+
+  // Handler untuk delete existing photo
+  const handleDeleteExistingPhoto = async (uuid, index) => {
+    // Konfirmasi security
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete this photo?\n\nThis action cannot be undone.`,
+    )
+
+    if (!confirmDelete) return
+
+    try {
+      // Step 1: Delete dari CDN
+      await cdnBackend.delete(`/documents/${uuid}`)
+
+      // Step 2: Update state - remove UUID dari array
+      const updatedUuids = existingPhotos.filter((id) => id !== uuid)
+      setExistingPhotos(updatedUuids)
+
+      // Step 3: Update receiving item dengan documentation_uuid yang baru
+      const documentUuidsString = updatedUuids.join(',')
+      await backendReceiving.put(`/receiving-items/${uploadingItem.id}`, {
+        documentation_uuid: documentUuidsString || null, // null jika kosong
+      })
+
+      toast.success('Photo deleted successfully')
+
+      // Refresh data untuk sync dengan backend
+      fetchDetail()
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Failed to delete photo'
+      toast.error(message)
+      console.error('Error deleting photo:', error)
+    }
+  }
+
   if (loading) {
     return (
       <div
@@ -352,14 +618,23 @@ const ReceivingDetail = () => {
                       <CTableDataCell>{item.quantity}</CTableDataCell>
                       <CTableDataCell>{item.is_serialized ? 'Yes' : 'No'}</CTableDataCell>
                       <CTableDataCell>
-                        {item.is_serialized && (
+                        {item.is_serialized ? (
                           <CButton
                             size="sm"
-                            color="primary"
+                            color="success"
                             onClick={() => handleScan(item)}
-                            className="d-block mx-auto"
+                            className="d-block mx-auto text-white"
                           >
                             Scan
+                          </CButton>
+                        ) : (
+                          <CButton
+                            size="sm"
+                            color="warning"
+                            onClick={() => handleUploadPhoto(item)}
+                            className="d-block mx-auto text-white"
+                          >
+                            Upload Photo
                           </CButton>
                         )}
                       </CTableDataCell>
@@ -392,7 +667,7 @@ const ReceivingDetail = () => {
       </CCol>
 
       {scanningItem && (
-        <CCol xs={12}>
+        <CCol xs={12} ref={scanSectionRef}>
           <CRow>
             {' '}
             {/* Kiri: Info dan Input */}
@@ -488,6 +763,195 @@ const ReceivingDetail = () => {
               </CCard>
             </CCol>
           </CRow>
+        </CCol>
+      )}
+
+      {uploadingItem && (
+        <CCol xs={12} ref={uploadSectionRef}>
+          <CCard className="mb-4">
+            <CCardHeader>
+              <strong>Upload Photo - {uploadingItem.product.data.name || '-'}</strong>
+            </CCardHeader>
+            <CCardBody>
+              <CRow className="mb-3">
+                <CCol md={6}>
+                  <div className="fw-semibold">Product Name</div>
+                  <div>{uploadingItem.product.data.name || '-'}</div>
+                </CCol>
+                <CCol md={6}>
+                  <div className="fw-semibold">Item Type</div>
+                  <div>{uploadingItem.item_type || '-'}</div>
+                </CCol>
+              </CRow>
+
+              <CRow className="mb-3">
+                <CCol md={6}>
+                  <div className="fw-semibold">Quantity</div>
+                  <div>{uploadingItem.quantity || '-'}</div>
+                </CCol>
+                <CCol md={6}>
+                  <div className="fw-semibold">Serialized</div>
+                  <div>{uploadingItem.is_serialized ? 'Yes' : 'No'}</div>
+                </CCol>
+              </CRow>
+
+              {/* Existing Photos Section */}
+              {existingPhotos.length > 0 && (
+                <div className="mb-4">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h6 className="mb-0">Existing Photos ({existingPhotos.length}):</h6>
+                    <CButton
+                      size="sm"
+                      color="primary"
+                      onClick={handleDownloadAllPhotos}
+                      disabled={uploading}
+                    >
+                      <CIcon icon={cilCloudDownload} className="me-1" />
+                      Download All
+                    </CButton>
+                  </div>
+                  <CRow className="g-3">
+                    {existingPhotos.map((uuid, index) => (
+                      <CCol key={uuid} xs={6} md={4} lg={3}>
+                        <CCard className="h-100 shadow-sm existing-photo-card position-relative">
+                          <button
+                            className="photo-preview-close-btn position-absolute top-0 end-0"
+                            onClick={() => handleDeleteExistingPhoto(uuid, index)}
+                            disabled={uploading}
+                            title="Delete this photo"
+                          >
+                            <CIcon icon={cilX} size="sm" />
+                          </button>
+                          <div className="photo-preview-container">
+                            <img
+                              src={`${cdnBackend.defaults.baseURL}/documents/${uuid}/thumbnail`}
+                              alt={`Photo ${index + 1}`}
+                              className="photo-preview-image"
+                              onError={(e) => {
+                                e.target.src =
+                                  'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2Y4ZjlmYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+'
+                              }}
+                            />
+                          </div>
+                          <CCardBody className="p-2 text-center">
+                            <small className="text-muted photo-preview-filesize">
+                              Photo {index + 1}
+                            </small>
+                          </CCardBody>
+                        </CCard>
+                      </CCol>
+                    ))}
+                  </CRow>
+                </div>
+              )}
+
+              {/* Upload New Photos Section */}
+              <FormRow label="Select Photos" labelCols="2">
+                <CFormInput
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  disabled={uploading}
+                />
+                <small className="text-muted">
+                  Maximum file size: 10MB per file. You can select multiple files.
+                </small>
+              </FormRow>
+
+              {selectedFiles.length > 0 && (
+                <div className="mb-3 mt-4">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h6 className="mb-0">Preview Gambar ({selectedFiles.length} file):</h6>
+                    <div>
+                      <input
+                        type="file"
+                        ref={addMorePhotosRef}
+                        multiple
+                        accept="image/*"
+                        onChange={handleAddMorePhotos}
+                        style={{ display: 'none' }}
+                      />
+                      <CButton
+                        size="sm"
+                        color="primary"
+                        variant="outline"
+                        onClick={() => addMorePhotosRef.current?.click()}
+                        disabled={uploading}
+                      >
+                        <CIcon icon={cilPlus} className="me-1" />
+                        Add More Photos
+                      </CButton>
+                    </div>
+                  </div>
+                  <CRow className="g-3 mt-2">
+                    {selectedFiles.map((file, index) => (
+                      <CCol key={index} xs={6} md={4} lg={3}>
+                        <CCard className="h-100 position-relative shadow-sm">
+                          <button
+                            className="photo-preview-close-btn position-absolute top-0 end-0"
+                            onClick={() => handleRemoveImage(index)}
+                            disabled={uploading}
+                          >
+                            <CIcon icon={cilX} size="sm" />
+                          </button>
+                          <div className="photo-preview-container">
+                            <img
+                              src={previewUrls[index]}
+                              alt={file.name}
+                              className="photo-preview-image"
+                            />
+                          </div>
+                          <CCardBody className="p-2">
+                            <small
+                              className="text-truncate d-block photo-preview-filename"
+                              title={file.name}
+                            >
+                              {file.name}
+                            </small>
+                            <small className="text-muted photo-preview-filesize">
+                              {(file.size / (1024 * 1024)).toFixed(2)} MB
+                            </small>
+                          </CCardBody>
+                        </CCard>
+                      </CCol>
+                    ))}
+                  </CRow>
+                </div>
+              )}
+
+              <div className="d-flex justify-content-end gap-2">
+                <CButton
+                  color="secondary"
+                  onClick={() => {
+                    // Cleanup preview URLs
+                    previewUrls.forEach((url) => URL.revokeObjectURL(url))
+                    setUploadingItem(null)
+                    setSelectedFiles([])
+                    setPreviewUrls([])
+                  }}
+                  disabled={uploading}
+                >
+                  Cancel
+                </CButton>
+                <CButton
+                  color="success"
+                  className="text-white"
+                  onClick={handleSubmitUpload}
+                  disabled={uploading || selectedFiles.length === 0}
+                >
+                  {uploading ? (
+                    <>
+                      <CSpinner size="sm" className="me-2" />
+                      Uploading...
+                    </>
+                  ) : (
+                    'Upload'
+                  )}
+                </CButton>
+              </div>
+            </CCardBody>
+          </CCard>
         </CCol>
       )}
     </CRow>
