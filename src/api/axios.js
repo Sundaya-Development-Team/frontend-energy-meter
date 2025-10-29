@@ -90,6 +90,11 @@ export const backendAuth = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/auth`,
 })
 
+//CDN Backend for document upload
+export const cdnBackend = axios.create({
+  baseURL: `${VITE_SERVER_DATA}/api/v2/cdn`,
+})
+
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,
 // })
