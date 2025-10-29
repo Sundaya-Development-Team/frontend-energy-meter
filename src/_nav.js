@@ -338,8 +338,8 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'QC Laser & Gripping',
-        to: '/production/serialnoaql/QC-LG016/QC Laser And Gripping',
+        name: 'QC Laser & Engraving',
+        to: '/production/serialnoaql/QC-LG016/QC Laser And Engraving',
       },
       {
         component: CNavItem,
@@ -356,6 +356,16 @@ const _nav = [
     component: CNavItem,
     name: 'QC Repair',
     to: '/repair/QC-R015/QC Repair',
+    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavTitle,
+    name: 'Shipping',
+  },
+  {
+    component: CNavItem,
+    name: 'Shipping Order',
+    to: '/shipping/shippingorder',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
   },
   {

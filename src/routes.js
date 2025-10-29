@@ -36,6 +36,9 @@ const MatchingAssemblyPcbSerial = React.lazy(
   () => import('./views/production/assembly/MatchingAssemblyPcb.js'),
 )
 
+//Shipping
+const ShippingHeader = React.lazy(() => import('./views/shipping/ShippingHeader.js'))
+
 //Aging
 const ScanBeforeAging = React.lazy(() => import('./views/production/agingtest/ScanBeforeAging'))
 
@@ -114,7 +117,7 @@ const routes = [
   },
   {
     path: '/receiving/receivingHeader',
-    name: 'Receving Header213',
+    name: 'Receving Header',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
@@ -482,6 +485,19 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <GeneratePlnSerial />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  //Shipping
+  { path: '/shipping', name: 'Shipping' },
+  {
+    path: '/shipping/shippingorder',
+    name: 'Shipping Order',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ShippingHeader />
         </DefaultLayout>
       </PrivateRoutes>
     ),
