@@ -16,8 +16,11 @@ COPY . .
 # Build the application for production
 RUN npm run build
 
+# Install serve globally for production serving
+RUN npm install -g serve@latest
+
 # Expose port
 EXPOSE 3000
 
-# Serve built files with Express (proper SPA routing)
-CMD ["node", "server-spa.js"]
+# Serve built files (SPA mode with single flag)
+CMD ["serve", "-s", "build", "-l", "3000", "--no-clipboard", "--single"]
