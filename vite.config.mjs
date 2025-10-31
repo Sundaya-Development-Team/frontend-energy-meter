@@ -8,14 +8,10 @@ export default defineConfig(() => {
     base: './',
     build: {
       outDir: 'build',
-      // Minification dengan terser untuk hasil lebih kecil
-      minify: 'terser',
-      terserOptions: {
-        compress: {
-          drop_console: true, // Hapus console.log di production
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info'], // Hapus specific functions
-        },
+      // Minification dengan esbuild (built-in, faster)
+      minify: 'esbuild',
+      esbuild: {
+        drop: ['console', 'debugger'], // Hapus console.log & debugger di production
       },
       // CSS code splitting untuk parallel loading
       cssCodeSplit: true,
