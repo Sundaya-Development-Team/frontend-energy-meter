@@ -5,51 +5,30 @@ import autoprefixer from 'autoprefixer'
 
 export default defineConfig(() => {
   return {
-    base: './',
+    base: '/',  // Use absolute path for proper SPA routing
     build: {
       outDir: 'build',
-      // Minification dengan terser untuk hasil lebih kecil
-      minify: 'terser',
-      terserOptions: {
-        compress: {
-          drop_console: true, // Hapus console.log di production
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info'], // Hapus specific functions
-        },
-      },
+      // Disable minification untuk testing (temporary)
+      minify: false,
+      // Keep console for debugging
+      // esbuild: {
+      //   drop: ['console', 'debugger'],
+      // },
       // CSS code splitting untuk parallel loading
       cssCodeSplit: true,
-      // Disable source maps untuk production (lebih kecil)
-      sourcemap: false,
+      // Enable source maps untuk debugging
+      sourcemap: true,
       // Rollup options untuk advanced optimization
       rollupOptions: {
         output: {
-          // Manual chunks - split vendor code
-          manualChunks: (id) => {
-            if (id.includes('node_modules')) {
-              // React core libraries
-              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-                return 'vendor-react';
-              }
-              // CoreUI components
-              if (id.includes('@coreui')) {
-                return 'vendor-coreui';
-              }
-              // DataTables & jQuery (heavy libraries)
-              if (id.includes('datatables') || id.includes('jquery')) {
-                return 'vendor-datatable';
-              }
-              // Chart libraries
-              if (id.includes('chart.js')) {
-                return 'vendor-chart';
-              }
-              // Redux & state management
-              if (id.includes('redux') || id.includes('react-redux')) {
-                return 'vendor-redux';
-              }
-              // Other node_modules
-              return 'vendor-utils';
-            }
+          // Manual chunks - simplified to avoid dependency issues
+          manualChunks: {
+            // Keep React together (IMPORTANT - don't split React internals)
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            // CoreUI components
+            'vendor-coreui': ['@coreui/react', '@coreui/coreui'],
+            // Heavy libraries
+            'vendor-heavy': ['jquery', 'chart.js'],
           },
           // Optimized file naming untuk better caching
           chunkFileNames: 'assets/js/[name]-[hash].js',

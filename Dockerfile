@@ -1,35 +1,26 @@
-# ===== STAGE 1: Build =====
-FROM node:18.14-alpine AS build
+# Pull image node 20 alpine (sesuai pattern lama)
+FROM node:20.14-alpine
 
-# Set working directory
+# Create working directory
 WORKDIR /usr/src/app
 
 # Copy package files first (for better caching)
 COPY package*.json ./
 
-# Install ALL dependencies (including devDependencies for build)
-RUN npm ci --silent
+# Install dependencies (including Express)
+RUN npm install --silent
 
-# Copy source code
+# Copy rest of the files
 COPY . .
 
-# Build the application with optimizations
+# Build the application for production
 RUN npm run build
 
-# ===== STAGE 2: Production =====
-FROM node:18.14-alpine
-
-# Set working directory
-WORKDIR /usr/src/app
-
-# Install serve globally for serving static files
-RUN npm install -g serve
-
-# Copy built files from build stage
-COPY --from=build /usr/src/app/build ./build
+# Install serve globally for production serving
+RUN npm install -g serve@latest
 
 # Expose port
 EXPOSE 3000
 
-# Serve built files with compression
-CMD ["serve", "-s", "build", "-l", "3000", "--no-clipboard"]
+# Serve built files (SPA mode with single flag)
+CMD ["serve", "-s", "build", "-l", "3000", "--no-clipboard", "--single"]
