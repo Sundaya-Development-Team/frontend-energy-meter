@@ -105,7 +105,7 @@ const SidePlnSerial = () => {
               <CRow className="mb-3">
                 <CCol sm={12}>
                   <ImageContainer
-                    src={`/src/assets/images/assembly/kwhm_product_serial_side.jpeg`}
+                    src={`/images/assembly/kwhm_product_serial_side.jpeg`}
                     alt="Side Product Serial Number"
                     height="300px" // ✅ konsisten
                   />
@@ -151,7 +151,7 @@ const SidePlnSerial = () => {
               <CRow className="mb-3">
                 <CCol sm={12}>
                   <ImageContainer
-                    src={`/src/assets/images/assembly/kwhm_pln_serial_side.jpeg`}
+                    src={`/images/assembly/kwhm_pln_serial_side.jpeg`}
                     alt="Side PLN Serial Number"
                     height="300px" // ✅ konsisten
                   />

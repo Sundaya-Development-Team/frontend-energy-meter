@@ -84,7 +84,7 @@ const ScanBeforeAssembly = () => {
               <CRow className="mb-3">
                 <CCol sm={12}>
                   <ImageContainer
-                    src="/src/assets/images/assembly/pcb_serial_number.jpeg"
+                    src="/images/assembly/pcb_serial_number.jpeg"
                     alt="PCB Preview"
                     height="300px"
                   />
@@ -123,7 +123,7 @@ const ScanBeforeAssembly = () => {
               <CRow className="mb-3">
                 <CCol sm={12}>
                   <ImageContainer
-                    src="/src/assets/images/assembly/kwhm_product_serial_side.jpeg"
+                    src="/images/assembly/kwhm_product_serial_side.jpeg"
                     alt="Side Cover Preview"
                     height="300px"
                   />
