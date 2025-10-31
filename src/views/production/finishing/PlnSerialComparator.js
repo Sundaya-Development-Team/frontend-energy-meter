@@ -80,7 +80,7 @@ const PlnSerialComparator = () => {
               <CRow className="mb-3">
                 <CCol sm={12}>
                   <ImageContainer
-                    src={`/src/assets/images/assembly/kwhm_pln_serial_side.jpeg`}
+                    src={`/images/assembly/kwhm_pln_serial_side.jpeg`}
                     alt="Side Cover Preview"
                     height="300px"
                   />
@@ -120,7 +120,7 @@ const PlnSerialComparator = () => {
               <CRow className="mb-3">
                 <CCol sm={12}>
                   <ImageContainer
-                    src={`/src/assets/images/assembly/tutup_cover.jpeg`}
+                    src={`/images/assembly/tutup_cover.jpeg`}
                     alt="Front Cover Preview"
                     height="300px"
                   />
