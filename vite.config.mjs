@@ -5,9 +5,41 @@ import autoprefixer from 'autoprefixer'
 
 export default defineConfig(() => {
   return {
-    base: './',
+    base: '/',  // Use absolute path for proper SPA routing
     build: {
       outDir: 'build',
+      // Disable minification untuk testing (temporary)
+      minify: false,
+      // Keep console for debugging
+      // esbuild: {
+      //   drop: ['console', 'debugger'],
+      // },
+      // CSS code splitting untuk parallel loading
+      cssCodeSplit: true,
+      // Enable source maps untuk debugging
+      sourcemap: true,
+      // Rollup options untuk advanced optimization
+      rollupOptions: {
+        output: {
+          // Manual chunks - simplified to avoid dependency issues
+          manualChunks: {
+            // Keep React together (IMPORTANT - don't split React internals)
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            // CoreUI components
+            'vendor-coreui': ['@coreui/react', '@coreui/coreui'],
+            // Heavy libraries
+            'vendor-heavy': ['jquery', 'chart.js'],
+          },
+          // Optimized file naming untuk better caching
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
+          assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+        },
+      },
+      // Target modern browsers untuk smaller bundles
+      target: 'es2015',
+      // Chunk size warning
+      chunkSizeWarningLimit: 500,
     },
     css: {
       postcss: {

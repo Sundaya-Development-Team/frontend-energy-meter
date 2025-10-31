@@ -1,17 +1,26 @@
-# pull image node 18.14 alpine
-FROM node:18.14-alpine
+# Pull image node 20 alpine (sesuai pattern lama)
+FROM node:20.14-alpine
 
-# create working directory
+# Create working directory
 WORKDIR /usr/src/app
 
-# copy all files to working directory
-COPY . .
+# Copy package files first (for better caching)
+COPY package*.json ./
 
-# install dependencies
+# Install dependencies (including Express)
 RUN npm install --silent
 
-# expose port
+# Copy rest of the files
+COPY . .
+
+# Build the application for production
+RUN npm run build
+
+# Install serve globally for production serving
+RUN npm install -g serve@latest
+
+# Expose port
 EXPOSE 3000
 
-# run the app
-CMD ["npm", "run", "start"]
+# Serve built files (SPA mode with single flag)
+CMD ["serve", "-s", "build", "-l", "3000", "--no-clipboard", "--single"]
