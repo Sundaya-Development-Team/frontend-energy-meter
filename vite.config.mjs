@@ -8,6 +8,59 @@ export default defineConfig(() => {
     base: './',
     build: {
       outDir: 'build',
+      // Minification dengan terser untuk hasil lebih kecil
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true, // Hapus console.log di production
+          drop_debugger: true,
+          pure_funcs: ['console.log', 'console.info'], // Hapus specific functions
+        },
+      },
+      // CSS code splitting untuk parallel loading
+      cssCodeSplit: true,
+      // Disable source maps untuk production (lebih kecil)
+      sourcemap: false,
+      // Rollup options untuk advanced optimization
+      rollupOptions: {
+        output: {
+          // Manual chunks - split vendor code
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              // React core libraries
+              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+                return 'vendor-react';
+              }
+              // CoreUI components
+              if (id.includes('@coreui')) {
+                return 'vendor-coreui';
+              }
+              // DataTables & jQuery (heavy libraries)
+              if (id.includes('datatables') || id.includes('jquery')) {
+                return 'vendor-datatable';
+              }
+              // Chart libraries
+              if (id.includes('chart.js')) {
+                return 'vendor-chart';
+              }
+              // Redux & state management
+              if (id.includes('redux') || id.includes('react-redux')) {
+                return 'vendor-redux';
+              }
+              // Other node_modules
+              return 'vendor-utils';
+            }
+          },
+          // Optimized file naming untuk better caching
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
+          assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+        },
+      },
+      // Target modern browsers untuk smaller bundles
+      target: 'es2015',
+      // Chunk size warning
+      chunkSizeWarningLimit: 500,
     },
     css: {
       postcss: {
