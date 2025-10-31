@@ -13,11 +13,8 @@ RUN npm install --silent
 # Build the application for production
 RUN npm run build
 
-# Install serve globally for production serving
-RUN npm install -g serve
-
 # Expose port
 EXPOSE 3000
 
-# Serve built files (production mode)
-CMD ["serve", "-s", "build", "-l", "3000", "--no-clipboard"]
+# Serve built files with Express (proper SPA routing)
+CMD ["node", "server-spa.js"]

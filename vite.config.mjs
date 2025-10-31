@@ -5,7 +5,7 @@ import autoprefixer from 'autoprefixer'
 
 export default defineConfig(() => {
   return {
-    base: './',
+    base: '/',  // Use absolute path for proper SPA routing
     build: {
       outDir: 'build',
       // Disable minification untuk testing (temporary)
