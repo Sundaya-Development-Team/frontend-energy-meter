@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CRow,
-  CCard,
   CCol,
+  CCard,
   CCardBody,
   CCardHeader,
+  CBadge,
   CFormLabel,
   CFormInput,
   CButton,
@@ -27,7 +28,7 @@ const FormRow = ({ label, children }) => (
   </CRow>
 )
 
-const QcAqlSerial = () => {
+const QcSerialNoAql = () => {
   const { qcIdParams } = useParams()
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
@@ -39,15 +40,12 @@ const QcAqlSerial = () => {
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
-  const [errorMessage, setErrorMessage] = useState(null)
-
   const resetStates = () => {
     setProductData(null)
     setTrackingProduct(null)
     setQuestionData([])
     setAnswers({})
     setFormData({ serialNumber: '', notes: '' })
-    setErrorMessage(null)
   }
 
   useEffect(() => {
@@ -61,19 +59,17 @@ const QcAqlSerial = () => {
   }
 
   const handleSerial = () => {
-    console.log('Serial Number di-scan:', formData.serialNumber)
-
-    // Bersihkan semua state dulu
     resetStates()
+
     // Panggil fetch validasi serial
     fetchValidationSnumb(formData.serialNumber)
 
     // Reset input serial number
     // setFormData({ serialNumber: '' })
   }
+
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
-    console.log('qcCodeSerial :', qcCodeSerial)
     try {
       const response = await backendQc.get('/validation', {
         params: {
@@ -84,7 +80,6 @@ const QcAqlSerial = () => {
 
       if (response.data.valid === true) {
         // toast.success(response.data.message ?? 'Serial number valid')
-        setErrorMessage(null)
 
         // Convert object questions → array
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
@@ -106,20 +101,15 @@ const QcAqlSerial = () => {
         // Ambil product
         fetchProduct(serialNumber)
       } else {
-        const errorMsg = response.data.message ?? 'Serial number already scan'
-        setErrorMessage(errorMsg)
-        // toast.error(errorMsg)
+        toast.error(response.data.message ?? 'Serial number already scan')
       }
     } catch (error) {
-      console.log('ERROR')
-      const errorMsg = error.response?.data?.message || 'Serial Number Validation Failed'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      console.log(error)
+      toast.error(error.response?.data?.message || 'Serial Number Validation Failed')
     }
   }
 
   const fetchProduct = async (serialNumber) => {
-    console.log('masuk fetch product')
     try {
       const response = await backendTracking.get(`/serial/${serialNumber}`)
 
@@ -134,45 +124,37 @@ const QcAqlSerial = () => {
         }))
 
         const assemblyId = response.data.data.assembly_id
-        console.log('assemblyId :', assemblyId)
 
         fetchTrackingProduct(assemblyId)
       } else {
-        const errorMsg = response.data.message || 'Failed get product data'
-        setErrorMessage(errorMsg)
-        // toast.error(errorMsg)
+        toast.error(response.data.message || 'Failed get product data')
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || 'ERROR get data product'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      console.log(error)
+      toast.error(error.response?.data?.message || 'ERROR get data product')
     }
   }
 
   const fetchTrackingProduct = async (assemblyId) => {
     try {
-      const response = await backendTracking.get('/sample-inspections/aql-summary', {
+      const response = await backendTracking.get('/sample-inspections/quantity-summary', {
         params: {
           assembly_id: assemblyId,
           qc_id: qcCodeSerial, //cek kembali ini nanti
         },
       })
-      const remainingSample = response.data.data.inspection_summary.remaining_samples
-      console.log('remaining Sample : ', remainingSample)
+      const remainingSample = response.data.data.quantity_summary.remaining_quantity
+
       if (remainingSample <= 0) {
-        const errorMsg = 'SAMPLE SUDAH CUKUP !!'
-        setErrorMessage(errorMsg)
-        // toast.error(
-        //   <span>
-        //     <span style={{ color: 'red', fontWeight: 'bold' }}> {errorMsg}</span>
-        //   </span>,
-        // )
+        toast.error(
+          <span>
+            <span style={{ color: 'red', fontWeight: 'bold' }}> SAMPLE SUDAH CUKUP !!</span>
+          </span>,
+        )
         //Besihkan page
         resetStates()
       } else {
-        console.log('LANJUT')
         setTrackingProduct(response.data.data)
-        setErrorMessage(null)
         const baseMessage = response.data?.message ?? ''
 
         toast.success(
@@ -183,51 +165,56 @@ const QcAqlSerial = () => {
         )
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || 'Failed Validation'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      console.log(error)
+      toast.error(error.response?.data?.message || 'Failed Validation')
     }
   }
 
+  // const [questionData] = useState([
+  //   {
+  //     id: 1,
+  //     title: 'Pemeriksaan Visual',
+  //     questions: [
+  //       { id: 101, question: 'Apakah ada goresan pada produk?' },
+  //       { id: 102, question: 'Apakah warna sesuai spesifikasi?' },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     title: 'Pemeriksaan Fungsional',
+  //     questions: [
+  //       { id: 201, question: 'Apakah semua tombol berfungsi?' },
+  //       { id: 202, question: 'Apakah produk menyala dengan benar?' },
+  //     ],
+  //   },
+  // ])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     // Validasi field wajib
     if (!productData?.serial_number) {
-      const errorMsg = 'Serial number wajib diisi!'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      toast.error('Serial number wajib diisi!')
       return
     }
     if (!inspected_by) {
-      const errorMsg = 'Inspector name wajib diisi!'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      toast.error('Inspector name wajib diisi!')
       return
     }
     if (!qcName) {
-      const errorMsg = 'QC Name wajib diisi!'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      toast.error('QC Name wajib diisi!')
       return
     }
     if (!qcCodeSerial) {
-      const errorMsg = 'QC ID wajib diisi!'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      toast.error('QC ID wajib diisi!')
       return
     }
-
     // if (!formData.notes) {
     //   toast.error('Notes wajib diisi!')
     //   return
     // }
-
     if (Object.keys(answers).length === 0) {
-      const errorMsg = 'Jawaban pertanyaan QC wajib diisi!'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      toast.error('Jawaban pertanyaan QC wajib diisi!')
       return
     }
 
@@ -244,7 +231,7 @@ const QcAqlSerial = () => {
       answers,
     }
 
-    console.log('Submit payload:', payload)
+    // console.log('Submit payload:', payload)
 
     try {
       const res = await backendQc.post('/submit', payload)
@@ -260,13 +247,11 @@ const QcAqlSerial = () => {
       )
 
       toast.success(messageShow)
-      setErrorMessage(null)
+
       serialNumberInputRef.current.focus()
     } catch (error) {
       console.error('QC submit error:', error)
-      const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QC'
-      setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
+      toast.error(error.response?.data?.message || error.message || 'Gagal submit QC')
     }
 
     // Bersihkan semua state
@@ -276,11 +261,10 @@ const QcAqlSerial = () => {
   return (
     <CRow>
       <CCol xs={12}>
-        <CRow className="g-4 align-items-stretch">
-          {/* Kolom Kiri - Scan Serial + Quality Control */}
-          <CCol md={8} className="d-flex flex-column">
+        <CRow className="g-4 mb-4">
           {/* Scan Serial Number */}
-            <CCard className="mb-4">
+          <CCol md={6}>
+            <CCard className="mb-4 h-100">
               <CCardHeader>
                 <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
               </CCardHeader>
@@ -308,13 +292,99 @@ const QcAqlSerial = () => {
                     onChange={handleInput}
                   />
                 </FormRow>
+                <FormRow label="Counter"></FormRow>
+                <CRow className="mb-3">
+                  <CounterCard6
+                    title="Required Quantity"
+                    value={trackingProduct?.quantity_summary?.total_quantity ?? `-`}
+                  />
+                  <CounterCard6
+                    title="Remaining Quantity"
+                    value={trackingProduct?.quantity_summary?.remaining_quantity ?? `-`}
+                  />
+                  <CounterCard6
+                    title="Pass Quantity"
+                    value={trackingProduct?.quantity_summary?.pass_quantity ?? `-`}
+                  />
+                  <CounterCard6
+                    title="Fail Quantity"
+                    value={trackingProduct?.quantity_summary?.fail_quantity ?? `-`}
+                  />
+                </CRow>
               </CCardBody>
             </CCard>
+          </CCol>
 
-            {/* Quality Control */}
-            <CCard className="mb-4 flex-grow-1">
+          {/* Detail */}
+          <CCol md={6}>
+            <CCard className="mb-4 h-100">
               <CCardHeader>
-                <strong>Quality Control</strong>
+                <strong>Detail</strong>
+              </CCardHeader>
+              <CCardBody>
+                <FormRow label="Product Detail :"></FormRow>
+                <CRow className="mb-3">
+                  <CCol md={12}>
+                    <div className="fw-semibold">Assembly Code</div>
+                    <div> {productData?.assembly_id ?? '-'}</div>
+                  </CCol>
+                </CRow>
+                <CRow className="mb-3">
+                  <CCol md={12}>
+                    <div className="fw-semibold">Item Code</div>
+                    <div> {productData?.code_item ?? '-'}</div>
+                  </CCol>
+                </CRow>
+                <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Tracking</div>
+                    <div> {productData?.tracking_type ?? '-'}</div>
+                  </CCol>
+                  <CCol md={6}>
+                    <div className="fw-semibold">Batch</div>
+                    <div> {productData?.batch ?? '-'}</div>
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Type</div>
+                    <div> {productData?.product?.type?.name ?? '-'}</div>
+                  </CCol>
+                  <CCol md={6}>
+                    <div className="fw-semibold">Supplier</div>
+                    <div> {productData?.product?.supplier?.name ?? '-'}</div>
+                  </CCol>
+                </CRow>
+
+                {/* <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Type</div>
+                    <div>{productData?.product?.type?.name ?? '-'}</div>
+                  </CCol>
+                </CRow>
+                <FormRow label="AQL Setting :"></FormRow>
+                <CRow className="mb-3">
+                  <CCol md={6}>
+                    <div className="fw-semibold">Inspection Level</div>
+                    <div>{trackingProduct?.aql_configuration?.inspection_level ?? `-`}</div>
+                  </CCol>
+                  <CCol md={6}>
+                    <div className="fw-semibold">AQL Critical</div>
+                    <div>{trackingProduct?.aql_configuration?.aql_critical ?? `-`}</div>
+                  </CCol>
+                </CRow> */}
+              </CCardBody>
+            </CCard>
+          </CCol>
+        </CRow>
+      </CCol>
+
+      {/* Quality Control Assembly */}
+      <CCol xs={12}>
+        <CCard className="mb-4">
+          <CCardHeader>
+            <strong>Quality Control</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
@@ -353,63 +423,9 @@ const QcAqlSerial = () => {
             </CForm>
           </CCardBody>
         </CCard>
-          </CCol>
-
-          {/* Kolom Kanan - Counter atau Error */}
-          <CCol md={4} className="d-flex flex-column">
-            {errorMessage ? (
-              /* Error Card */
-              <CCard
-                className="mb-4 h-100 d-flex flex-column"
-                style={{ backgroundColor: '#dc3545', border: 'none' }}
-              >
-                <CCardHeader style={{ backgroundColor: '#bd2130', color: 'white', border: 'none' }}>
-                  <strong>⚠️ Error</strong>
-                </CCardHeader>
-                <CCardBody
-                  className="d-flex flex-column justify-content-center align-items-center flex-grow-1"
-                  style={{ color: 'white' }}
-                >
-                  <div className="text-center">
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
-                    <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>ERROR</h4>
-                    <p style={{ fontSize: '1.1rem', lineHeight: '1.5' }}>{errorMessage}</p>
-                  </div>
-                </CCardBody>
-              </CCard>
-            ) : (
-              /* Counter Card */
-              <CCard className="mb-4 h-100 d-flex flex-column">
-                <CCardHeader>
-                  <strong>Counter</strong>
-                </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
-                  <CRow className="mb-3">
-                    <CounterCard6
-                      title="Required Sample"
-                      value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Remaining Samples"
-                      value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Max Fail"
-                      value={trackingProduct?.aql_configuration?.aql_reject ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Fail Count"
-                      value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
-                    />
-                  </CRow>
-                </CCardBody>
-              </CCard>
-            )}
-          </CCol>
-        </CRow>
       </CCol>
     </CRow>
   )
 }
 
-export default QcAqlSerial
+export default QcSerialNoAql

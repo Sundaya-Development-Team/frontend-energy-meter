@@ -339,7 +339,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Laser & Engraving',
-        to: '/production/serialnoaql/QC-LG016/QC Laser And Engraving',
+        to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving',
       },
       {
         component: CNavItem,
