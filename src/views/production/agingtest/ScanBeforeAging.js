@@ -122,15 +122,15 @@ const ScanBeforeAging = () => {
                 <CRow className="mb-3">
                   <CounterCard6 title="Total Items" value={inspectionSummary.total_items} />
                   <CounterCard6 title="Required Sample" value={inspectionSummary.required_sample} />
-                  <CounterCard6 title="Inspected" value={inspectionSummary.total_inspected} />
+                  <CounterCard6 title="Scanned Sample" value={inspectionSummary.total_inspected} />
                   <CounterCard6 title="Remaining" value={inspectionSummary.remaining_samples} />
-                  <CounterCard6 title="Pass Count" value={inspectionSummary.pass_count} />
+                  {/* <CounterCard6 title="Pass Count" value={inspectionSummary.pass_count} />
                   <CounterCard6 title="Fail Count" value={inspectionSummary.fail_count} />
                   <CounterCard6
                     title="Completion %"
                     value={inspectionSummary.completion_percentage + '%'}
                   />
-                  <CounterCard6 title="Defect Rate" value={inspectionSummary.defect_rate + '%'} />
+                  <CounterCard6 title="Defect Rate" value={inspectionSummary.defect_rate + '%'} /> */}
                 </CRow>
               </div>
             )}
@@ -153,7 +153,7 @@ const ScanBeforeAging = () => {
                     <CTableHeaderCell>Serial Number</CTableHeaderCell>
                     <CTableHeaderCell>Code Item</CTableHeaderCell>
                     <CTableHeaderCell>Inspection Count</CTableHeaderCell>
-                    <CTableHeaderCell>Result</CTableHeaderCell>
+                    {/* <CTableHeaderCell>Result</CTableHeaderCell> */}
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
