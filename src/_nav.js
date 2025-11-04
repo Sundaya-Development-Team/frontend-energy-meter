@@ -113,16 +113,15 @@ const _nav = [
         name: 'Assembly Serial List',
         to: '/production/assembly/assemblyseriallist',
       },
-
-      {
-        component: CNavItem,
-        name: 'Matching Assy & PCB',
-        to: '/production/assembly/matchingassypcb',
-      },
       {
         component: CNavItem,
         name: 'QC Sub Assembly',
         to: '/production/serialnoaql/QC-SA002/Sub Assembly',
+      },
+      {
+        component: CNavItem,
+        name: 'Matching Assy & PCB',
+        to: '/production/assembly/matchingassypcb',
       },
       // {
       //   component: CNavItem,
@@ -283,6 +282,19 @@ const _nav = [
   },
   {
     component: CNavGroup,
+    name: 'Matching PLN Serial',
+    to: '/production/plnserial',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'SCAN PLN Serial',
+        to: '/production/plnserial/scansidepln',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
     name: 'Aging Test',
     to: '/production/aging',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
@@ -321,11 +333,11 @@ const _nav = [
     to: '/production/finishing/clearzero',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'SCAN PLN Serial',
-        to: '/production/finishing/scansidepln',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'SCAN PLN Serial',
+      //   to: '/production/finishing/scansidepln',
+      // },
       {
         component: CNavItem,
         name: 'Print Laser Post 1',
