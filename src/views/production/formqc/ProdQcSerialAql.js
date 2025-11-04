@@ -189,7 +189,6 @@ const QcAqlSerial = () => {
     }
   }
 
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -279,7 +278,7 @@ const QcAqlSerial = () => {
         <CRow className="g-4 align-items-stretch">
           {/* Kolom Kiri - Scan Serial + Quality Control */}
           <CCol md={8} className="d-flex flex-column">
-          {/* Scan Serial Number */}
+            {/* Scan Serial Number */}
             <CCard className="mb-4">
               <CCardHeader>
                 <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
@@ -315,44 +314,44 @@ const QcAqlSerial = () => {
             <CCard className="mb-4 flex-grow-1">
               <CCardHeader>
                 <strong>Quality Control</strong>
-          </CCardHeader>
-          <CCardBody>
-            <CForm onSubmit={handleSubmit}>
-              {questionData.length === 0 ? (
-                <p className="text-muted">Questions not yet available...</p>
-              ) : (
-                questionData.map((q) => {
-                  const isYes = answers[q.id] === true // memastikan boolean
+              </CCardHeader>
+              <CCardBody>
+                <CForm onSubmit={handleSubmit}>
+                  {questionData.length === 0 ? (
+                    <p className="text-muted">Questions not yet available...</p>
+                  ) : (
+                    questionData.map((q) => {
+                      const isYes = answers[q.id] === true // memastikan boolean
 
-                  return (
-                    <div
-                      key={q.id}
-                      className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
-                    >
-                      <CFormLabel className="mb-0">{q.question}</CFormLabel>
-                      <CFormSwitch
-                        name={`question-${q.id}`}
-                        label={answers[q.id] ? 'Ya' : 'Tidak'}
-                        checked={!!answers[q.id]}
-                        onChange={(e) =>
-                          setAnswers((prev) => ({
-                            ...prev,
-                            [q.id]: e.target.checked, // true kalau on, false kalau off
-                          }))
-                        }
-                      />
-                    </div>
-                  )
-                })
-              )}
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">
-                  Submit
-                </CButton>
-              </div>
-            </CForm>
-          </CCardBody>
-        </CCard>
+                      return (
+                        <div
+                          key={q.id}
+                          className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
+                        >
+                          <CFormLabel className="mb-0">{q.question}</CFormLabel>
+                          <CFormSwitch
+                            name={`question-${q.id}`}
+                            label={answers[q.id] ? 'Ya' : 'Tidak'}
+                            checked={!!answers[q.id]}
+                            onChange={(e) =>
+                              setAnswers((prev) => ({
+                                ...prev,
+                                [q.id]: e.target.checked, // true kalau on, false kalau off
+                              }))
+                            }
+                          />
+                        </div>
+                      )
+                    })
+                  )}
+                  <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <CButton color="primary" type="submit">
+                      Submit
+                    </CButton>
+                  </div>
+                </CForm>
+              </CCardBody>
+            </CCard>
           </CCol>
 
           {/* Kolom Kanan - Counter atau Error */}

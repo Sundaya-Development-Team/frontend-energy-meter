@@ -41,7 +41,7 @@ const QcSerialNoAql = () => {
   const [isFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  
+
   const resetStates = () => {
     setProductData(null)
     setTrackingProduct(null)
