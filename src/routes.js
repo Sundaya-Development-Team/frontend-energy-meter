@@ -50,7 +50,7 @@ const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClea
 const ScanAfterZeroClear = React.lazy(
   () => import('./views/production/finishing/ScanAfterClearZero.js'),
 )
-const SidePlnSerial = React.lazy(() => import('./views/production/finishing/SidePlnSerial'))
+const SidePlnSerial = React.lazy(() => import('./views/production/plnserial/SidePlnSerial.js'))
 const PlnSerialComparator = React.lazy(
   () => import('./views/production/finishing/PlnSerialComparator'),
 )
@@ -315,10 +315,10 @@ const routes = [
       </PrivateRoutes>
     ),
   },
-  //Finishing Assembly
-  { path: '/production/finishing', name: 'Finishing' },
+  //PLN Serial
+  { path: '/production/plnserial', name: 'PLN Serial' },
   {
-    path: '/production/finishing/scansidepln',
+    path: '/production/plnserial/scansidepln',
     name: 'SCAN PLN & Production Barcode',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
@@ -328,6 +328,8 @@ const routes = [
       </PrivateRoutes>
     ),
   },
+  //Finishing Assembly
+  { path: '/production/finishing', name: 'Finishing' },
   {
     path: '/production/finishing/printlaser/post1',
     name: 'Post 1',
