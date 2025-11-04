@@ -269,13 +269,13 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Matching PLN Serial',
+    name: 'Matching Assy & PLN',
     to: '/production/plnserial',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: 'SCAN PLN Serial',
+        name: 'Matching Assy & PLN',
         to: '/production/plnserial/scansidepln',
       },
     ],
@@ -350,13 +350,13 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'QC Laser & Engraving',
-        to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving',
+        name: 'Matching PLN Serial',
+        to: '/production/finishing/comparePlnSerial',
       },
       {
         component: CNavItem,
-        name: 'Matching PLN Serial',
-        to: '/production/finishing/comparePlnSerial',
+        name: 'QC Laser & Engraving',
+        to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving',
       },
     ],
   },
