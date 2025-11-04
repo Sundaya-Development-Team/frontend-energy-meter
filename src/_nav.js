@@ -269,19 +269,6 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Calibration 2',
-    to: '/production/calibration',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'QC Calibration 2',
-        to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
     name: 'Matching PLN Serial',
     to: '/production/plnserial',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
@@ -290,6 +277,19 @@ const _nav = [
         component: CNavItem,
         name: 'SCAN PLN Serial',
         to: '/production/plnserial/scansidepln',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Calibration 2',
+    to: '/production/calibration',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'QC Calibration 2',
+        to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
       },
     ],
   },
