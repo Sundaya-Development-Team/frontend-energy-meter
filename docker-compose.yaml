@@ -3,7 +3,12 @@ version: '3.8'
 services:
   frontend-kwhmeter:
     # Build the image from the Dockerfile in the current directory
-    build: .
+    build:
+      context: .
+      args:
+        # BUILD_MODE akan menentukan .env mana yang dibaca saat build
+        # Bisa di-override dengan: BUILD_MODE=development docker compose up -d --build
+        BUILD_MODE: ${BUILD_MODE:-development}
     # Name of the container
     container_name: frontend-kwhmeter
     # Restart the container always
