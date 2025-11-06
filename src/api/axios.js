@@ -1,29 +1,9 @@
 import axios from 'axios'
 
 const QUALITY_SERVICE = import.meta.env.VITE_QUALITY_SERVICE
-const UPLOADFILE = import.meta.env.VITE_UPLOAD
-const VITE_MASTER_DATA = import.meta.env.VITE_MASTER_DATA
-const VITE_RECEIVING = import.meta.env.VITE_RECEIVING
 const PARTNER = import.meta.env.VITE_PARTNER
-const INCOMING = import.meta.env.VITE_INCOMING
-const TRACKEDITEMS = import.meta.env.VITE_TRACKEDITEMS
-const AQL = import.meta.env.VITE_AQL
-const WAREHOUSE = import.meta.env.VITE_WAREHOUSE
-
 const BASE_SERVER = import.meta.env.VITE_SERVER
 const VITE_SERVER_DATA = import.meta.env.VITE_SERVER_DATA
-
-// export const backendQualityService = axios.create({
-//   baseURL: `${BASE_SERVER}/v1/quality-service`,
-// })
-
-// export const backendUploadFile = axios.create({
-//   baseURL: `${BASE_SERVER}/v1/upload-service`,
-// })
-
-// export const backendProduct = axios.create({
-//   baseURL: `${BASE_SERVER}/v1/products`,
-// })
 
 //Master Data
 export const backendProduct = axios.create({
@@ -90,9 +70,14 @@ export const backendAuth = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/auth`,
 })
 
-//CDN Backend for document upload
+//CDN Backend for document upload (Arsy)
 export const cdnBackend = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/cdn`,
+})
+
+//Backend QC
+export const backendQualityService = axios.create({
+  baseURL: QUALITY_SERVICE,
 })
 
 // export const backendPartner = axios.create({
@@ -115,30 +100,6 @@ export const backendWarehouse = axios.create({
   baseURL: `${BASE_SERVER}/v1/warehouses`,
 })
 
-export const backendQualityService = axios.create({
-  baseURL: QUALITY_SERVICE,
-})
-
-// export const backendProduct = axios.create({
-//   baseURL: PRODUCT,
-// })
-
 export const backendPartner = axios.create({
   baseURL: PARTNER,
 })
-
-// export const backendIncoming = axios.create({
-//   baseURL: INCOMING,
-// })
-
-// export const backendTrackedItems = axios.create({
-//   baseURL: TRACKEDITEMS,
-// })
-
-// export const backendAql = axios.create({
-//   baseURL: AQL,
-// })
-
-// export const backendWarehouse = axios.create({
-//   baseURL: WAREHOUSE,
-// })
