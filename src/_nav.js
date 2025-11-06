@@ -34,7 +34,7 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    permissions: ['DASHBOARD', 'QC_ENGINEER'],
+    permissions: ['DASHBOARD', 'QC_ENGINEER', 'PO_RECEIVING'],
   },
   {
     component: CNavTitle,
@@ -45,19 +45,21 @@ const _nav = [
     name: 'Purchase Order',
     to: '/receiving/purchaseOrder',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER'],
   },
   {
     component: CNavItem,
     name: 'Receiving Products',
     to: '/receiving/receivingHeader',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'WAREHOUSE_ADMIN'], // multi permission bisa akses
+    permissions: ['QC_ENGINEER', 'PO_RECEIVING'], // multi permission bisa akses
   },
   {
     component: CNavItem,
     name: 'Receiving List',
     to: '/receiving/receivingList',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER'],
   },
   {
     component: CNavItem,

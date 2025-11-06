@@ -94,6 +94,7 @@ const routes = [
           'PIC_CHAMBER',
           'GUDANG_ELEKTRONIK',
           'GUDANG_NON_ELEKTRONIK',
+          'PO_RECEIVING',
         ]}
       >
         <DefaultLayout>
