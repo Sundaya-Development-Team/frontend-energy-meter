@@ -26,6 +26,8 @@ yarn-error.log*
 
 #env
 .env
+.env.development
+.env.production
 
 #docker
 docker-compose.yaml

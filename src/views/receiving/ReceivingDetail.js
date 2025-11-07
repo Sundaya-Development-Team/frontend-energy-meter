@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import {
   CCard,
   CCardBody,
@@ -21,7 +21,7 @@ import {
   CFormTextarea,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilPlus, cilX, cilCloudDownload } from '@coreui/icons'
+import { cilPlus, cilX, cilCloudDownload, cilArrowLeft } from '@coreui/icons'
 import { backendReceiving, cdnBackend } from '../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard12 } from '../components/CounterCard'
@@ -38,6 +38,7 @@ const FormRow = ({ label, labelCols = '2', children }) => (
 const ReceivingDetail = () => {
   const { user } = useAuth()
   const { receivingHeaderId } = useParams()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [header, setHeader] = useState(null)
   const [items, setItems] = useState([])
@@ -136,7 +137,7 @@ const ReceivingDetail = () => {
   const filterStageingItem = (item, stagingRes) => {
     // console.log('item scan : ', item.id)
 
-    const itemName = item.product.data.name
+    const itemName = item.product?.data?.name || 'Unknown Product'
     const stagingSummary = stagingRes.data.data.staging_summary
     const receivingItem = stagingRes.data.data.receiving_item
     const serialNumbers = stagingRes.data.data.serial_numbers
@@ -534,7 +535,18 @@ const ReceivingDetail = () => {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Receiving Detail - GR Number: {header?.gr_number}</strong>
+            <div className="d-flex justify-content-between align-items-center">
+              <strong>Receiving Detail - GR Number: {header?.gr_number}</strong>
+              <CButton
+                color="secondary"
+                size="sm"
+                onClick={() => navigate(-1)}
+                className="d-flex align-items-center"
+              >
+                <CIcon icon={cilArrowLeft} className="me-1" />
+                Back
+              </CButton>
+            </div>
           </CCardHeader>
           <CCardBody>
             <CRow className="mb-3">
@@ -611,22 +623,32 @@ const ReceivingDetail = () => {
               <CTableBody>
                 {items.length > 0 ? (
                   items.map((item, index) => (
-                    <CTableRow key={item.id || index} className="text-center">
-                      <CTableDataCell>{index + 1}</CTableDataCell>
-                      <CTableDataCell>{item.product.data.name || '-'}</CTableDataCell>
-                      <CTableDataCell>{item.item_type}</CTableDataCell>
-                      <CTableDataCell>{item.quantity}</CTableDataCell>
-                      <CTableDataCell>{item.is_serialized ? 'Yes' : 'No'}</CTableDataCell>
-                      <CTableDataCell>
+                    <CTableRow key={item.id || index} className="text-center align-middle">
+                      <CTableDataCell className="align-middle">{index + 1}</CTableDataCell>
+                      <CTableDataCell className="align-middle">{item.product?.data?.name || '-'}</CTableDataCell>
+                      <CTableDataCell className="align-middle">{item.item_type}</CTableDataCell>
+                      <CTableDataCell className="align-middle">{item.quantity}</CTableDataCell>
+                      <CTableDataCell className="align-middle">{item.is_serialized ? 'Yes' : 'No'}</CTableDataCell>
+                      <CTableDataCell className="align-middle">
                         {item.is_serialized ? (
-                          <CButton
-                            size="sm"
-                            color="success"
-                            onClick={() => handleScan(item)}
-                            className="d-block mx-auto text-white"
-                          >
-                            Scan
-                          </CButton>
+                          <div className="d-flex flex-column gap-2 align-items-center">
+                            <CButton
+                              size="sm"
+                              color="success"
+                              onClick={() => handleScan(item)}
+                              className="text-white"
+                            >
+                              Scan
+                            </CButton>
+                            <CButton
+                              size="sm"
+                              color="warning"
+                              onClick={() => handleUploadPhoto(item)}
+                              className="text-white"
+                            >
+                              Upload Photo
+                            </CButton>
+                          </div>
                         ) : (
                           <CButton
                             size="sm"
@@ -770,13 +792,13 @@ const ReceivingDetail = () => {
         <CCol xs={12} ref={uploadSectionRef}>
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>Upload Photo - {uploadingItem.product.data.name || '-'}</strong>
+              <strong>Upload Photo - {uploadingItem.product?.data?.name || '-'}</strong>
             </CCardHeader>
             <CCardBody>
               <CRow className="mb-3">
                 <CCol md={6}>
                   <div className="fw-semibold">Product Name</div>
-                  <div>{uploadingItem.product.data.name || '-'}</div>
+                  <div>{uploadingItem.product?.data?.name || '-'}</div>
                 </CCol>
                 <CCol md={6}>
                   <div className="fw-semibold">Item Type</div>
