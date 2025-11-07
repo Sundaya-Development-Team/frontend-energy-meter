@@ -394,7 +394,7 @@ const QcAqlSerial = () => {
                     />
                     <CounterCard6
                       title="Max Fail"
-                      value={trackingProduct?.aql_configuration?.aql_reject ?? `-`}
+                      value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
                     />
                     <CounterCard6
                       title="Fail Count"

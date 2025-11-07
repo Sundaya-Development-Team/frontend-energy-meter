@@ -352,7 +352,7 @@ const ReceivingSerialQc = () => {
                   />
                   <CounterCard
                     title="Max Fail"
-                    value={trackingProduct?.aql_configuration?.aql_reject ?? `-`}
+                    value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
                   />
                   <CounterCard
                     title="Fail Count"
