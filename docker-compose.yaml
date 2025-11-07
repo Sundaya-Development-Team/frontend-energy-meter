@@ -3,7 +3,13 @@ version: '3.8'
 services:
   frontend-kwhmeter:
     # Build the image from the Dockerfile in the current directory
-    build: .
+    build:
+      context: .
+      args:
+        # BUILD_MODE dibaca dari .env.local (per-server config, gitignored)
+        # Default: production jika .env.local tidak ada
+        # File .env.local menentukan: development (226) atau production (223)
+        BUILD_MODE: ${BUILD_MODE:-production}
     # Name of the container
     container_name: frontend-kwhmeter
     # Restart the container always

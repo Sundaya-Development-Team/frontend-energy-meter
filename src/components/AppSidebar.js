@@ -57,7 +57,7 @@ const AppSidebar = () => {
           {/*Logo kecil (hanya muncul saat sidebar collapse) */}
           <CImage
             className="sidebar-brand-narrow d-none"
-            src="http://192.168.100.226:3000/images/white_logo.webp"
+            src="/images/white_logo.webp"
             alt="Sundaya Logo Narrow"
             width={40}
             height={40}

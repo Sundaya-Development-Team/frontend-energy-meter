@@ -26,3 +26,10 @@ yarn-error.log*
 
 #env
 .env
+
+#docker
+docker-compose.yaml
+Dockerfile
+
+# Note: .env.local sudah di-gitignore di baris 18 (Vite default)
+# File .env.local digunakan untuk menyimpan BUILD_MODE per server

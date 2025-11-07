@@ -34,7 +34,7 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    permissions: ['DASHBOARD', 'QC_ENGINEER'],
+    permissions: ['DASHBOARD', 'QC_ENGINEER', 'PO_RECEIVING'],
   },
   {
     component: CNavTitle,
@@ -45,19 +45,21 @@ const _nav = [
     name: 'Purchase Order',
     to: '/receiving/purchaseOrder',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER'],
   },
   {
     component: CNavItem,
     name: 'Receiving Products',
     to: '/receiving/receivingHeader',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'WAREHOUSE_ADMIN'], // multi permission bisa akses
+    permissions: ['QC_ENGINEER', 'PO_RECEIVING'], // multi permission bisa akses
   },
   {
     component: CNavItem,
     name: 'Receiving List',
     to: '/receiving/receivingList',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER'],
   },
   {
     component: CNavItem,
@@ -269,13 +271,13 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Matching PLN Serial',
+    name: 'Matching Assy & PLN',
     to: '/production/plnserial',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: 'SCAN PLN Serial',
+        name: 'Matching Assy & PLN',
         to: '/production/plnserial/scansidepln',
       },
     ],
@@ -350,13 +352,13 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'QC Laser & Engraving',
-        to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving',
+        name: 'Matching PLN Serial',
+        to: '/production/finishing/comparePlnSerial',
       },
       {
         component: CNavItem,
-        name: 'Matching PLN Serial',
-        to: '/production/finishing/comparePlnSerial',
+        name: 'QC Laser & Engraving',
+        to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving',
       },
     ],
   },
