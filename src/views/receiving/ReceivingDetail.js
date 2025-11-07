@@ -625,10 +625,14 @@ const ReceivingDetail = () => {
                   items.map((item, index) => (
                     <CTableRow key={item.id || index} className="text-center align-middle">
                       <CTableDataCell className="align-middle">{index + 1}</CTableDataCell>
-                      <CTableDataCell className="align-middle">{item.product?.data?.name || '-'}</CTableDataCell>
+                      <CTableDataCell className="align-middle">
+                        {item.product?.data?.name || '-'}
+                      </CTableDataCell>
                       <CTableDataCell className="align-middle">{item.item_type}</CTableDataCell>
                       <CTableDataCell className="align-middle">{item.quantity}</CTableDataCell>
-                      <CTableDataCell className="align-middle">{item.is_serialized ? 'Yes' : 'No'}</CTableDataCell>
+                      <CTableDataCell className="align-middle">
+                        {item.is_serialized ? 'Yes' : 'No'}
+                      </CTableDataCell>
                       <CTableDataCell className="align-middle">
                         {item.is_serialized ? (
                           <div className="d-flex flex-column gap-2 align-items-center">

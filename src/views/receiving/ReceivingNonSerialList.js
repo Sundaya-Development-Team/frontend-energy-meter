@@ -47,7 +47,7 @@ const ReceivingNonSerialQc = () => {
     } finally {
       setLoading(false)
     }
-  }, [page, limit, searchKeyword])
+  }, [searchKeyword])
 
   useEffect(() => {
     fetchTracking()
