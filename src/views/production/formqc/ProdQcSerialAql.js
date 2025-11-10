@@ -17,6 +17,7 @@ import {
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard6 } from '../../components/CounterCard'
+import '../../../scss/style.scss'
 
 const FormRow = ({ label, children }) => (
   <CRow className="mb-3 align-items-center">
@@ -35,11 +36,27 @@ const QcAqlSerial = () => {
   const [questionData, setQuestionData] = useState([])
   const [qcName, setQcName] = useState([])
   const qcCodeSerial = qcIdParams
-  const inspected_by = 'ADMIN_RECEIVING'
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [errorSerialNumber, setErrorSerialNumber] = useState(null)
+
+  // Ambil user dari localStorage
+  const getUserFromStorage = () => {
+    try {
+      const userString = localStorage.getItem('user')
+      if (userString) {
+        return JSON.parse(userString)
+      }
+      return null
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error)
+      return null
+    }
+  }
+
+  const user = getUserFromStorage()
 
   const resetStates = () => {
     setProductData(null)
@@ -48,6 +65,7 @@ const QcAqlSerial = () => {
     setAnswers({})
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
+    setErrorSerialNumber(null)
   }
 
   useEffect(() => {
@@ -63,13 +81,20 @@ const QcAqlSerial = () => {
   const handleSerial = () => {
     console.log('Serial Number di-scan:', formData.serialNumber)
 
-    // Bersihkan semua state dulu
-    resetStates()
-    // Panggil fetch validasi serial
-    fetchValidationSnumb(formData.serialNumber)
+    // Simpan serial number sebelum reset
+    const currentSerialNumber = formData.serialNumber
 
-    // Reset input serial number
-    // setFormData({ serialNumber: '' })
+    // Bersihkan semua state dan clear input field
+    setProductData(null)
+    setTrackingProduct(null)
+    setQuestionData([])
+    setAnswers({})
+    setErrorMessage(null)
+    setErrorSerialNumber(null)
+    setFormData({ serialNumber: '', notes: '' })
+
+    // Panggil fetch validasi serial
+    fetchValidationSnumb(currentSerialNumber)
   }
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
@@ -85,6 +110,7 @@ const QcAqlSerial = () => {
       if (response.data.valid === true) {
         // toast.success(response.data.message ?? 'Serial number valid')
         setErrorMessage(null)
+        setErrorSerialNumber(null)
 
         // Convert object questions → array
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
@@ -108,12 +134,16 @@ const QcAqlSerial = () => {
       } else {
         const errorMsg = response.data.message ?? 'Serial number already scan'
         setErrorMessage(errorMsg)
+        // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+        setErrorSerialNumber(serialNumber)
         // toast.error(errorMsg)
       }
     } catch (error) {
       console.log('ERROR')
       const errorMsg = error.response?.data?.message || 'Serial Number Validation Failed'
       setErrorMessage(errorMsg)
+      // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+      setErrorSerialNumber(serialNumber)
       // toast.error(errorMsg)
     }
   }
@@ -140,11 +170,15 @@ const QcAqlSerial = () => {
       } else {
         const errorMsg = response.data.message || 'Failed get product data'
         setErrorMessage(errorMsg)
+        // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+        setErrorSerialNumber(serialNumber)
         // toast.error(errorMsg)
       }
     } catch (error) {
       const errorMsg = error.response?.data?.message || 'ERROR get data product'
       setErrorMessage(errorMsg)
+      // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+      setErrorSerialNumber(serialNumber)
       // toast.error(errorMsg)
     }
   }
@@ -167,8 +201,12 @@ const QcAqlSerial = () => {
         //     <span style={{ color: 'red', fontWeight: 'bold' }}> {errorMsg}</span>
         //   </span>,
         // )
-        //Besihkan page
+        // Simpan serial number sebelum reset states
+        const currentSerialNumber = productData?.serial_number || formData.serialNumber
+        // Bersihkan page
         resetStates()
+        // Set serial number untuk error card (input field tetap kosong)
+        setErrorSerialNumber(currentSerialNumber)
       } else {
         console.log('LANJUT')
         setTrackingProduct(response.data.data)
@@ -185,6 +223,11 @@ const QcAqlSerial = () => {
     } catch (error) {
       const errorMsg = error.response?.data?.message || 'Failed Validation'
       setErrorMessage(errorMsg)
+      // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+      const currentSerialNumber = productData?.serial_number || formData.serialNumber
+      if (currentSerialNumber) {
+        setErrorSerialNumber(currentSerialNumber)
+      }
       // toast.error(errorMsg)
     }
   }
@@ -199,8 +242,8 @@ const QcAqlSerial = () => {
       // toast.error(errorMsg)
       return
     }
-    if (!inspected_by) {
-      const errorMsg = 'Inspector name wajib diisi!'
+    if (!user || !user.id || !user.name) {
+      const errorMsg = 'User tidak ditemukan di localStorage!'
       setErrorMessage(errorMsg)
       // toast.error(errorMsg)
       return
@@ -232,8 +275,8 @@ const QcAqlSerial = () => {
 
     const payload = {
       serial_number: productData.serial_number,
-      inspector_by: 1,
-      inspector_name: inspected_by,
+      inspector_by: user.id,
+      inspector_name: user.name,
       qc_name: qcName, // sementara hardcode
       qc_id: qcCodeSerial,
       qc_place: 'Workshop A', // sementara hardcode
@@ -265,10 +308,16 @@ const QcAqlSerial = () => {
       console.error('QC submit error:', error)
       const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QC'
       setErrorMessage(errorMsg)
+      // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+      const currentSerialNumber = productData?.serial_number || formData.serialNumber
+      if (currentSerialNumber) {
+        setErrorSerialNumber(currentSerialNumber)
+      }
       // toast.error(errorMsg)
+      return // Jangan reset states jika ada error
     }
 
-    // Bersihkan semua state
+    // Bersihkan semua state hanya jika submit berhasil
     resetStates()
   }
 
@@ -358,21 +407,18 @@ const QcAqlSerial = () => {
           <CCol md={4} className="d-flex flex-column">
             {errorMessage ? (
               /* Error Card */
-              <CCard
-                className="mb-4 h-100 d-flex flex-column"
-                style={{ backgroundColor: '#dc3545', border: 'none' }}
-              >
-                <CCardHeader style={{ backgroundColor: '#bd2130', color: 'white', border: 'none' }}>
+              <CCard className="mb-4 h-100 d-flex flex-column error-card">
+                <CCardHeader className="error-card-header">
                   <strong>⚠️ Error</strong>
                 </CCardHeader>
-                <CCardBody
-                  className="d-flex flex-column justify-content-center align-items-center flex-grow-1"
-                  style={{ color: 'white' }}
-                >
+                <CCardBody className="d-flex flex-column justify-content-center align-items-center flex-grow-1 error-card-body">
                   <div className="text-center">
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
-                    <h4 style={{ fontWeight: 'bold', marginBottom: '1rem' }}>ERROR</h4>
-                    <p style={{ fontSize: '1.1rem', lineHeight: '1.5' }}>{errorMessage}</p>
+                    <div className="error-icon">❌</div>
+                    <h4 className="error-title">ERROR</h4>
+                    {errorSerialNumber && (
+                      <div className="error-serial-number">Serial: {errorSerialNumber}</div>
+                    )}
+                    <p className="error-message">{errorMessage}</p>
                   </div>
                 </CCardBody>
               </CCard>
