@@ -48,6 +48,22 @@ const DetailNonSerialQc = () => {
   const [formData, setFormData] = useState({ notes: '' })
   const [qcIdReceivingSerial, setQcIdReceivingSerial] = useState(null)
 
+  // Ambil user dari localStorage
+  const getUserFromStorage = () => {
+    try {
+      const userString = localStorage.getItem('user')
+      if (userString) {
+        return JSON.parse(userString)
+      }
+      return null
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error)
+      return null
+    }
+  }
+
+  const user = getUserFromStorage()
+
   const fetchTrackingSumary = useCallback(
     async (receivingItemId, qcProduct) => {
       try {
@@ -193,9 +209,15 @@ const DetailNonSerialQc = () => {
       return
     }
 
+    // Validasi user
+    if (!user || !user.id || !user.name) {
+      toast.error('User tidak ditemukan di localStorage, silakan login kembali!')
+      return
+    }
+
     const payload = {
-      inspector_by: 1,
-      inspector_name: 'Inspector A',
+      inspector_by: user.id,
+      inspector_name: user.name,
       qc_name: qcName,
       qc_id: qcIdReceivingSerial,
       receiving_item_id: detail.receiving_item_id,
