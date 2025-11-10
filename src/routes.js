@@ -84,6 +84,7 @@ const routes = [
       <PrivateRoutes
         requiredPermission={[
           'QC_ENGINEER',
+          'QC_RECEIVING',
           'ADMIN',
           'SPV_QC',
           'PRODUKSI_ELEKTRONIK:SOLDER_RELAY',

@@ -34,7 +34,7 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    permissions: ['DASHBOARD', 'QC_ENGINEER', 'PO_RECEIVING'],
+    permissions: ['DASHBOARD', 'QC_ENGINEER', 'PO_RECEIVING', 'QC_RECEIVING'],
   },
   {
     component: CNavTitle,
