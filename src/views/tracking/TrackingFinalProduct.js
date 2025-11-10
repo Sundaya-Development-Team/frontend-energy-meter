@@ -398,6 +398,8 @@ const TrackingFinalProduct = () => {
           paginationPerPage={rowsPerPage}
           onChangePage={(page) => setCurrentPage(page)}
           onChangeRowsPerPage={(newPerPage) => setRowsPerPage(newPerPage)}
+          fixedHeader
+          fixedHeaderScrollHeight="500px"
         />
       </CCardBody>
     </CCard>
