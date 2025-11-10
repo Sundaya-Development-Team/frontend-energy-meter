@@ -132,7 +132,7 @@ const routes = [
     path: '/receiving/receivingList',
     name: 'Receiving List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <ReceivingList />
         </DefaultLayout>
@@ -143,7 +143,7 @@ const routes = [
     path: '/receiving/receivingDetail/:receivingHeaderId',
     name: 'Receiving Detail',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <ReceivingDetail />
         </DefaultLayout>
@@ -154,7 +154,7 @@ const routes = [
     path: '/receiving/receivingserialqc',
     name: 'Receiving Serial QC',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <ReceivingSerialQc />
         </DefaultLayout>
@@ -165,7 +165,7 @@ const routes = [
     path: '/receiving/receivingnonseriallist',
     name: 'Non Serial QC List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <ReceivingNonSerialList />
         </DefaultLayout>
@@ -176,7 +176,7 @@ const routes = [
     path: '/receiving/detailnonserialqc/:trackingId',
     name: 'Reciving Non Serial Detail',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <DetailNonSerialQc />
         </DefaultLayout>
@@ -189,7 +189,7 @@ const routes = [
     path: '/tracking/list',
     name: 'Tracking Product List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <TrackingList />
         </DefaultLayout>
@@ -200,7 +200,7 @@ const routes = [
     path: '/tracking/detail/:trackingId',
     name: 'Tracking Detail',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <TrackingDetail />
         </DefaultLayout>
@@ -211,7 +211,7 @@ const routes = [
     path: '/tracking/finalproduct',
     name: 'Tracking Final Product',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <TrackingFinalProduct />
         </DefaultLayout>

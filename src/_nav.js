@@ -59,19 +59,21 @@ const _nav = [
     name: 'Receiving List',
     to: '/receiving/receivingList',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER'],
+    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Receiving Serial QC',
     to: '/receiving/receivingserialqc',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Non Serial QC List',
     to: '/receiving/receivingnonseriallist',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
   },
   {
     component: CNavTitle,
@@ -82,12 +84,14 @@ const _nav = [
     name: 'Tracking Production List',
     to: '/tracking/list',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Tracking Final Product',
     to: '/tracking/finalproduct',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
   },
   {
     component: CNavTitle,
