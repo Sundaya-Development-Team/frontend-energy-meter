@@ -11,7 +11,7 @@ import {
   CSpinner,
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
-import { backendTracking, backendWh } from '../../api/axios'
+import { backendTracking, backendWhNew } from '../../api/axios'
 import { toast } from 'react-toastify'
 
 // helper row agar form rapi
@@ -35,7 +35,7 @@ const AssemblyWhRequest = () => {
   // fetch warehouse list
   const fetchWarehouses = async () => {
     try {
-      const res = await backendWh.get('/', { params: { page: 1, limit: 10 } })
+      const res = await backendWhNew.get('/', { params: { page: 1, limit: 10 } })
       setWarehouses(res.data.data || [])
     } catch (error) {
       console.error(error)

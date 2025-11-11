@@ -18,7 +18,7 @@ import DataTable from 'react-data-table-component'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useNavigate } from 'react-router-dom'
-import { backendTracking, backendReceiving, backendWh } from '../../api/axios'
+import { backendTracking, backendReceiving, backendWhNew } from '../../api/axios'
 
 // Search bar
 const SearchBar = ({ value, onChange }) => (
@@ -118,7 +118,7 @@ const ReceivingWhReq = () => {
   // fetch warehouses
   const fetchWarehouses = async () => {
     try {
-      const res = await backendWh.get('/', { params: { page: 1, limit: 10 } })
+      const res = await backendWhNew.get('/', { params: { page: 1, limit: 10 } })
       setWarehouses(res.data.data || [])
     } catch (error) {
       console.error(error)

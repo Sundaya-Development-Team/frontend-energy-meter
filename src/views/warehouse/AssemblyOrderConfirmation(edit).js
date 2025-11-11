@@ -21,7 +21,7 @@ import {
   CPagination,
   CPaginationItem,
 } from '@coreui/react'
-import { backendAssembly, backendWh } from '../../api/axios'
+import { backendAssembly, backendWhNew } from '../../api/axios'
 import { toast } from 'react-toastify'
 import Select from 'react-select'
 
@@ -148,7 +148,7 @@ const AssemblyOrders = () => {
         const productIds = order.assembly_order_items.map((i) => i.product_id)
 
         try {
-          const res = await backendWh.post('/stock-units/stock-by-multiple-products', {
+          const res = await backendWhNew.post('/stock-units/stock-by-multiple-products', {
             product_ids: productIds,
             warehouse_id: 1, // sesuaikan warehouse
             include_zero_stock: true,
@@ -258,7 +258,7 @@ const AssemblyOrders = () => {
               setSelectedItems({}) // reset selection
               // update stock
               const productIds = updatedOrder.assembly_order_items.map((i) => i.product_id)
-              const stockRes = await backendWh.post('/stock-units/stock-by-multiple-products', {
+              const stockRes = await backendWhNew.post('/stock-units/stock-by-multiple-products', {
                 product_ids: productIds,
                 warehouse_id: 1,
                 include_zero_stock: true,
