@@ -275,19 +275,6 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Matching Assy & PLN',
-    to: '/production/plnserial',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Matching Assy & PLN',
-        to: '/production/plnserial/scansidepln',
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
     name: 'Calibration 2',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
@@ -332,7 +319,19 @@ const _nav = [
       // },
     ],
   },
-
+  {
+    component: CNavGroup,
+    name: 'Matching Assy & PLN',
+    to: '/production/plnserial',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Matching Assy & PLN',
+        to: '/production/plnserial/scansidepln',
+      },
+    ],
+  },
   {
     component: CNavGroup,
     name: 'Finishing',
