@@ -5,7 +5,6 @@ import {
   CCard,
   CCardBody,
   CCardHeader,
-  CBadge,
   CFormLabel,
   CFormInput,
   CButton,
@@ -234,51 +233,6 @@ const ReceivingSerialQc = () => {
         setErrorSerialNumber(currentSerialNumber)
       }
       // toast.error(errorMsg)
-    }
-  }
-
-  // const [questionData] = useState([
-  //   {
-  //     id: 1,
-  //     title: 'Pemeriksaan Visual',
-  //     questions: [
-  //       { id: 101, question: 'Apakah ada goresan pada produk?' },
-  //       { id: 102, question: 'Apakah warna sesuai spesifikasi?' },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'Pemeriksaan Fungsional',
-  //     questions: [
-  //       { id: 201, question: 'Apakah semua tombol berfungsi?' },
-  //       { id: 202, question: 'Apakah produk menyala dengan benar?' },
-  //     ],
-  //   },
-  // ])
-
-  const data = {
-    po_number: 'PO-2025-001',
-    batch: 'BATCH-01',
-    status: 'pending',
-    inspection_level: 'Level II',
-    aql_critical: 0.65,
-    aql_major: 1.5,
-    aql_minor: 2.5,
-    total_quantity: 1200,
-    used_defects: 5,
-    sample_size: 80,
-  }
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'pending':
-        return <CBadge color="warning">Pending</CBadge>
-      case 'complete':
-        return <CBadge color="success">Complete</CBadge>
-      case 'reject':
-        return <CBadge color="danger">Reject</CBadge>
-      default:
-        return <CBadge color="secondary">{status}</CBadge>
     }
   }
 
