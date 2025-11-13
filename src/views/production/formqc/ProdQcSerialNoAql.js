@@ -61,7 +61,7 @@ const QcSerialNoAql = () => {
 
   const resetStates = () => {
     setProductData(null)
-    setTrackingProduct(null)
+    // setTrackingProduct(null)
     setQuestionData([])
     setAnswers({})
     setFormData({ serialNumber: '', notes: '' })
@@ -301,6 +301,27 @@ const QcSerialNoAql = () => {
 
       toast.success(messageShow)
       setErrorMessage(null)
+
+      // Fetch counter terbaru setelah submit berhasil
+      const assemblyId = productData.assembly_id
+      if (assemblyId) {
+        try {
+          const counterResponse = await backendTracking.get(
+            '/sample-inspections/quantity-summary',
+            {
+              params: {
+                assembly_id: assemblyId,
+                qc_id: qcCodeSerial,
+              },
+            },
+          )
+          // Update counter dengan data terbaru
+          setTrackingProduct(counterResponse.data.data)
+        } catch (counterError) {
+          console.error('Error fetching updated counter:', counterError)
+          // Tidak perlu error handling, karena submit sudah berhasil
+        }
+      }
 
       serialNumberInputRef.current.focus()
     } catch (error) {

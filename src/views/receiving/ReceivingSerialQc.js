@@ -305,6 +305,25 @@ const ReceivingSerialQc = () => {
 
       toast.success(messageShow)
       setErrorMessage(null)
+
+      // Fetch counter terbaru setelah submit berhasil
+      const receivingItemId = productData.receiving_item_id
+      if (receivingItemId) {
+        try {
+          const counterResponse = await backendTracking.get('/sample-inspections/aql-summary', {
+            params: {
+              receiving_item_id: receivingItemId,
+              qc_id: qcIdReceivingSerial,
+            },
+          })
+          // Update counter dengan data terbaru
+          setTrackingProduct(counterResponse.data.data)
+        } catch (counterError) {
+          console.error('Error fetching updated counter:', counterError)
+          // Tidak perlu error handling, karena submit sudah berhasil
+        }
+      }
+
       serialNumberInputRef.current.focus()
     } catch (error) {
       console.error('QC submit error:', error)
