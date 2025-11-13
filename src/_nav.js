@@ -206,7 +206,7 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Calibration 1',
+    name: 'Test Bench 1',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
@@ -227,8 +227,8 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Calibration 1',
-        to: '/production/serialnoaql/QC-CT1006/Calibration 1 Test',
+        name: 'QC Test Bench 1',
+        to: '/production/serialnoaql/QC-TB1006/Test Bench 1',
       },
       // {
       //   component: CNavItem,
@@ -275,14 +275,14 @@ const _nav = [
   },
   {
     component: CNavGroup,
-    name: 'Calibration 2',
+    name: 'Test Bench 2',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
-        name: 'QC Calibration 2',
-        to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
+        name: 'QC Test Bench 2',
+        to: '/production/serialnoaql/QC-TB2014/Test Bench 2',
       },
     ],
   },
