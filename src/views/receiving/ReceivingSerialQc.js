@@ -46,7 +46,7 @@ const ReceivingSerialQc = () => {
   const [qcName, setQcName] = useState([])
   const qcIdReceivingSerial = 'QC-SPS-PCBA-001'
   const [formData, setFormData] = useState({ serialNumber: '' })
-  const [isFormLocked] = useState(false)
+  const [isFormLocked, setIsFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
@@ -74,6 +74,7 @@ const ReceivingSerialQc = () => {
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setIsFormLocked(false)
   }
 
   useEffect(() => {
@@ -162,6 +163,15 @@ const ReceivingSerialQc = () => {
       if (response.data.success == true) {
         // toast.success(response.data.message || 'Serial number valid')
         setProductData(response.data.data)
+
+        // isi kembali serial number di form
+        setFormData((prev) => ({
+          ...prev,
+          serialNumber: serialNumber,
+        }))
+
+        // Lock serial number field setelah berhasil fetch data
+        setIsFormLocked(true)
 
         const receivingItemId = response.data.data.receiving_item_id
         console.log('receiving_item_id :', receivingItemId)
