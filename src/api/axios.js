@@ -38,9 +38,9 @@ export const backendQc = axios.create({
 })
 
 //Warehouse
-export const backendWh = axios.create({
-  baseURL: `${VITE_SERVER_DATA}/api/v2/warehouse`,
-})
+// export const backendWh = axios.create({
+//   baseURL: `${VITE_SERVER_DATA}/api/v2/warehouse`,
+// })
 export const backendWhNew = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/warehouse-new`,
 })

@@ -38,7 +38,7 @@ const QcSerialNoAql = () => {
   const [qcName, setQcName] = useState([])
   const qcCodeSerial = qcIdParams
   const [formData, setFormData] = useState({ serialNumber: '' })
-  const [isFormLocked] = useState(false)
+  const [isFormLocked, setIsFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
@@ -61,12 +61,13 @@ const QcSerialNoAql = () => {
 
   const resetStates = () => {
     setProductData(null)
-    setTrackingProduct(null)
+    // setTrackingProduct(null)
     setQuestionData([])
     setAnswers({})
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setIsFormLocked(false)
   }
 
   useEffect(() => {
@@ -162,6 +163,9 @@ const QcSerialNoAql = () => {
           ...prev,
           serialNumber: serialNumber,
         }))
+
+        // Lock serial number field setelah berhasil fetch data
+        setIsFormLocked(true)
 
         const assemblyId = response.data.data.assembly_id
 
@@ -302,6 +306,27 @@ const QcSerialNoAql = () => {
       toast.success(messageShow)
       setErrorMessage(null)
 
+      // Fetch counter terbaru setelah submit berhasil
+      const assemblyId = productData.assembly_id
+      if (assemblyId) {
+        try {
+          const counterResponse = await backendTracking.get(
+            '/sample-inspections/quantity-summary',
+            {
+              params: {
+                assembly_id: assemblyId,
+                qc_id: qcCodeSerial,
+              },
+            },
+          )
+          // Update counter dengan data terbaru
+          setTrackingProduct(counterResponse.data.data)
+        } catch (counterError) {
+          console.error('Error fetching updated counter:', counterError)
+          // Tidak perlu error handling, karena submit sudah berhasil
+        }
+      }
+
       serialNumberInputRef.current.focus()
     } catch (error) {
       console.error('QC submit error:', error)
@@ -392,11 +417,14 @@ const QcSerialNoAql = () => {
                       )
                     })
                   )}
-                  <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <CButton color="primary" type="submit">
-                      Submit
-                    </CButton>
-                  </div>
+                  {/* Tombol Submit hanya muncul jika ada questions dan tidak ada error */}
+                  {questionData.length > 0 && !errorMessage && (
+                    <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <CButton color="primary" type="submit">
+                        Submit
+                      </CButton>
+                    </div>
+                  )}
                 </CForm>
               </CCardBody>
             </CCard>

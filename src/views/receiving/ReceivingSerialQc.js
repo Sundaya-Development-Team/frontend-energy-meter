@@ -5,7 +5,6 @@ import {
   CCard,
   CCardBody,
   CCardHeader,
-  CBadge,
   CFormLabel,
   CFormInput,
   CButton,
@@ -47,7 +46,7 @@ const ReceivingSerialQc = () => {
   const [qcName, setQcName] = useState([])
   const qcIdReceivingSerial = 'QC-SPS-PCBA-001'
   const [formData, setFormData] = useState({ serialNumber: '' })
-  const [isFormLocked] = useState(false)
+  const [isFormLocked, setIsFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
@@ -69,12 +68,13 @@ const ReceivingSerialQc = () => {
   const user = getUserFromStorage()
   const resetStates = () => {
     setProductData(null)
-    setTrackingProduct(null)
+    // setTrackingProduct(null)
     setQuestionData([])
     setAnswers({})
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setIsFormLocked(false)
   }
 
   useEffect(() => {
@@ -164,6 +164,15 @@ const ReceivingSerialQc = () => {
         // toast.success(response.data.message || 'Serial number valid')
         setProductData(response.data.data)
 
+        // isi kembali serial number di form
+        setFormData((prev) => ({
+          ...prev,
+          serialNumber: serialNumber,
+        }))
+
+        // Lock serial number field setelah berhasil fetch data
+        setIsFormLocked(true)
+
         const receivingItemId = response.data.data.receiving_item_id
         console.log('receiving_item_id :', receivingItemId)
 
@@ -237,51 +246,6 @@ const ReceivingSerialQc = () => {
     }
   }
 
-  // const [questionData] = useState([
-  //   {
-  //     id: 1,
-  //     title: 'Pemeriksaan Visual',
-  //     questions: [
-  //       { id: 101, question: 'Apakah ada goresan pada produk?' },
-  //       { id: 102, question: 'Apakah warna sesuai spesifikasi?' },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'Pemeriksaan Fungsional',
-  //     questions: [
-  //       { id: 201, question: 'Apakah semua tombol berfungsi?' },
-  //       { id: 202, question: 'Apakah produk menyala dengan benar?' },
-  //     ],
-  //   },
-  // ])
-
-  const data = {
-    po_number: 'PO-2025-001',
-    batch: 'BATCH-01',
-    status: 'pending',
-    inspection_level: 'Level II',
-    aql_critical: 0.65,
-    aql_major: 1.5,
-    aql_minor: 2.5,
-    total_quantity: 1200,
-    used_defects: 5,
-    sample_size: 80,
-  }
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'pending':
-        return <CBadge color="warning">Pending</CBadge>
-      case 'complete':
-        return <CBadge color="success">Complete</CBadge>
-      case 'reject':
-        return <CBadge color="danger">Reject</CBadge>
-      default:
-        return <CBadge color="secondary">{status}</CBadge>
-    }
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -351,6 +315,25 @@ const ReceivingSerialQc = () => {
 
       toast.success(messageShow)
       setErrorMessage(null)
+
+      // Fetch counter terbaru setelah submit berhasil
+      const receivingItemId = productData.receiving_item_id
+      if (receivingItemId) {
+        try {
+          const counterResponse = await backendTracking.get('/sample-inspections/aql-summary', {
+            params: {
+              receiving_item_id: receivingItemId,
+              qc_id: qcIdReceivingSerial,
+            },
+          })
+          // Update counter dengan data terbaru
+          setTrackingProduct(counterResponse.data.data)
+        } catch (counterError) {
+          console.error('Error fetching updated counter:', counterError)
+          // Tidak perlu error handling, karena submit sudah berhasil
+        }
+      }
+
       serialNumberInputRef.current.focus()
     } catch (error) {
       console.error('QC submit error:', error)
@@ -372,10 +355,11 @@ const ReceivingSerialQc = () => {
   return (
     <CRow>
       <CCol xs={12}>
-        <CRow className="g-4 mb-4">
-          {/* Scan Serial Number */}
-          <CCol md={6}>
-            <CCard className="mb-4 h-100">
+        <CRow className="g-4 align-items-stretch">
+          {/* Kolom Kiri - Scan Serial + Quality Control */}
+          <CCol md={8} className="d-flex flex-column">
+            {/* Scan Serial Number */}
+            <CCard className="mb-4">
               <CCardHeader>
                 <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
               </CCardHeader>
@@ -403,31 +387,58 @@ const ReceivingSerialQc = () => {
                     onChange={handleInput}
                   />
                 </FormRow>
-                <FormRow label="Counter"></FormRow>
-                <CRow className="mb-3">
-                  <CounterCard
-                    title="Required Sample"
-                    value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
-                  />
-                  <CounterCard
-                    title="Remaining Samples"
-                    value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
-                  />
-                  <CounterCard
-                    title="Max Fail"
-                    value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
-                  />
-                  <CounterCard
-                    title="Fail Count"
-                    value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
-                  />
-                </CRow>
+              </CCardBody>
+            </CCard>
+
+            {/* Quality Control */}
+            <CCard className="mb-4 flex-grow-1">
+              <CCardHeader>
+                <strong>Quality Control</strong>
+              </CCardHeader>
+              <CCardBody>
+                <CForm onSubmit={handleSubmit}>
+                  {questionData.length === 0 ? (
+                    <p className="text-muted">Questions not yet available...</p>
+                  ) : (
+                    questionData.map((q) => {
+                      const isYes = answers[q.id] === true // memastikan boolean
+
+                      return (
+                        <div
+                          key={q.id}
+                          className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
+                        >
+                          <CFormLabel className="mb-0">{q.question}</CFormLabel>
+                          <CFormSwitch
+                            name={`question-${q.id}`}
+                            label={answers[q.id] ? 'Ya' : 'Tidak'}
+                            checked={!!answers[q.id]}
+                            onChange={(e) =>
+                              setAnswers((prev) => ({
+                                ...prev,
+                                [q.id]: e.target.checked, // true kalau on, false kalau off
+                              }))
+                            }
+                          />
+                        </div>
+                      )
+                    })
+                  )}
+                  {/* Tombol Submit hanya muncul jika ada questions dan tidak ada error */}
+                  {questionData.length > 0 && !errorMessage && (
+                    <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <CButton color="primary" type="submit">
+                        Submit
+                      </CButton>
+                    </div>
+                  )}
+                </CForm>
               </CCardBody>
             </CCard>
           </CCol>
 
-          {/* Error Card atau Detail */}
-          <CCol md={6}>
+          {/* Kolom Kanan - Counter atau Error */}
+          <CCol md={4} className="d-flex flex-column">
             {errorMessage ? (
               /* Error Card */
               <CCard className="mb-4 h-100 d-flex flex-column error-card">
@@ -446,152 +457,35 @@ const ReceivingSerialQc = () => {
                 </CCardBody>
               </CCard>
             ) : (
-              /* Detail Card */
-              <CCard className="mb-4 h-100">
+              /* Counter Card */
+              <CCard className="mb-4 h-100 d-flex flex-column">
                 <CCardHeader>
-                  <strong>Detail</strong>
+                  <strong>Counter</strong>
                 </CCardHeader>
-                <CCardBody>
-                  <FormRow label="Product Detail :"></FormRow>
+                <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
                   <CRow className="mb-3">
-                    <CCol md={12}>
-                      <div className="fw-semibold">Item Code</div>
-                      <div> {productData?.code_item ?? '-'}</div>
-                    </CCol>
-                  </CRow>
-
-                  <CRow className="mb-3">
-                    <CCol md={6}>
-                      <div className="fw-semibold">Tracking</div>
-                      <div> {productData?.tracking_type ?? '-'}</div>
-                    </CCol>
-                    <CCol md={6}>
-                      <div className="fw-semibold">Batch</div>
-                      <div> {productData?.batch ?? '-'}</div>
-                    </CCol>
-                  </CRow>
-
-                  <CRow className="mb-3">
-                    <CCol md={6}>
-                      <div className="fw-semibold">Type</div>
-                      <div>{productData?.product?.type?.name ?? '-'}</div>
-                    </CCol>
-                  </CRow>
-                  <FormRow label="AQL Setting :"></FormRow>
-                  <CRow className="mb-3">
-                    <CCol md={6}>
-                      <div className="fw-semibold">Inspection Level</div>
-                      <div>{trackingProduct?.aql_configuration?.inspection_level ?? `-`}</div>
-                    </CCol>
-                    <CCol md={6}>
-                      <div className="fw-semibold">AQL Critical</div>
-                      <div>{trackingProduct?.aql_configuration?.aql_critical ?? `-`}</div>
-                    </CCol>
+                    <CounterCard
+                      title="Required Sample"
+                      value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
+                    />
+                    <CounterCard
+                      title="Remaining Samples"
+                      value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
+                    />
+                    <CounterCard
+                      title="Max Fail"
+                      value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
+                    />
+                    <CounterCard
+                      title="Fail Count"
+                      value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
+                    />
                   </CRow>
                 </CCardBody>
               </CCard>
             )}
           </CCol>
         </CRow>
-      </CCol>
-
-      {/* Details */}
-      <CCol xs={12} hidden>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Details</strong>
-          </CCardHeader>
-          <CCardBody>
-            <CRow className="mb-3">
-              <CCol md={6}>
-                <div className="fw-semibold">PO Number</div>
-                <div>{data.po_number}</div>
-              </CCol>
-              <CCol md={6}>
-                <div className="fw-semibold">Batch</div>
-                <div>{data.batch}</div>
-              </CCol>
-            </CRow>
-
-            <CRow className="mb-3">
-              <CCol md={6}>
-                <div className="fw-semibold">Status</div>
-                <div>{getStatusBadge(data.status)}</div>
-              </CCol>
-              <CCol md={6}>
-                <div className="fw-semibold">Inspection Level</div>
-                <div>{data.inspection_level}</div>
-              </CCol>
-            </CRow>
-
-            <CRow className="mb-3">
-              <CCol md={6}>
-                <div className="fw-semibold">AQL Minor</div>
-                <div>{data.aql_minor}</div>
-              </CCol>
-              <CCol md={6}>
-                <div className="fw-semibold">Total Quantity</div>
-                <div>{data.total_quantity}</div>
-              </CCol>
-            </CRow>
-
-            <CRow className="mb-3">
-              <CCol md={6}>
-                <div className="fw-semibold">Used Defects</div>
-                <div>{data.used_defects}</div>
-              </CCol>
-              <CCol md={6}>
-                <div className="fw-semibold">Sample Size</div>
-                <div>{data.sample_size}</div>
-              </CCol>
-            </CRow>
-          </CCardBody>
-        </CCard>
-      </CCol>
-
-      {/* Quality Control Assembly */}
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Quality Control</strong>
-          </CCardHeader>
-          <CCardBody>
-            <CForm onSubmit={handleSubmit}>
-              {questionData.length === 0 ? (
-                <p className="text-muted">Questions not yet available...</p>
-              ) : (
-                questionData.map((q) => {
-                  const isYes = answers[q.id] === true // memastikan boolean
-
-                  return (
-                    <div
-                      key={q.id}
-                      className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
-                    >
-                      <CFormLabel className="mb-0">{q.question}</CFormLabel>
-                      <CFormSwitch
-                        name={`question-${q.id}`}
-                        label={answers[q.id] ? 'Ya' : 'Tidak'}
-                        checked={!!answers[q.id]}
-                        onChange={(e) =>
-                          setAnswers((prev) => ({
-                            ...prev,
-                            [q.id]: e.target.checked, // true kalau on, false kalau off
-                          }))
-                        }
-                      />
-                    </div>
-                  )
-                })
-              )}
-              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                <CButton color="primary" type="submit">
-                  Submit
-                </CButton>
-              </div>
-            </CForm>
-          </CCardBody>
-        </CCard>
       </CCol>
     </CRow>
   )
