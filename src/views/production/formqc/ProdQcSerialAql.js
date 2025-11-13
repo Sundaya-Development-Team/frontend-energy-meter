@@ -37,7 +37,7 @@ const QcAqlSerial = () => {
   const [qcName, setQcName] = useState([])
   const qcCodeSerial = qcIdParams
   const [formData, setFormData] = useState({ serialNumber: '' })
-  const [isFormLocked] = useState(false)
+  const [isFormLocked, setIsFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
@@ -66,6 +66,7 @@ const QcAqlSerial = () => {
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setIsFormLocked(false)
   }
 
   useEffect(() => {
@@ -162,6 +163,9 @@ const QcAqlSerial = () => {
           ...prev,
           serialNumber: serialNumber,
         }))
+
+        // Lock serial number field setelah berhasil fetch data
+        setIsFormLocked(true)
 
         const assemblyId = response.data.data.assembly_id
         console.log('assemblyId :', assemblyId)
