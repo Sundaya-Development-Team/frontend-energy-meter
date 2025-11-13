@@ -393,11 +393,14 @@ const QcAqlSerial = () => {
                       )
                     })
                   )}
-                  <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <CButton color="primary" type="submit">
-                      Submit
-                    </CButton>
-                  </div>
+                  {/* Tombol Submit hanya muncul jika ada questions dan tidak ada error */}
+                  {questionData.length > 0 && !errorMessage && (
+                    <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                      <CButton color="primary" type="submit">
+                        Submit
+                      </CButton>
+                    </div>
+                  )}
                 </CForm>
               </CCardBody>
             </CCard>
