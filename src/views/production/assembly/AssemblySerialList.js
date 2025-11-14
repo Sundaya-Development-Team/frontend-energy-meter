@@ -64,10 +64,7 @@ const AssemblySerialList = () => {
 
     const headers = ['No', 'Assembly Serial Code']
 
-    const rows = records.map((row, index) => [
-      (page - 1) * limit + index + 1,
-      row.partialCode,
-    ])
+    const rows = records.map((row, index) => [(page - 1) * limit + index + 1, row.partialCode])
 
     const csvContent =
       'data:text/csv;charset=utf-8,' + [headers, ...rows].map((e) => e.join(',')).join('\n')

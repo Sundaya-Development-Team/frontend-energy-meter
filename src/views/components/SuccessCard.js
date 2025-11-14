@@ -11,9 +11,7 @@ const SuccessCard = ({ serialNumber, message, additionalInfo }) => {
         <div className="text-center">
           <div className="success-icon">✓</div>
           <h4 className="success-title">VALID</h4>
-          {serialNumber && (
-            <div className="success-serial-number">Serial: {serialNumber}</div>
-          )}
+          {serialNumber && <div className="success-serial-number">Serial: {serialNumber}</div>}
           {message && <p className="success-message">{message}</p>}
           {additionalInfo && <div className="success-additional-info">{additionalInfo}</div>}
         </div>
@@ -23,4 +21,3 @@ const SuccessCard = ({ serialNumber, message, additionalInfo }) => {
 }
 
 export default SuccessCard
-
