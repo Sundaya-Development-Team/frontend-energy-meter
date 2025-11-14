@@ -121,6 +121,11 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Validate Assy Serial',
+        to: '/production/assembly/validateAssemblySerial',
+      },
+      {
+        component: CNavItem,
         name: 'QC Sub Assembly',
         to: '/production/serialnoaql/QC-SA002/Sub Assembly',
       },

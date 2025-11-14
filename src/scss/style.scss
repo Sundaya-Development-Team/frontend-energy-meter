@@ -299,3 +299,67 @@ body {
 /* ==========================
    END Error Card Styles
    ========================== */
+
+/* ==========================
+   Success Card Styles
+   ========================== */
+
+/* Success card dengan background hijau */
+.success-card {
+  background-color: #28a745;
+  border: none;
+}
+
+/* Success card header dengan background hijau gelap */
+.success-card-header {
+  background-color: #218838;
+  color: white;
+  border: none;
+}
+
+/* Success card body dengan text putih dan layout center */
+.success-card-body {
+  color: white;
+}
+
+/* Container untuk serial number di success card */
+.success-serial-number {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Success icon styling */
+.success-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: white;
+  font-weight: bold;
+}
+
+/* Success title styling */
+.success-title {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+/* Success message text styling */
+.success-message {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+/* Success additional info styling */
+.success-additional-info {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* ==========================
+   END Success Card Styles
+   ========================== */
