@@ -9,12 +9,11 @@ const PurchaseOrder = React.lazy(() => import('./views/receiving/PurchaseOrder')
 const ReceivingHeader = React.lazy(() => import('./views/receiving/ReceivingHeader'))
 const ReceivingList = React.lazy(() => import('./views/receiving/ReceivingList'))
 const ReceivingDetail = React.lazy(() => import('./views/receiving/ReceivingDetail'))
-const ReceivingNonSerialList = React.lazy(
-  () => import('./views/receiving/ReceivingNonSerialList.js'),
-)
+const ReceivingNonSerialList = React.lazy(() => import('./views/receiving/ReceivingNonSerialList'))
+
 //QC Receiving
 const ReceivingSerialQc = React.lazy(() => import('./views/receiving/ReceivingSerialQc'))
-const DetailNonSerialQc = React.lazy(() => import('./views/receiving/DetailNonSerialQc.js'))
+const DetailNonSerialQc = React.lazy(() => import('./views/receiving/DetailNonSerialQc'))
 
 //Tracking
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
@@ -22,22 +21,25 @@ const TrackingDetail = React.lazy(() => import('./views/tracking/TrackingDetail'
 const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingFinalProduct'))
 
 //QCProd
-const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql.js'))
-const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql.js'))
-const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc.js'))
+const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql'))
+const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql'))
+const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc'))
 
 // Assembly
-const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder.js'))
-const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder.js'))
+const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder'))
+const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder'))
 const AssemblySerialList = React.lazy(
-  () => import('./views/production/assembly/AssemblySerialList.js'),
+  () => import('./views/production/assembly/AssemblySerialList'),
 )
 const MatchingAssemblyPcbSerial = React.lazy(
-  () => import('./views/production/assembly/MatchingAssemblyPcb.js'),
+  () => import('./views/production/assembly/MatchingAssemblyPcb'),
+)
+const ValidateAssemblySerial = React.lazy(
+  () => import('./views/production/assembly/ValidateAssemblySerial'),
 )
 
 //Shipping
-const ShippingHeader = React.lazy(() => import('./views/shipping/ShippingHeader.js'))
+const ShippingHeader = React.lazy(() => import('./views/shipping/ShippingHeader'))
 
 //Aging
 const ScanBeforeAging = React.lazy(() => import('./views/production/agingtest/ScanBeforeAging'))
@@ -48,9 +50,9 @@ const ScanBeforeClearZero = React.lazy(
 )
 const QCClearZero = React.lazy(() => import('./views/production/finishing/QCClearZero'))
 const ScanAfterZeroClear = React.lazy(
-  () => import('./views/production/finishing/ScanAfterClearZero.js'),
+  () => import('./views/production/finishing/ScanAfterClearZero'),
 )
-const SidePlnSerial = React.lazy(() => import('./views/production/plnserial/SidePlnSerial.js'))
+const SidePlnSerial = React.lazy(() => import('./views/production/plnserial/SidePlnSerial'))
 const PlnSerialComparator = React.lazy(
   () => import('./views/production/finishing/PlnSerialComparator'),
 )
@@ -104,7 +106,7 @@ const routes = [
       </PrivateRoutes>
     ),
   },
-  //Reciving
+  //Receiving
   { path: '/receiving', name: 'Receiving' },
   {
     path: '/receiving/purchaseOrder',
@@ -252,6 +254,17 @@ const routes = [
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
           <AssemblySerialList />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/production/assembly/validateAssemblySerial',
+    name: 'Validate Serial',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <ValidateAssemblySerial />
         </DefaultLayout>
       </PrivateRoutes>
     ),
