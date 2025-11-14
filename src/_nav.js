@@ -476,16 +476,19 @@ const _nav = [
   //   to: '/delivery/scan',
   //   icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
   // },
-  {
-    component: CNavTitle,
-    name: 'Admins',
-  },
-  {
-    component: CNavItem,
-    name: 'Generate PLN Serial',
-    to: '/admin/generate/plnserial',
-    icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
-  },
+
+  //Admin
+  // {
+  //   component: CNavTitle,
+  //   name: 'Admins',
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: 'Generate PLN Serial',
+  //   to: '/admin/generate/plnserial',
+  //   icon: <CIcon icon={cilChartLine} customClassName="nav-icon" />,
+  // },
+
   // {
   //   component: CNavItem,
   //   name: 'Confirm Lassered Serial',

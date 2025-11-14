@@ -47,7 +47,7 @@ export const backendWhNew = axios.create({
 
 //Generate Serial number
 export const backendGenerate = axios.create({
-  baseURL: `${VITE_SERVER_DATA}/api/v2/serial-numbers`,
+  baseURL: `${VITE_SERVER_DATA}/api/v2/generate-pln`,
 })
 
 //Assembly
