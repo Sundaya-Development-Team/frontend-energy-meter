@@ -371,11 +371,15 @@ const _nav = [
       //   name: 'SCAN PLN Serial',
       //   to: '/production/finishing/scansidepln',
       // },
-
       {
         component: CNavItem,
         name: 'QC Cover & Finishing',
         to: '/production/serialnoaql/QC-C001/QC Cover & Finishing',
+      },
+      {
+        component: CNavItem,
+        name: 'Generate Box Serial',
+        to: '/production/finishing/generateboxserial',
       },
     ],
   },

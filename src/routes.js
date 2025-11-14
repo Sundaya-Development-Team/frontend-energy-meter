@@ -57,6 +57,7 @@ const PlnSerialComparator = React.lazy(
   () => import('./views/production/finishing/PlnSerialComparator'),
 )
 const PrintLaser = React.lazy(() => import('./views/production/finishing/PrintLaser'))
+const GenerateBoxSerial = React.lazy(() => import('./views/production/finishing/GenerateBoxSerial'))
 
 //Master Data
 //Master Product
@@ -379,6 +380,18 @@ const routes = [
       </PrivateRoutes>
     ),
   },
+  {
+    path: '/production/finishing/generateboxserial',
+    name: 'Generate Box Serial',
+    element: (
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+        <DefaultLayout>
+          <GenerateBoxSerial />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
   { path: '/repair', name: 'Repair' },
   {
     path: '/repair/:qcIdParams/:qcNameParams',
