@@ -11,7 +11,7 @@ import {
   CForm,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
-import { backendGenerate } from '../../../api/axios'
+import { backendLuhn } from '../../../api/axios'
 import SuccessCard from '../../components/SuccessCard'
 import ErrorCard from '../../components/ErrorCard'
 import '../../../scss/style.scss'
@@ -63,8 +63,8 @@ const ValidateAssemblySerial = () => {
 
     try {
       // Panggil API validasi
-      const validateRes = await backendGenerate.post('/validate', {
-        serialCode: currentSerialNumber,
+      const validateRes = await backendLuhn.post('/validate', {
+        number: currentSerialNumber,
       })
 
       // Cek response
@@ -74,7 +74,7 @@ const ValidateAssemblySerial = () => {
         setValidatedSerialNumber(currentSerialNumber)
         setValidationMessage(validateRes.data.data.message || 'Serial number is valid')
         setValidationData(validateRes.data.data)
-        toast.success('Serial number validated successfully!')
+        // toast.success('Serial number validated successfully!')
       } else {
         // Failed validation
         setValidationState('error')
@@ -128,7 +128,7 @@ const ValidateAssemblySerial = () => {
                 </CForm>
 
                 {/* Informasi tambahan jika ada */}
-                {validationData && validationState === 'success' && (
+                {/* {validationData && validationState === 'success' && (
                   <div className="mt-4">
                     <h6 className="text-muted mb-3">Validation Details:</h6>
                     <div className="border rounded p-3">
@@ -149,7 +149,7 @@ const ValidateAssemblySerial = () => {
                       )}
                     </div>
                   </div>
-                )}
+                )} */}
               </CCardBody>
             </CCard>
           </CCol>

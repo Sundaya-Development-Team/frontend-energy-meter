@@ -14,16 +14,34 @@ const AssemblySerialList = () => {
   const [searchKeyword, setSearchKeyword] = useState('')
   const navigate = useNavigate()
 
+  // Ambil user dari localStorage
+  const getUserFromStorage = () => {
+    try {
+      const userString = localStorage.getItem('user')
+      if (userString) {
+        return JSON.parse(userString)
+      }
+      return null
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error)
+      return null
+    }
+  }
+
+  const user = getUserFromStorage()
+
   const fetchRecords = useCallback(async () => {
     try {
       setLoading(true)
-      const response = await backendGenerate.get('/production/generated', {
+      const response = await backendGenerate.get('/pln-codes/partial', {
         params: { page, limit, search: searchKeyword || undefined },
       })
 
       if (response.data.success) {
-        setRecords(response.data.data || [])
-        setTotalRows(response.data.pagination?.totalItems || 0)
+        // Response structure: data.data.data (array of records)
+        setRecords(response.data.data?.data || [])
+        // Pagination: data.data.pagination.total
+        setTotalRows(response.data.data?.pagination?.total || 0)
       }
     } catch (error) {
       console.error('Error fetching records:', error)
@@ -44,26 +62,11 @@ const AssemblySerialList = () => {
       return
     }
 
-    const headers = [
-      'No',
-      'Company',
-      'Year',
-      'Month',
-      'Sequence',
-      'Serial Number',
-      'Status',
-      'Created At',
-    ]
+    const headers = ['No', 'Assembly Serial Code']
 
     const rows = records.map((row, index) => [
       (page - 1) * limit + index + 1,
-      row.companyCode,
-      row.year,
-      row.month,
-      row.sequence,
-      row.serialNumber,
-      row.status,
-      new Date(row.createdAt).toLocaleString(),
+      row.partialCode,
     ])
 
     const csvContent =
@@ -77,11 +80,18 @@ const AssemblySerialList = () => {
     link.click()
     document.body.removeChild(link)
 
-    // Ambil semua id dari records
-    const ids = records.map((row) => row.id)
+    // Ambil semua id dari records sebagai plnCodeIds
+    const plnCodeIds = records.map((row) => row.id)
+
+    // Payload baru sesuai dengan API
+    const payload = {
+      plnCodeIds: plnCodeIds,
+      printedBy: user?.name || 'Unknown User',
+      printNotes: `Bulk download CSV at ${new Date().toLocaleString()}`,
+    }
 
     try {
-      await backendGenerate.patch('/production/print-by-ids', { ids })
+      await backendGenerate.post('/pln-codes/bulk-mark-printed', payload)
       toast.success('Print status updated successfully!')
 
       fetchRecords()
@@ -96,20 +106,38 @@ const AssemblySerialList = () => {
       name: 'No',
       selector: (row, index) => (page - 1) * limit + index + 1,
       sortable: false,
-      width: '90px',
+      width: '70px',
     },
     {
-      name: 'Serial Number',
-      selector: (row) => row.serialNumber,
+      name: 'Assembly Serial Code',
+      selector: (row) => row.partialCode,
       sortable: true,
       grow: 2,
     },
-    { name: 'Status', selector: (row) => row.status, sortable: true },
     {
-      name: 'Created At',
-      selector: (row) => new Date(row.createdAt).toLocaleString(),
+      name: 'Factory',
+      selector: (row) => row.factory?.name || '-',
       sortable: true,
-      grow: 2,
+      width: '150px',
+    },
+    {
+      name: 'Status',
+      selector: (row) => row.status,
+      sortable: true,
+      width: '100px',
+    },
+    {
+      name: 'Printed',
+      selector: (row) => (row.isPrinted ? '✓' : '✗'),
+      sortable: true,
+      width: '80px',
+      center: true,
+    },
+    {
+      name: 'Generated At',
+      selector: (row) => new Date(row.generatedAt).toLocaleString(),
+      sortable: true,
+      grow: 1,
     },
   ]
 
