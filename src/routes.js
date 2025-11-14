@@ -294,6 +294,7 @@ const routes = [
       </PrivateRoutes>
     ),
   },
+
   //QC Production No Aql Serial
   { path: '/production/serialnoaql', name: 'QC Serial No AQL' },
   {
