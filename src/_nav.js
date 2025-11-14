@@ -324,30 +324,25 @@ const _nav = [
       // },
     ],
   },
+  // {
+  //   component: CNavGroup,
+  //   name: 'Matching Assy & PLN',
+  //   to: '/production/plnserial',
+  //   icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+  //   items: [
+  //     {
+  //       component: CNavItem,
+  //       name: 'Matching Assy & PLN',
+  //       to: '/production/plnserial/scansidepln',
+  //     },
+  //   ],
+  // },
   {
     component: CNavGroup,
-    name: 'Matching Assy & PLN',
-    to: '/production/plnserial',
+    name: 'Laser Print',
+    to: '/production/finishing',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Matching Assy & PLN',
-        to: '/production/plnserial/scansidepln',
-      },
-    ],
-  },
-  {
-    component: CNavGroup,
-    name: 'Finishing',
-    to: '/production/finishing/clearzero',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'SCAN PLN Serial',
-      //   to: '/production/finishing/scansidepln',
-      // },
       {
         component: CNavItem,
         name: 'Print Laser Post 1',
@@ -360,13 +355,27 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Matching PLN Serial',
-        to: '/production/finishing/comparePlnSerial',
-      },
-      {
-        component: CNavItem,
         name: 'QC Laser & Engraving',
         to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Finishing',
+    to: '/production/finishing',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
+      // {
+      //   component: CNavItem,
+      //   name: 'SCAN PLN Serial',
+      //   to: '/production/finishing/scansidepln',
+      // },
+
+      {
+        component: CNavItem,
+        name: 'QC Cover & Finishing',
+        to: '/production/serialnoaql/QC-C001/QC Cover & Finishing',
       },
     ],
   },
