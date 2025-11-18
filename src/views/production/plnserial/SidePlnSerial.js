@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow } from '@coreui/react'
 import { toast } from 'react-toastify'
 import { backendGenerate, backendTracking } from '../../../api/axios'
-import ImageContainer from '../../../components/common/ImageContainer' // ✅ gunakan komponen reusable
+import ImageContainer from '../../components/ImageContainer' // ✅ gunakan komponen reusable
 
 const SidePlnSerial = () => {
   const [formData, setFormData] = useState({
