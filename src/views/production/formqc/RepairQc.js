@@ -18,6 +18,7 @@ import {
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard6 } from '../../components/CounterCard'
+import SuccessCard from '../../components/SuccessCard'
 import { useAuth } from '../../../context/AuthContext'
 import '../../../scss/style.scss'
 
@@ -45,6 +46,7 @@ const QcAqlSerial = () => {
   const [repairInfo, setRepairInfo] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
+  const [successValidation, setSuccessValidation] = useState(null) // untuk success card
 
   const resetStates = () => {
     setProductData(null)
@@ -55,6 +57,7 @@ const QcAqlSerial = () => {
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setIsFormLocked(false)
   }
 
@@ -81,6 +84,7 @@ const QcAqlSerial = () => {
     setRepairInfo(null)
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setFormData({ serialNumber: '', notes: '' })
 
     // Panggil fetch validasi serial
@@ -100,6 +104,12 @@ const QcAqlSerial = () => {
       if (response.data.valid === true) {
         setErrorMessage(null)
         setErrorSerialNumber(null)
+
+        // Set success validation untuk success card
+        setSuccessValidation({
+          serialNumber: serialNumber,
+          message: response.data.message ?? 'Serial number valid for repair',
+        })
 
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
           id: Number(id),
@@ -353,7 +363,7 @@ const QcAqlSerial = () => {
             </CCard>
           </CCol>
 
-          {/* Error Card atau Status Info */}
+          {/* Error Card, Success Card, atau Status Info */}
           <CCol md={4}>
             {errorMessage ? (
               /* Error Card */
@@ -372,6 +382,12 @@ const QcAqlSerial = () => {
                   </div>
                 </CCardBody>
               </CCard>
+            ) : successValidation ? (
+              /* Success Card */
+              <SuccessCard
+                serialNumber={successValidation.serialNumber}
+                message={successValidation.message}
+              />
             ) : (
               /* Status Info Card */
               <CCard className="mb-4 h-100">
