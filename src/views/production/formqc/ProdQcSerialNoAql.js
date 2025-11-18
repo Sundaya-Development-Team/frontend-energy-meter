@@ -15,9 +15,10 @@ import {
   CFormSwitch,
 } from '@coreui/react'
 
-import { backendQc, backendTracking } from '../../../api/axios'
+import { backendQc, backendTracking, backendLuhn } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard6 } from '../../components/CounterCard'
+import SuccessCard from '../../components/SuccessCard'
 import '../../../scss/style.scss'
 
 const FormRow = ({ label, children }) => (
@@ -42,6 +43,7 @@ const QcSerialNoAql = () => {
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
+  const [successValidation, setSuccessValidation] = useState(null) // untuk success card
 
   // Ambil user dari localStorage
   const getUserFromStorage = () => {
@@ -67,6 +69,7 @@ const QcSerialNoAql = () => {
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setIsFormLocked(false)
   }
 
@@ -93,10 +96,47 @@ const QcSerialNoAql = () => {
     setAnswers({})
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setFormData({ serialNumber: '', notes: '' })
 
-    // Panggil fetch validasi serial
-    fetchValidationSnumb(currentSerialNumber)
+    // Cek apakah QC code adalah QC-SA002
+    if (qcCodeSerial === 'QC-SA002') {
+      // Validasi ke backendLuhn dulu untuk QC-SA002
+      validateSerialWithLuhn(currentSerialNumber)
+    } else {
+      // Langsung ke validasi QC biasa untuk QC lainnya
+      fetchValidationSnumb(currentSerialNumber)
+    }
+  }
+
+  // Validasi serial number ke backendLuhn (khusus QC-SA002)
+  const validateSerialWithLuhn = async (serialNumber) => {
+    try {
+      const validateRes = await backendLuhn.post('/validate', {
+        number: serialNumber,
+      })
+
+      // Cek response validasi
+      if (validateRes.data.data?.isValid) {
+        // Serial valid, lanjut ke validasi QC
+        console.log('Luhn validation success:', validateRes.data.data.message)
+        fetchValidationSnumb(serialNumber)
+      } else {
+        // Serial tidak valid
+        const errorMsg = validateRes.data.data.message || 'Invalid serial number'
+        setErrorMessage(errorMsg)
+        setErrorSerialNumber(serialNumber)
+        // toast.error(errorMsg)
+      }
+    } catch (error) {
+      // Error dari API
+      console.error('Luhn validation error:', error)
+      const errorMsg =
+        error.response?.data?.message || error.message || 'Failed to validate serial number'
+      setErrorMessage(errorMsg)
+      setErrorSerialNumber(serialNumber)
+      // toast.error(errorMsg)
+    }
   }
 
   // Fetch validation serial number
@@ -113,6 +153,12 @@ const QcSerialNoAql = () => {
         // toast.success(response.data.message ?? 'Serial number valid')
         setErrorMessage(null)
         setErrorSerialNumber(null)
+
+        // Set success validation untuk success card
+        setSuccessValidation({
+          serialNumber: serialNumber,
+          message: response.data.message ?? 'Serial number valid',
+        })
 
         // Convert object questions → array
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
@@ -430,7 +476,7 @@ const QcSerialNoAql = () => {
             </CCard>
           </CCol>
 
-          {/* Kolom Kanan - Counter atau Error */}
+          {/* Kolom Kanan - Success Card + Counter atau Error */}
           <CCol md={4} className="d-flex flex-column">
             {errorMessage ? (
               /* Error Card */
@@ -450,32 +496,42 @@ const QcSerialNoAql = () => {
                 </CCardBody>
               </CCard>
             ) : (
-              /* Counter Card */
-              <CCard className="mb-4 h-100 d-flex flex-column">
-                <CCardHeader>
-                  <strong>Counter</strong>
-                </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
-                  <CRow className="mb-3">
-                    <CounterCard6
-                      title="Required Quantity"
-                      value={trackingProduct?.quantity_summary?.total_quantity ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Remaining Quantity"
-                      value={trackingProduct?.quantity_summary?.remaining_quantity ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Pass Quantity"
-                      value={trackingProduct?.quantity_summary?.pass_quantity ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Fail Quantity"
-                      value={trackingProduct?.quantity_summary?.fail_quantity ?? `-`}
-                    />
-                  </CRow>
-                </CCardBody>
-              </CCard>
+              <div className="h-100 d-flex flex-column">
+                {/* Counter Card */}
+                <CCard className="mb-4 flex-grow-1 d-flex flex-column">
+                  <CCardHeader>
+                    <strong>Counter</strong>
+                  </CCardHeader>
+                  <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
+                    <CRow className="mb-3">
+                      <CounterCard6
+                        title="Required Quantity"
+                        value={trackingProduct?.quantity_summary?.total_quantity ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Remaining Quantity"
+                        value={trackingProduct?.quantity_summary?.remaining_quantity ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Pass Quantity"
+                        value={trackingProduct?.quantity_summary?.pass_quantity ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Fail Quantity"
+                        value={trackingProduct?.quantity_summary?.fail_quantity ?? `-`}
+                      />
+                    </CRow>
+                  </CCardBody>
+                </CCard>
+
+                {/* Success Card */}
+                {successValidation && (
+                  <SuccessCard
+                    serialNumber={successValidation.serialNumber}
+                    message={successValidation.message}
+                  />
+                )}
+              </div>
             )}
           </CCol>
         </CRow>
