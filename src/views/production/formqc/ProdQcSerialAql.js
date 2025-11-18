@@ -17,6 +17,7 @@ import {
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard6 } from '../../components/CounterCard'
+import SuccessCard from '../../components/SuccessCard'
 import '../../../scss/style.scss'
 
 const FormRow = ({ label, children }) => (
@@ -41,6 +42,7 @@ const QcAqlSerial = () => {
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
+  const [successValidation, setSuccessValidation] = useState(null) // untuk success card
 
   // Ambil user dari localStorage
   const getUserFromStorage = () => {
@@ -66,6 +68,7 @@ const QcAqlSerial = () => {
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setIsFormLocked(false)
   }
 
@@ -92,6 +95,7 @@ const QcAqlSerial = () => {
     setAnswers({})
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setFormData({ serialNumber: '', notes: '' })
 
     // Panggil fetch validasi serial
@@ -112,6 +116,12 @@ const QcAqlSerial = () => {
         // toast.success(response.data.message ?? 'Serial number valid')
         setErrorMessage(null)
         setErrorSerialNumber(null)
+
+        // Set success validation untuk success card
+        setSuccessValidation({
+          serialNumber: serialNumber,
+          message: response.data.message ?? 'Serial number valid',
+        })
 
         // Convert object questions → array
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
@@ -429,7 +439,7 @@ const QcAqlSerial = () => {
             </CCard>
           </CCol>
 
-          {/* Kolom Kanan - Counter atau Error */}
+          {/* Kolom Kanan - Counter + Success Card atau Error */}
           <CCol md={4} className="d-flex flex-column">
             {errorMessage ? (
               /* Error Card */
@@ -449,32 +459,42 @@ const QcAqlSerial = () => {
                 </CCardBody>
               </CCard>
             ) : (
-              /* Counter Card */
-              <CCard className="mb-4 h-100 d-flex flex-column">
-                <CCardHeader>
-                  <strong>Counter</strong>
-                </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
-                  <CRow className="mb-3">
-                    <CounterCard6
-                      title="Required Sample"
-                      value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Remaining Samples"
-                      value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Max Fail"
-                      value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Fail Count"
-                      value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
-                    />
-                  </CRow>
-                </CCardBody>
-              </CCard>
+              <div className="h-100 d-flex flex-column">
+                {/* Counter Card */}
+                <CCard className="mb-4 flex-grow-1 d-flex flex-column">
+                  <CCardHeader>
+                    <strong>Counter</strong>
+                  </CCardHeader>
+                  <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
+                    <CRow className="mb-3">
+                      <CounterCard6
+                        title="Required Sample"
+                        value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Remaining Samples"
+                        value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Max Fail"
+                        value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Fail Count"
+                        value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
+                      />
+                    </CRow>
+                  </CCardBody>
+                </CCard>
+
+                {/* Success Card */}
+                {successValidation && (
+                  <SuccessCard
+                    serialNumber={successValidation.serialNumber}
+                    message={successValidation.message}
+                  />
+                )}
+              </div>
             )}
           </CCol>
         </CRow>
