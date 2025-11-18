@@ -196,7 +196,7 @@ const ScanBeforeAssembly = () => {
         <CCol xs={6}>
           <CCard className="mb-4">
             <CCardHeader>
-              <strong>Side Cover Assembly Serial Number</strong>
+              <strong>Assembly Serial Number</strong>
             </CCardHeader>
             <CCardBody>
               <CForm>
