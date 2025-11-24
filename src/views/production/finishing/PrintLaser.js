@@ -113,7 +113,7 @@ const PrintLaser = () => {
     serialInputRef.current?.focus()
   }
 
-  // ============ STEP 1-4: Scan Serial, Validasi, Generate PLN, Fetch QC ============
+  // ============ STEP 1: Scan Serial, Validasi QC (ambil pertanyaan tapi jangan tampilkan) ============
   const handleSerialScan = async (e) => {
     e.preventDefault()
     if (!serialNumber) {
@@ -124,25 +124,7 @@ const PrintLaser = () => {
     const currentSerialNumber = serialNumber
 
     try {
-      // STEP 1-2: Validasi serial number
-      const validateRes = await backendGenerate.post('/validate', {
-        serialCode: currentSerialNumber,
-      })
-
-      if (!validateRes.data.data?.isValid) {
-        setErrorMessage(validateRes.data.data.message || 'Invalid serial')
-        setErrorSerialNumber(currentSerialNumber)
-        setSerialNumber('')
-        return
-      }
-
-      // STEP 3: Generate PLN Serial (DUMMY untuk sekarang)
-      const dummyPlnSerial = `PLN-${lasserNo}-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Date.now().toString().slice(-6)}`
-      setGeneratedPlnSerial(dummyPlnSerial)
-      // Lock serial input
-      setIsSerialLocked(true)
-
-      // STEP 4: Fetch QC Questions
+      // STEP 1: Validasi QC dan ambil pertanyaan (tapi jangan tampilkan dulu)
       await fetchQcValidation(currentSerialNumber)
     } catch (err) {
       console.error(err)
@@ -153,13 +135,14 @@ const PrintLaser = () => {
     }
   }
 
-  // Fetch QC Validation dan Questions
+  // STEP 1: Fetch QC Validation dan Questions (simpan tapi jangan tampilkan)
   const fetchQcValidation = async (serialNumber) => {
     try {
       const response = await backendQc.get('/validation', {
         params: {
           serial_number: serialNumber,
           qc_id: qcIdPrintLaser,
+          pln_code_id: serialNumber, // pakai serial assembly
         },
       })
 
@@ -167,7 +150,7 @@ const PrintLaser = () => {
         setErrorMessage(null)
         setErrorSerialNumber(null)
 
-        // Convert object questions → array
+        // Convert object questions → array dan SIMPAN (jangan tampilkan dulu)
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
           id: Number(id),
           question: text,
@@ -183,12 +166,11 @@ const PrintLaser = () => {
         })
         setAnswers(initialAnswers)
 
-        // Fetch product data
-        await fetchProduct(serialNumber)
+        // Lock serial input
+        setIsSerialLocked(true)
 
-        // Update step
-        setCurrentStep('QC_QUESTIONS')
-        toast.success('Serial valid! Silakan jawab pertanyaan QC.')
+        // STEP 2: Generate PLN Code
+        await generatePlnCode(serialNumber)
       } else {
         const errorMsg = response.data.message ?? 'Serial tidak bisa masuk tahap print laser'
         setErrorMessage(errorMsg)
@@ -199,6 +181,39 @@ const PrintLaser = () => {
     } catch (error) {
       console.error(error)
       const errorMsg = error.response?.data?.message || 'Gagal validasi QC'
+      setErrorMessage(errorMsg)
+      setErrorSerialNumber(serialNumber)
+      setSerialNumber('')
+      setIsSerialLocked(false)
+    }
+  }
+
+  // STEP 2: Generate PLN Code
+  const generatePlnCode = async (serialNumber) => {
+    try {
+      const response = await backendGenerate.post(`/pln-codes/${serialNumber}/add-material`)
+
+      if (response.data.success) {
+        const plnSerial = response.data.data?.pln_serial || response.data.data?.plnSerial
+        setGeneratedPlnSerial(plnSerial)
+
+        // Fetch product data
+        await fetchProduct(serialNumber)
+
+        // Update step ke PRINT_READY (tampilkan PLN dan tombol print)
+        setCurrentStep('PRINT_READY')
+        setShowPrintButton(true)
+        toast.success('PLN Serial berhasil di-generate! Silakan klik tombol Print.')
+      } else {
+        const errorMsg = response.data.message || 'Gagal generate PLN Serial'
+        setErrorMessage(errorMsg)
+        setErrorSerialNumber(serialNumber)
+        setSerialNumber('')
+        setIsSerialLocked(false)
+      }
+    } catch (error) {
+      console.error(error)
+      const errorMsg = error.response?.data?.message || 'Gagal generate PLN Serial'
       setErrorMessage(errorMsg)
       setErrorSerialNumber(serialNumber)
       setSerialNumber('')
@@ -246,38 +261,24 @@ const PrintLaser = () => {
     }
   }
 
-  // ============ STEP 6-7: Validasi QC dan Print ============
-  const handleQcSubmit = async (e) => {
-    e.preventDefault()
-
-    // Cek apakah semua jawaban Pass (true)
-    const allPass = Object.values(answers).every((answer) => answer === true)
-
-    if (!allPass) {
-      setErrorMessage('Tidak semua pertanyaan QC dijawab Ya (Pass). Tidak bisa lanjut print!')
-      setErrorSerialNumber(serialNumber)
-      toast.error('QC tidak Pass! Perbaiki jawaban untuk melanjutkan.')
-      return
-    }
-
-    // Jika semua Pass, tampilkan tombol Print
-    setShowPrintButton(true)
-    setCurrentStep('PRINT_READY')
-    toast.success('QC Pass! Silakan klik tombol Print Laser.')
-  }
-
-  // ============ STEP 8-9: Print Laser ============
+  // ============ STEP 5-6: Print Laser (kirim perintah ke mesin) ============
   const handlePrintLaser = async () => {
     setCurrentStep('PRINTING')
 
+    if (!user || !user.name) {
+      toast.error('User tidak ditemukan di localStorage!')
+      setCurrentStep('PRINT_READY')
+      return
+    }
+
     try {
-      const lasserRes = await backendGenerate.post('/lassered', {
-        serialNumber: serialNumber,
-        lasser: lasserNo,
-        plnSerial: generatedPlnSerial, // kirim PLN serial jika diperlukan
+      const response = await backendGenerate.post(`/pln-codes/${serialNumber}/mark-lasered`, {
+        station: lasserNo, // station 1 atau 2 sesuai post yang dipilih
+        laseredBy: user.name, // nama operator dari localStorage
+        laserNotes: notes || 'Laser marking completed successfully', // notes dari form atau default
       })
 
-      if (lasserRes.data.success) {
+      if (response.data.success) {
         toast.success('PRINT SELESAI! Silakan scan hasil print laser.')
         setCurrentStep('SCAN_RESULT')
 
@@ -286,7 +287,7 @@ const PrintLaser = () => {
           scanResultInputRef.current?.focus()
         }, 100)
       } else {
-        toast.error(lasserRes.data.message || 'Print gagal')
+        toast.error(response.data.message || 'Print gagal')
         setCurrentStep('PRINT_READY')
       }
     } catch (err) {
@@ -297,7 +298,7 @@ const PrintLaser = () => {
     }
   }
 
-  // ============ STEP 10-12: Scan Hasil Print dan Compare ============
+  // ============ STEP 7-8: Scan Hasil Print dan Compare, lalu tampilkan QC Questions ============
   const handleScanResult = async (e) => {
     e.preventDefault()
 
@@ -308,8 +309,9 @@ const PrintLaser = () => {
 
     // Compare dengan PLN Serial yang di-generate
     if (scannedPlnSerial.trim() === generatedPlnSerial.trim()) {
-      // SAMA - Submit QC ke backend
-      await submitQcToBackend()
+      // SAMA - Tampilkan QC Questions
+      setCurrentStep('QC_QUESTIONS')
+      toast.success('Serial cocok! Silakan jawab pertanyaan QC.')
     } else {
       // BEDA - Error
       setErrorMessage(
@@ -318,6 +320,24 @@ const PrintLaser = () => {
       setErrorSerialNumber(scannedPlnSerial)
       toast.error('Serial hasil print tidak sesuai!')
     }
+  }
+
+  // ============ STEP 9: Submit QC ============
+  const handleQcSubmit = async (e) => {
+    e.preventDefault()
+
+    // Cek apakah semua jawaban Pass (true)
+    const allPass = Object.values(answers).every((answer) => answer === true)
+
+    if (!allPass) {
+      setErrorMessage('Tidak semua pertanyaan QC dijawab Ya (Pass). Tidak bisa submit!')
+      setErrorSerialNumber(serialNumber)
+      toast.error('QC tidak Pass! Perbaiki jawaban untuk melanjutkan.')
+      return
+    }
+
+    // Jika semua Pass, submit QC
+    await submitQcToBackend()
   }
 
   // Submit QC ke backend setelah print berhasil
@@ -438,11 +458,38 @@ const PrintLaser = () => {
               </CCardBody>
             </CCard>
 
-            {/* Card QC Questions */}
-            {(currentStep === 'QC_QUESTIONS' ||
-              currentStep === 'PRINT_READY' ||
-              currentStep === 'PRINTING' ||
-              currentStep === 'SCAN_RESULT') && (
+            {/* Card Tombol Print Laser - muncul setelah generate PLN */}
+            {currentStep === 'PRINT_READY' && showPrintButton && !errorMessage && (
+              <CCard className="mb-4">
+                <CCardHeader>
+                  <strong>Print Laser Ready</strong>
+                </CCardHeader>
+                <CCardBody>
+                  <div className="d-grid gap-2">
+                    <CButton color="success" onClick={handlePrintLaser} size="lg">
+                      🖨️ Print Laser {postName}
+                    </CButton>
+                  </div>
+                </CCardBody>
+              </CCard>
+            )}
+
+            {/* Status Printing */}
+            {currentStep === 'PRINTING' && (
+              <CCard className="mb-4">
+                <CCardBody>
+                  <div className="text-center p-4">
+                    <div className="spinner-border text-primary mb-3" role="status">
+                      <span className="visually-hidden">Printing...</span>
+                    </div>
+                    <p className="text-muted">Printing in progress...</p>
+                  </div>
+                </CCardBody>
+              </CCard>
+            )}
+
+            {/* Card QC Questions - muncul setelah scan hasil print cocok */}
+            {currentStep === 'QC_QUESTIONS' && (
               <CCard className="mb-4 flex-grow-1">
                 <CCardHeader>
                   <strong>Quality Control - {qcName}</strong>
@@ -468,37 +515,17 @@ const PrintLaser = () => {
                                 [q.id]: e.target.checked,
                               }))
                             }
-                            disabled={currentStep !== 'QC_QUESTIONS'}
                           />
                         </div>
                       ))
                     )}
 
                     {/* Tombol Submit QC */}
-                    {currentStep === 'QC_QUESTIONS' && questionData.length > 0 && !errorMessage && (
+                    {questionData.length > 0 && !errorMessage && (
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                         <CButton color="primary" type="submit">
                           Submit QC
                         </CButton>
-                      </div>
-                    )}
-
-                    {/* Tombol Print Laser */}
-                    {currentStep === 'PRINT_READY' && showPrintButton && (
-                      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <CButton color="success" onClick={handlePrintLaser} size="lg">
-                          🖨️ Print Laser
-                        </CButton>
-                      </div>
-                    )}
-
-                    {/* Status Printing */}
-                    {currentStep === 'PRINTING' && (
-                      <div className="text-center p-4">
-                        <div className="spinner-border text-primary mb-3" role="status">
-                          <span className="visually-hidden">Printing...</span>
-                        </div>
-                        <p className="text-muted">Printing in progress...</p>
                       </div>
                     )}
                   </CForm>
@@ -509,13 +536,17 @@ const PrintLaser = () => {
 
           {/* Kolom Kanan - PLN Serial Card, Counter, Error/Success */}
           <CCol md={4} className="d-flex flex-column">
-            {/* PLN Serial Card */}
-            {generatedPlnSerial && (
-              <PlnSerialCard
-                plnSerial={generatedPlnSerial}
-                productName={productData?.product?.name}
-              />
-            )}
+            {/* PLN Serial Card - tampil setelah generate */}
+            {generatedPlnSerial &&
+              (currentStep === 'PRINT_READY' ||
+                currentStep === 'PRINTING' ||
+                currentStep === 'SCAN_RESULT' ||
+                currentStep === 'QC_QUESTIONS') && (
+                <PlnSerialCard
+                  plnSerial={generatedPlnSerial}
+                  productName={productData?.product?.name}
+                />
+              )}
 
             {/* Error Card */}
             {errorMessage && <ErrorCard serialNumber={errorSerialNumber} message={errorMessage} />}
