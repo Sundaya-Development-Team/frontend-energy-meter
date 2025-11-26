@@ -221,7 +221,7 @@ const PrintLaser = () => {
 
         const normalizedStatus = currentStatus?.toUpperCase()
 
-        if (normalizedStatus === 'COMPLETED' || normalizedStatus === 'LASSERED') {
+        if (normalizedStatus === 'LASERED') {
           // Serial sudah pernah selesai proses print laser, lanjutkan langsung ke scan hasil
           setShowPrintButton(false)
           setForceShowQuestions(true)
@@ -413,6 +413,11 @@ const PrintLaser = () => {
 
       toast.success(messageShow)
       setCurrentStep('COMPLETED')
+
+      if (productData?.assembly_id) {
+        await fetchTrackingProduct(productData.assembly_id)
+      }
+
       setTimeout(() => {
         resetStates()
         serialInputRef.current?.focus()
