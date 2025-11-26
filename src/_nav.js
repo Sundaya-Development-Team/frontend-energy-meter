@@ -34,18 +34,36 @@ const _nav = [
     name: 'Dashboard',
     to: '/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
-    permissions: ['DASHBOARD', 'QC_ENGINEER', 'PO_RECEIVING', 'QC_RECEIVING'],
+    permissions: [
+      'DASHBOARD',
+      'QC_ENGINEER',
+      'PO_RECEIVING',
+      'QC_RECEIVING',
+      'QC_SUB_ASSEMBLY',
+      'QC_ASSEMBLY',
+      'ON_TEST',
+      'HIPOT_TEST',
+      'TEST_BENCH1',
+      'ULTRA_SONIC',
+      'QC_RES_METER',
+      'TEST_BENCH2',
+      'AGING_TEST',
+      'LASER_PRINT',
+      'QC_COVER',
+      'GENERATE_BOX',
+    ],
   },
   {
     component: CNavTitle,
     name: 'Receiving Products',
+    permissions: ['QC_ENGINEER', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Purchase Order',
     to: '/receiving/purchaseOrder',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER'],
+    permissions: ['QC_ENGINEER', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
@@ -59,7 +77,7 @@ const _nav = [
     name: 'Receiving List',
     to: '/receiving/receivingList',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
+    permissions: ['QC_ENGINEER', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
@@ -78,6 +96,7 @@ const _nav = [
   {
     component: CNavTitle,
     name: 'Tracking',
+    permissions: ['QC_ENGINEER', 'SPV_QC'],
   },
   {
     component: CNavItem,
@@ -96,6 +115,7 @@ const _nav = [
   {
     component: CNavTitle,
     name: 'Production',
+    permissions: ['QC_ENGINEER', 'SPV_QC'],
   },
 
   {
@@ -103,21 +123,41 @@ const _nav = [
     name: 'Assembly',
     to: '/production/assembly',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: [
+      'QC_ENGINEER',
+      'SPV_QC',
+      'QC_SUB_ASSEMBLY',
+
+      'QC_ASSEMBLY',
+      'ON_TEST',
+      'HIPOT_TEST',
+      'TEST_BENCH1',
+      'ULTRA_SONIC',
+      'QC_RES_METER',
+      'TEST_BENCH2',
+      'AGING_TEST',
+      'LASER_PRINT',
+      'QC_COVER',
+      'GENERATE_BOX',
+    ],
     items: [
       {
         component: CNavItem,
         name: 'Create PLN Order',
         to: '/production/assembly/plnorder',
+        permissions: ['QC_ENGINEER', 'SPV_QC'],
       },
       {
         component: CNavItem,
         name: 'Req. Assembly Order',
         to: '/production/assembly/assemblyorder',
+        permissions: ['QC_ENGINEER', 'SPV_QC'],
       },
       {
         component: CNavItem,
         name: 'Assembly Serial List',
         to: '/production/assembly/assemblyseriallist',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY'],
       },
       // {
       //   component: CNavItem,
@@ -128,11 +168,13 @@ const _nav = [
         component: CNavItem,
         name: 'QC Base Sub Assy',
         to: '/production/serialnoaql/QC-SA002/Base Sub Assy/QC Station Sub Assembly',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY'],
       },
       {
         component: CNavItem,
         name: 'Matching Assy & PCB',
         to: '/production/assembly/matchingassypcb',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'QC_ASSEMBLY'],
       },
       // {
       //   component: CNavItem,
@@ -143,6 +185,7 @@ const _nav = [
         component: CNavItem,
         name: 'QC Assembly',
         to: '/production/serialnoaql/QC-AT003/Assembly/QC Station Assembly',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'QC_ASSEMBLY'],
       },
       // {
       //   component: CNavItem,
@@ -172,6 +215,7 @@ const _nav = [
         component: CNavItem,
         name: 'QC Test ON',
         to: '/production/serialnoaql/QC-OT004/Test ON/Testing Station On Test',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'ON_TEST'],
       },
 
       // {
@@ -201,6 +245,7 @@ const _nav = [
         component: CNavItem,
         name: 'QC Hipot Test',
         to: '/production/serialnoaql/QC-HT005/Hipot Test/Testing Station Hipot Test',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'HIPOT_TEST'],
       },
       // {
       //   component: CNavItem,
@@ -234,6 +279,7 @@ const _nav = [
         component: CNavItem,
         name: 'QC Test Bench 1',
         to: '/production/serialnoaql/QC-TB1006/Test Bench 1/Testing Station Test Bench1',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'TEST_BENCH1'],
       },
       // {
       //   component: CNavItem,
@@ -262,6 +308,7 @@ const _nav = [
         component: CNavItem,
         name: 'QC Ultrasonic',
         to: '/production/serialnoaql/QC-U015/Ultrasonic Test/Testing Station Ultra Sonic',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'ULTRA_SONIC'],
       },
     ],
   },
@@ -275,6 +322,7 @@ const _nav = [
         component: CNavItem,
         name: 'QC Ref. Meter',
         to: '/production/serialnoaql/QC-RM013/QC Ref. Meter/QC Station Ref Meter',
+        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'ULTRA_SONIC'],
       },
     ],
   },

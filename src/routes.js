@@ -99,6 +99,18 @@ const routes = [
           'GUDANG_ELEKTRONIK',
           'GUDANG_NON_ELEKTRONIK',
           'PO_RECEIVING',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'ON_TEST',
+          'HIPOT_TEST',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_RES_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'GENERATE_BOX',
         ]}
       >
         <DefaultLayout>
@@ -113,7 +125,7 @@ const routes = [
     path: '/receiving/purchaseOrder',
     name: 'Purchase Order',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <PurchaseOrder />
         </DefaultLayout>
@@ -124,7 +136,7 @@ const routes = [
     path: '/receiving/receivingHeader',
     name: 'Receving Header',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <ReceivingHeader />
         </DefaultLayout>
@@ -135,7 +147,7 @@ const routes = [
     path: '/receiving/receivingList',
     name: 'Receiving List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <ReceivingList />
         </DefaultLayout>
@@ -146,7 +158,7 @@ const routes = [
     path: '/receiving/receivingDetail/:receivingHeaderId',
     name: 'Receiving Detail',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <ReceivingDetail />
         </DefaultLayout>

@@ -42,6 +42,7 @@ const PrintLaser = () => {
   const [scannedPlnSerial, setScannedPlnSerial] = useState('')
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
+  const [forceShowQuestions, setForceShowQuestions] = useState(false)
 
   // States untuk QC
   const [questionData, setQuestionData] = useState([])
@@ -85,7 +86,8 @@ const PrintLaser = () => {
   }
 
   // QC ID untuk print laser dari params
-  const qcIdPrintLaser = qcIdParams || `QC-LE016-${lasserNo || 1}`
+  const qcIdPrintLaser =
+    (qcIdParams || `QC-LE016-${lasserNo || 1}`).replace(/-\d+$/, '') || 'QC-LE016'
 
   // Ambil user dari localStorage
   const getUserFromStorage = () => {
@@ -111,6 +113,7 @@ const PrintLaser = () => {
     setScannedPlnSerial('')
     setProductData(null)
     setTrackingProduct(null)
+    setForceShowQuestions(false)
     setQuestionData([])
     setAnswers({})
     setQcName('')
@@ -205,19 +208,32 @@ const PrintLaser = () => {
   // STEP 2: Generate PLN Code
   const generatePlnCode = async (serialNumber) => {
     try {
-      const response = await backendGenerate.post(`/pln-codes/${serialNumber}/add-material`)
+      const response = await backendGenerate.patch(`/pln-codes/${serialNumber}/add-material`)
 
       if (response.data.success) {
-        const plnSerial = response.data.data?.pln_serial || response.data.data?.plnSerial
+        const plnSerial = response.data.data?.fullCode || ''
         setGeneratedPlnSerial(plnSerial)
 
         // Fetch product data
         await fetchProduct(serialNumber)
 
-        // Update step ke PRINT_READY (tampilkan PLN dan tombol print)
-        setCurrentStep('PRINT_READY')
-        setShowPrintButton(true)
-        toast.success('PLN Serial berhasil di-generate! Silakan klik tombol Print.')
+        const currentStatus = response.data.data?.status
+
+        const normalizedStatus = currentStatus?.toUpperCase()
+
+        if (normalizedStatus === 'COMPLETED' || normalizedStatus === 'LASSERED') {
+          // Serial sudah pernah selesai proses print laser, lanjutkan langsung ke scan hasil
+          setShowPrintButton(false)
+          setForceShowQuestions(true)
+          setCurrentStep('SCAN_RESULT')
+          toast.info('Serial telah diproses. Silakan scan hasil print dan lanjutkan QC.')
+        } else {
+          // Update step ke PRINT_READY (tampilkan PLN dan tombol print)
+          setCurrentStep('PRINT_READY')
+          setShowPrintButton(true)
+          setForceShowQuestions(false)
+          toast.success('PLN Serial berhasil di-generate! Silakan klik tombol Print.')
+        }
       } else {
         const errorMsg = response.data.message || 'Gagal generate PLN Serial'
         setErrorMessage(errorMsg)
@@ -286,7 +302,7 @@ const PrintLaser = () => {
     }
 
     try {
-      const response = await backendGenerate.post(`/pln-codes/${serialNumber}/mark-lasered`, {
+      const response = await backendGenerate.patch(`/pln-codes/${serialNumber}/mark-lasered`, {
         station: lasserNo, // station 1 atau 2 sesuai post yang dipilih
         laseredBy: user.name, // nama operator dari localStorage
         laserNotes: notes || 'Laser marking completed successfully', // notes dari form atau default
@@ -325,14 +341,20 @@ const PrintLaser = () => {
     if (scannedPlnSerial.trim() === generatedPlnSerial.trim()) {
       // SAMA - Tampilkan QC Questions
       setCurrentStep('QC_QUESTIONS')
+      setForceShowQuestions(false)
+      setErrorMessage(null)
       toast.success('Serial cocok! Silakan jawab pertanyaan QC.')
     } else {
       // BEDA - Error
       setErrorMessage(
-        `Serial tidak cocok!\nGenerated: ${generatedPlnSerial}\nScanned: ${scannedPlnSerial}`,
+        `Serial tidak cocok!\nGenerated:\n${generatedPlnSerial}\nScanned:\n${scannedPlnSerial}`,
       )
       setErrorSerialNumber(scannedPlnSerial)
       toast.error('Serial hasil print tidak sesuai!')
+      setScannedPlnSerial('')
+      setTimeout(() => {
+        scanResultInputRef.current?.focus()
+      }, 100)
     }
   }
 
@@ -391,11 +413,10 @@ const PrintLaser = () => {
 
       toast.success(messageShow)
       setCurrentStep('COMPLETED')
-
-      // Tampilkan success card sebentar, lalu reset
       setTimeout(() => {
         resetStates()
-      }, 3000)
+        serialInputRef.current?.focus()
+      }, 0)
     } catch (error) {
       console.error('QC submit error:', error)
       const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QC'
@@ -420,15 +441,26 @@ const PrintLaser = () => {
   return (
     <CRow>
       <CCol xs={12}>
+        {/* PLN Serial Card Full Width */}
+        {generatedPlnSerial &&
+          (currentStep === 'PRINT_READY' ||
+            currentStep === 'PRINTING' ||
+            currentStep === 'SCAN_RESULT' ||
+            currentStep === 'QC_QUESTIONS') && (
+            <div className="mb-4">
+              <PlnSerialCard plnSerial={generatedPlnSerial} productName={productData?.product?.name} />
+            </div>
+          )}
+
         <CRow className="g-4 align-items-stretch">
           {/* Kolom Kiri - Form & Questions */}
           <CCol md={8} className="d-flex flex-column">
             {/* Card Serial Number & Notes */}
-            <CCard className="mb-4">
+            <CCard className="mb-4 flex-grow-1 d-flex flex-column">
               <CCardHeader>
                 <strong>Print Laser {postName}</strong>
               </CCardHeader>
-              <CCardBody>
+              <CCardBody className="flex-grow-1 d-flex flex-column">
                 <FormRow label="Product Name">
                   <div className="fw-semibold">{productData?.product?.name ?? '-'}</div>
                 </FormRow>
@@ -445,8 +477,8 @@ const PrintLaser = () => {
                   />
                 </FormRow>
 
-                {/* Input Scan Hasil Print - muncul setelah print */}
-                {currentStep === 'SCAN_RESULT' && (
+            {/* Input Scan Hasil Print - muncul setelah print */}
+            {(currentStep === 'SCAN_RESULT' || forceShowQuestions) && (
                   <FormRow label="Scan Hasil Print">
                     <CFormInput
                       name="scannedPlnSerial"
@@ -503,7 +535,7 @@ const PrintLaser = () => {
             )}
 
             {/* Card QC Questions - muncul setelah scan hasil print cocok */}
-            {currentStep === 'QC_QUESTIONS' && (
+            {(currentStep === 'QC_QUESTIONS' || forceShowQuestions) && (
               <CCard className="mb-4 flex-grow-1">
                 <CCardHeader>
                   <strong>Quality Control - {qcName}</strong>
@@ -535,7 +567,7 @@ const PrintLaser = () => {
                     )}
 
                     {/* Tombol Submit QC */}
-                    {questionData.length > 0 && !errorMessage && (
+                    {questionData.length > 0 && !errorMessage && currentStep === 'QC_QUESTIONS' && (
                       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                         <CButton color="primary" type="submit">
                           Submit QC
@@ -550,17 +582,6 @@ const PrintLaser = () => {
 
           {/* Kolom Kanan - PLN Serial Card, Counter, Error/Success */}
           <CCol md={4} className="d-flex flex-column">
-            {/* PLN Serial Card - tampil setelah generate */}
-            {generatedPlnSerial &&
-              (currentStep === 'PRINT_READY' ||
-                currentStep === 'PRINTING' ||
-                currentStep === 'SCAN_RESULT' ||
-                currentStep === 'QC_QUESTIONS') && (
-                <PlnSerialCard
-                  plnSerial={generatedPlnSerial}
-                  productName={productData?.product?.name}
-                />
-              )}
 
             {/* Error Card */}
             {errorMessage && <ErrorCard serialNumber={errorSerialNumber} message={errorMessage} />}
@@ -576,11 +597,11 @@ const PrintLaser = () => {
 
             {/* Counter Card */}
             {trackingProduct && !errorMessage && currentStep !== 'COMPLETED' && (
-              <CCard className="mb-4">
+              <CCard className="mb-4 flex-grow-1 d-flex flex-column">
                 <CCardHeader>
                   <strong>Counter</strong>
                 </CCardHeader>
-                <CCardBody>
+                <CCardBody className="flex-grow-1 d-flex flex-column justify-content-center">
                   <CRow className="mb-3">
                     <CounterCard6
                       title="Required Quantity"
@@ -602,6 +623,7 @@ const PrintLaser = () => {
                 </CCardBody>
               </CCard>
             )}
+
           </CCol>
         </CRow>
       </CCol>

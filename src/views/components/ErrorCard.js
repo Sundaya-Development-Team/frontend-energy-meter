@@ -1,9 +1,19 @@
 import React from 'react'
 import { CCard, CCardBody, CCardHeader } from '@coreui/react'
 
-const ErrorCard = ({ serialNumber, message }) => {
+const ErrorCard = ({ serialNumber, message, fullHeight = true }) => {
+  const cardClasses = [
+    'mb-4',
+    'd-flex',
+    'flex-column',
+    'error-card',
+    fullHeight ? 'h-100' : null,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <CCard className="mb-4 h-100 d-flex flex-column error-card">
+    <CCard className={cardClasses}>
       <CCardHeader className="error-card-header">
         <strong>⚠️ Error</strong>
       </CCardHeader>

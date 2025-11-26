@@ -4,8 +4,8 @@ import { CCard, CCardBody, CCardHeader } from '@coreui/react'
 const PlnSerialCard = ({ plnSerial, productName }) => {
   return (
     <CCard className="mb-4">
-      <CCardHeader className="bg-info text-white">
-        <strong>📋 PLN Serial Number</strong>
+      <CCardHeader className="bg-success text-white">
+        <strong>⚡ PLN Serial Number</strong>
       </CCardHeader>
       <CCardBody className="text-center">
         <div className="mb-3">
@@ -19,11 +19,13 @@ const PlnSerialCard = ({ plnSerial, productName }) => {
         <div
           className="p-3 rounded"
           style={{
-            backgroundColor: '#e7f3ff',
-            border: '2px solid #0d6efd',
+            backgroundColor: '#d1e7dd',
+            border: '2px solid #badbcc',
           }}
         >
-          <h4 className="mb-0 fw-bold text-primary">{plnSerial}</h4>
+          <h4 className="mb-0 fw-bold" style={{ color: '#0f5132' }}>
+            {plnSerial}
+          </h4>
         </div>
       </CCardBody>
     </CCard>
