@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import {
   CRow,
   CCard,
@@ -31,7 +31,7 @@ const FormRow = ({ label, children }) => (
 )
 
 const PrintLaser = () => {
-  const location = useLocation()
+  const { qcIdParams, postNameParams } = useParams()
 
   // States untuk flow control
   const [currentStep, setCurrentStep] = useState('SCAN_SERIAL') // SCAN_SERIAL, QC_QUESTIONS, PRINT_READY, PRINTING, SCAN_RESULT, COMPLETED
@@ -59,19 +59,33 @@ const PrintLaser = () => {
   const serialInputRef = useRef(null)
   const scanResultInputRef = useRef(null)
 
-  // Tentukan post
-  let postName = 'Post ?'
+  // Tentukan post dari params
+  // Cara 1: Dari postNameParams (contoh: "Post 1" atau "Post 2")
+  // Cara 2: Dari qcIdParams (contoh: "QC-LE016-1" atau "QC-LE016-2")
   let lasserNo = 0
-  if (location.pathname.includes('post1')) {
-    postName = 'Post 1'
-    lasserNo = 1
-  } else if (location.pathname.includes('post2')) {
-    postName = 'Post 2'
-    lasserNo = 2
+  let postName = 'Post ?'
+
+  if (postNameParams) {
+    // Extract angka dari "Post 1" atau "Post 2"
+    const postMatch = postNameParams.match(/(\d+)/)
+    if (postMatch) {
+      lasserNo = parseInt(postMatch[1]) || 0
+      postName = postNameParams
+    }
   }
 
-  // QC ID untuk print laser
-  const qcIdPrintLaser = `QC-PRINT-LASER-${lasserNo}`
+  // Jika belum dapat dari postNameParams, coba dari qcIdParams
+  if (lasserNo === 0 && qcIdParams) {
+    // Extract angka dari "QC-LE016-1" atau "QC-LE016-2"
+    const qcMatch = qcIdParams.match(/-(\d+)$/)
+    if (qcMatch) {
+      lasserNo = parseInt(qcMatch[1]) || 0
+      postName = `Post ${lasserNo}`
+    }
+  }
+
+  // QC ID untuk print laser dari params
+  const qcIdPrintLaser = qcIdParams || `QC-LE016-${lasserNo || 1}`
 
   // Ambil user dari localStorage
   const getUserFromStorage = () => {
@@ -88,11 +102,6 @@ const PrintLaser = () => {
   }
 
   const user = getUserFromStorage()
-
-  // fokus otomatis saat page load / nav pindah
-  useEffect(() => {
-    serialInputRef.current?.focus()
-  }, [location.pathname])
 
   // Reset semua states
   const resetStates = () => {
@@ -112,6 +121,11 @@ const PrintLaser = () => {
     setShowPrintButton(false)
     serialInputRef.current?.focus()
   }
+
+  // fokus otomatis saat page load / nav pindah
+  useEffect(() => {
+    resetStates()
+  }, [qcIdParams, postNameParams])
 
   // ============ STEP 1: Scan Serial, Validasi QC (ambil pertanyaan tapi jangan tampilkan) ============
   const handleSerialScan = async (e) => {

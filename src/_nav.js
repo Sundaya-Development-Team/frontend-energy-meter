@@ -346,12 +346,12 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Print Laser Post 1',
-        to: '/production/finishing/printlaser/post1',
+        to: '/production/finishing/printlaser/QC-LE016-1/Post 1',
       },
       {
         component: CNavItem,
         name: 'Print Laser Post 2',
-        to: '/production/finishing/printlaser/post2',
+        to: '/production/finishing/printlaser/QC-LE016-2/Post 2',
       },
       {
         component: CNavItem,

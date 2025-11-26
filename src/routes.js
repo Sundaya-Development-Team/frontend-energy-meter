@@ -348,19 +348,8 @@ const routes = [
   //Finishing Assembly
   { path: '/production/finishing', name: 'Finishing' },
   {
-    path: '/production/finishing/printlaser/post1',
-    name: 'Post 1',
-    element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
-        <DefaultLayout>
-          <PrintLaser />
-        </DefaultLayout>
-      </PrivateRoutes>
-    ),
-  },
-  {
-    path: '/production/finishing/printlaser/post2',
-    name: 'Post 2',
+    path: '/production/finishing/printlaser/:qcIdParams/:postNameParams',
+    name: 'Print Laser',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
         <DefaultLayout>
