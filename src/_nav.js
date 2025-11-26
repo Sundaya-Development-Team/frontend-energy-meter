@@ -127,7 +127,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Base Sub Assy',
-        to: '/production/serialnoaql/QC-SA002/Base Sub Assy',
+        to: '/production/serialnoaql/QC-SA002/Base Sub Assy/QC Station Sub Assembly',
       },
       {
         component: CNavItem,
@@ -142,7 +142,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Assembly',
-        to: '/production/serialnoaql/QC-AT003/Assembly',
+        to: '/production/serialnoaql/QC-AT003/Assembly/QC Station Assembly',
       },
       // {
       //   component: CNavItem,
@@ -171,7 +171,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test ON',
-        to: '/production/serialnoaql/QC-OT004/Test ON',
+        to: '/production/serialnoaql/QC-OT004/Test ON/Testing Station On Test',
       },
 
       // {
@@ -200,7 +200,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Hipot Test',
-        to: '/production/serialnoaql/QC-HT005/Hipot Test',
+        to: '/production/serialnoaql/QC-HT005/Hipot Test/Testing Station Hipot Test',
       },
       // {
       //   component: CNavItem,
@@ -233,7 +233,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test Bench 1',
-        to: '/production/serialnoaql/QC-TB1006/Test Bench 1',
+        to: '/production/serialnoaql/QC-TB1006/Test Bench 1/Testing Station Test Bench1',
       },
       // {
       //   component: CNavItem,
@@ -261,7 +261,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Ultrasonic',
-        to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
+        to: '/production/serialnoaql/QC-U015/Ultrasonic Test/Testing Station Ultra Sonic',
       },
     ],
   },
@@ -274,7 +274,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Ref. Meter',
-        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
+        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter/QC Station Ref Meter',
       },
     ],
   },
@@ -287,7 +287,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test Bench 2',
-        to: '/production/serialnoaql/QC-TB2014/Test Bench 2',
+        to: '/production/serialnoaql/QC-TB2014/Test Bench 2/Testing Station Test Bench2',
       },
     ],
   },
@@ -315,7 +315,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Aging',
-        to: '/production/serialaql/QC-AT007/Aging',
+        to: '/production/serialaql/QC-AT007/Aging/Testing Station Aging Test',
       },
       // {
       //   component: CNavItem,
@@ -346,18 +346,18 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Print Laser Post 1',
-        to: '/production/finishing/printlaser/QC-LE016-1/Post 1',
+        to: '/production/finishing/printlaser/QC-LE016-1/Post 1/Printing Station 1',
       },
       {
         component: CNavItem,
         name: 'Print Laser Post 2',
-        to: '/production/finishing/printlaser/QC-LE016-2/Post 2',
+        to: '/production/finishing/printlaser/QC-LE016-2/Post 2/Printing Station 2',
       },
-      {
-        component: CNavItem,
-        name: 'QC Laser & Engraving',
-        to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'QC Laser & Engraving',
+      //   to: '/production/serialnoaql/QC-LE016/QC Laser And Engraving/Qc Laser & Egraving',
+      // },
     ],
   },
   {
@@ -374,7 +374,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Cover & Finishing',
-        to: '/production/serialnoaql/QC-C001/QC Cover & Finishing',
+        to: '/production/serialnoaql/QC-C001/QC Cover & Finishing/QC Cover and Finishing',
       },
       {
         component: CNavItem,
@@ -390,7 +390,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'QC Repair',
-    to: '/repair/QC-R015/QC Repair',
+    to: '/repair/QC-R015/QC Repair/Workshop Repair',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
   },
   {

@@ -285,7 +285,7 @@ const routes = [
   //QC Production Aql Serial
   { path: '/production/serialaql', name: '' },
   {
-    path: '/production/serialaql/:qcIdParams/:qcNameParams',
+    path: '/production/serialaql/:qcIdParams/:qcNameParams/:qcPlaceParams',
     name: 'Scan Before',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
@@ -299,7 +299,7 @@ const routes = [
   //QC Production No Aql Serial
   { path: '/production/serialnoaql', name: 'QC Serial No AQL' },
   {
-    path: '/production/serialnoaql/:qcIdParams/:qcNameParams',
+    path: '/production/serialnoaql/:qcIdParams/:qcNameParams/:qcPlaceParams',
     name: '',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
@@ -310,7 +310,7 @@ const routes = [
     ),
   },
   {
-    path: '/production/serialnoaql/:qcIdParams/:qcNameParams',
+    path: '/production/serialnoaql/:qcIdParams/:qcNameParams/:qcPlaceParams',
     name: '',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
@@ -348,7 +348,7 @@ const routes = [
   //Finishing Assembly
   { path: '/production/finishing', name: 'Finishing' },
   {
-    path: '/production/finishing/printlaser/:qcIdParams/:postNameParams',
+    path: '/production/finishing/printlaser/:qcIdParams/:postNameParams/:qcPlaceParams',
     name: 'Print Laser',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
@@ -383,7 +383,7 @@ const routes = [
 
   { path: '/repair', name: 'Repair' },
   {
-    path: '/repair/:qcIdParams/:qcNameParams',
+    path: '/repair/:qcIdParams/:qcNameParams/:qcPlaceParams',
     name: '',
     element: (
       <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>

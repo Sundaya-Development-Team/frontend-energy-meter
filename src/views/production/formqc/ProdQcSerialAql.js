@@ -30,7 +30,7 @@ const FormRow = ({ label, children }) => (
 )
 
 const QcAqlSerial = () => {
-  const { qcIdParams } = useParams()
+  const { qcIdParams, qcPlaceParams } = useParams()
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
   const [answers, setAnswers] = useState({})
@@ -76,7 +76,7 @@ const QcAqlSerial = () => {
     resetStates()
     serialNumberInputRef.current.focus()
     console.clear()
-  }, [qcIdParams])
+  }, [qcIdParams, qcPlaceParams])
 
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -293,7 +293,7 @@ const QcAqlSerial = () => {
       inspector_name: user.name,
       qc_name: qcName, // sementara hardcode
       qc_id: qcCodeSerial,
-      qc_place: 'Workshop A', // sementara hardcode
+      qc_place: qcPlaceParams || 'Workshop A',
       tracking_id: productData.id,
       batch: productData.batch,
       notes: formData.notes,

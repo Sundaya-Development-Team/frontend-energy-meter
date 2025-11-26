@@ -31,7 +31,7 @@ const FormRow = ({ label, children }) => (
 )
 
 const PrintLaser = () => {
-  const { qcIdParams, postNameParams } = useParams()
+  const { qcIdParams, postNameParams, qcPlaceParams } = useParams()
 
   // States untuk flow control
   const [currentStep, setCurrentStep] = useState('SCAN_SERIAL') // SCAN_SERIAL, QC_QUESTIONS, PRINT_READY, PRINTING, SCAN_RESULT, COMPLETED
@@ -125,7 +125,7 @@ const PrintLaser = () => {
   // fokus otomatis saat page load / nav pindah
   useEffect(() => {
     resetStates()
-  }, [qcIdParams, postNameParams])
+  }, [qcIdParams, postNameParams, qcPlaceParams])
 
   // ============ STEP 1: Scan Serial, Validasi QC (ambil pertanyaan tapi jangan tampilkan) ============
   const handleSerialScan = async (e) => {
@@ -368,7 +368,7 @@ const PrintLaser = () => {
       inspector_name: user.name,
       qc_name: qcName,
       qc_id: qcIdPrintLaser,
-      qc_place: 'Workshop A',
+      qc_place: qcPlaceParams || 'Print Stages',
       tracking_id: productData?.id,
       batch: productData?.batch,
       notes: notes,
