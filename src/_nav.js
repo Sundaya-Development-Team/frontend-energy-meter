@@ -271,42 +271,13 @@ const _nav = [
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/calibration/before',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Quality Control',
-      //   to: '/production/calibration/qc',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan After',
-      //   to: '/production/calibration/after',
-      // },
       {
         component: CNavItem,
         name: 'QC Test Bench 1',
         to: '/production/serialnoaql/QC-TB1006/Test Bench 1/Testing Station Test Bench1',
         permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'TEST_BENCH1'],
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'QC Ultrasonic',
-      //   to: '/production/serialnoaql/QC-U015/Ultrasonic Test',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'QC Ref. Meter',
-      //   to: '/production/serialnoaql/QC-RM013/QC Ref. Meter',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'QC Calibration 2',
-      //   to: '/production/serialnoaql/QC-CT2014/Calibration 2 Test',
-      // },
+      
     ],
   },
 
