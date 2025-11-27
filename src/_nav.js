@@ -53,6 +53,8 @@ const _nav = [
       'GENERATE_BOX',
     ],
   },
+
+  // Receiving Products
   {
     component: CNavTitle,
     name: 'Receiving Products',
@@ -93,6 +95,8 @@ const _nav = [
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
     permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
   },
+
+  // Tracking
   {
     component: CNavTitle,
     name: 'Tracking',
@@ -112,12 +116,14 @@ const _nav = [
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
     permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
   },
+
+  // Production
   {
     component: CNavTitle,
     name: 'Production',
     permissions: ['QC_ENGINEER', 'SPV_QC'],
   },
-
+  // Assembly
   {
     component: CNavGroup,
     name: 'Assembly',
@@ -195,6 +201,7 @@ const _nav = [
     ],
   },
 
+  // On Test
   {
     component: CNavGroup,
     name: 'On Test',
@@ -225,6 +232,8 @@ const _nav = [
       // },
     ],
   },
+
+  // Hipot Test
   {
     component: CNavGroup,
     name: 'Hipot Test',
@@ -254,6 +263,8 @@ const _nav = [
       // },
     ],
   },
+
+  // Test Bench 1
   {
     component: CNavGroup,
     name: 'Test Bench 1',
@@ -298,6 +309,8 @@ const _nav = [
       // },
     ],
   },
+
+  // Ultrasonic
   {
     component: CNavGroup,
     name: 'Ultrasonic',
@@ -312,6 +325,8 @@ const _nav = [
       },
     ],
   },
+
+  // Ref. Meter
   {
     component: CNavGroup,
     name: 'Ref. Meter',
@@ -339,39 +354,30 @@ const _nav = [
       },
     ],
   },
-  {
-    component: CNavGroup,
-    name: 'Aging Test',
-    to: '/production/aging',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-    items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Batching',
-      //   to: '/production/aging/batching',
-      // },
-      {
-        component: CNavItem,
-        name: 'Scan Before',
-        to: '/production/aging/before',
-      },
-      // {
-      //   component: CNavItem,
-      //   name: 'Quality Control',
-      //   to: '/production/aging/qc',
-      // },
-      {
-        component: CNavItem,
-        name: 'QC Aging',
-        to: '/production/serialaql/QC-AT007/Aging/Testing Station Aging Test',
-      },
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan After',
-      //   to: '/production/aging/after',
-      // },
-    ],
-  },
+
+  // Aging Test
+  // {
+  //   component: CNavGroup,
+  //   name: 'Aging Test',
+  //   to: '/production/aging',
+  //   icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+  //   items: [
+     
+  //     {
+  //       component: CNavItem,
+  //       name: 'Scan Before',
+  //       to: '/production/aging/before',
+  //     },
+  //     {
+  //       component: CNavItem,
+  //       name: 'QC Aging',
+  //       to: '/production/serialaql/QC-AT007/Aging/Testing Station Aging Test',
+  //     },
+     
+  //   ],
+  // },
+
+  // Matching Assy & PLN
   // {
   //   component: CNavGroup,
   //   name: 'Matching Assy & PLN',
@@ -385,6 +391,8 @@ const _nav = [
   //     },
   //   ],
   // },
+
+  // Laser Print
   {
     component: CNavGroup,
     name: 'Laser Print',
