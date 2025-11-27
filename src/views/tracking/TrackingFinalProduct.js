@@ -34,12 +34,12 @@ const TrackingFinalProduct = () => {
     { code: 'QC-AT003', label: 'Assembly' },
     { code: 'QC-OT004', label: 'ON Test' },
     { code: 'QC-HT005', label: 'Hippot' },
-    { code: 'QC-CT1006', label: 'Calibration 1' },
+    { code: 'QC-CT1006', label: 'Test Bench 1' },
     { code: 'QC-U015', label: 'Ultrasonic' },
     { code: 'QC-RM013', label: 'Ref. Meter' },
-    { code: 'QC-CT2014', label: 'Calibration 2' },
-    { code: 'QC-AT007', label: 'Aging' },
-    { code: 'QC-LG016', label: 'Laser & Gripping' },
+    { code: 'QC-CT2014', label: 'Test Bench 2' },
+    // { code: 'QC-AT007', label: 'Aging' }, // temporarily hidden
+    { code: 'QC-LG016', label: 'Laser Engraving' },
   ]
 
   // === FILTER STATE PER KOLOM ===
@@ -346,7 +346,7 @@ const TrackingFinalProduct = () => {
           </CCol>
           <CCol md={8} sm={6} className="text-end">
             <CButton
-              color="success"
+              color="primary"
               size="sm"
               className="me-2"
               onClick={handleDownloadPage}
