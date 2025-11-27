@@ -131,17 +131,31 @@ const ScanBeforeAssembly = () => {
       }
 
       const res = await backendTracking.post('/assembly-components/by-serial', payload)
+      const isSuccess = res.data?.success
+
+      if (isSuccess === false) {
+      
+        const errorMessage = res.data?.message || 'Matching failed! Please try again.'
+        setFeedback({
+          title: 'Matching Failed',
+          message: errorMessage,
+          serialNumber: currentSerial,
+        })
+        toast.error(errorMessage)
+        resetForm()
+        return
+      }
 
       setFeedback(null)
       toast.success(res.data?.message || 'Matching Successful! Data saved successfully!')
       resetForm()
     } catch (error) {
+      console.log('error nih')
       setFeedback({
         title: 'Assembly Error',
         message: error.response?.data?.message || 'Failed to validate or submit data!',
         serialNumber: currentSerial,
       })
-      resetForm()
     }
   }
 

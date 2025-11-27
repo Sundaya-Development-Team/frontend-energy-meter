@@ -106,13 +106,15 @@ const PrintLaser = () => {
   const user = getUserFromStorage()
 
   // Reset semua states
-  const resetStates = () => {
+  const resetStates = ({ preserveTracking = false } = {}) => {
     setCurrentStep('SCAN_SERIAL')
     setSerialNumber('')
     setGeneratedPlnSerial('')
     setScannedPlnSerial('')
     setProductData(null)
-    setTrackingProduct(null)
+    if (!preserveTracking) {
+      setTrackingProduct(null)
+    }
     setForceShowQuestions(false)
     setQuestionData([])
     setAnswers({})
@@ -419,7 +421,7 @@ const PrintLaser = () => {
       }
 
       setTimeout(() => {
-        resetStates()
+        resetStates({ preserveTracking: true })
         serialInputRef.current?.focus()
       }, 0)
     } catch (error) {
@@ -601,7 +603,7 @@ const PrintLaser = () => {
             )}
 
             {/* Counter Card */}
-            {trackingProduct && !errorMessage && currentStep !== 'COMPLETED' && (
+            {!errorMessage && currentStep !== 'COMPLETED' && (
               <CCard className="mb-4 flex-grow-1 d-flex flex-column">
                 <CCardHeader>
                   <strong>Counter</strong>
