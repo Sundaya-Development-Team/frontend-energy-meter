@@ -18,8 +18,6 @@ import {
 import { toast } from 'react-toastify'
 import { backendGenerate } from '../../../api/axios'
 
-const MIN_SERIAL_LENGTH = 13
-
 const getOperatorName = () => {
   try {
     return localStorage.getItem('name') || 'Unknown Operator'
@@ -79,19 +77,11 @@ const GenerateBoxSerial = () => {
   const handleScan = async (e) => {
     e.preventDefault()
     const trimmedSerial = scanValue.trim()
-    await submitScan(trimmedSerial)
-  }
-
-  useEffect(() => {
-    const trimmedSerial = scanValue.trim()
     if (!trimmedSerial || isSubmitting) {
       return
     }
-
-    if (trimmedSerial.length >= MIN_SERIAL_LENGTH) {
-      submitScan(trimmedSerial)
-    }
-  }, [scanValue, isSubmitting, submitScan])
+    await submitScan(trimmedSerial)
+  }
 
   const renderBoxInfo = () => {
     if (!boxInfo) {
