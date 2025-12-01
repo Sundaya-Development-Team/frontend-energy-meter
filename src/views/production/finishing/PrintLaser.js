@@ -39,7 +39,8 @@ const PrintLaser = () => {
   // States untuk data
   const [serialNumber, setSerialNumber] = useState('')
   const [generatedPlnSerial, setGeneratedPlnSerial] = useState('')
-  const [scannedPlnSerial, setScannedPlnSerial] = useState('')
+  const [scannedBarcode, setScannedBarcode] = useState('')
+  const [scannedQrCode, setScannedQrCode] = useState('')
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
   const [forceShowQuestions, setForceShowQuestions] = useState(false)
@@ -58,7 +59,8 @@ const PrintLaser = () => {
 
   // Refs
   const serialInputRef = useRef(null)
-  const scanResultInputRef = useRef(null)
+  const barcodeInputRef = useRef(null)
+  const qrCodeInputRef = useRef(null)
 
   // Tentukan post dari params
   // Cara 1: Dari postNameParams (contoh: "Post 1" atau "Post 2")
@@ -110,7 +112,8 @@ const PrintLaser = () => {
     setCurrentStep('SCAN_SERIAL')
     setSerialNumber('')
     setGeneratedPlnSerial('')
-    setScannedPlnSerial('')
+    setScannedBarcode('')
+    setScannedQrCode('')
     setProductData(null)
     if (!preserveTracking) {
       setTrackingProduct(null)
@@ -147,7 +150,7 @@ const PrintLaser = () => {
       await fetchQcValidation(currentSerialNumber)
     } catch (err) {
       console.error(err)
-      const errorMsg = err.response?.data?.message || 'Terjadi kesalahan validasi'
+      const errorMsg = err.response?.data?.message || 'Validation error occurred'
       setErrorMessage(errorMsg)
       setErrorSerialNumber(currentSerialNumber)
       setSerialNumber('')
@@ -191,7 +194,7 @@ const PrintLaser = () => {
         // STEP 2: Generate PLN Code
         await generatePlnCode(serialNumber)
       } else {
-        const errorMsg = response.data.message ?? 'Serial tidak bisa masuk tahap print laser'
+        const errorMsg = response.data.message ?? 'Serial cannot proceed to print laser stage'
         setErrorMessage(errorMsg)
         setErrorSerialNumber(serialNumber)
         setSerialNumber('')
@@ -199,7 +202,7 @@ const PrintLaser = () => {
       }
     } catch (error) {
       console.error(error)
-      const errorMsg = error.response?.data?.message || 'Gagal validasi QC'
+      const errorMsg = error.response?.data?.message || 'QC validation failed'
       setErrorMessage(errorMsg)
       setErrorSerialNumber(serialNumber)
       setSerialNumber('')
@@ -228,16 +231,16 @@ const PrintLaser = () => {
           setShowPrintButton(false)
           setForceShowQuestions(true)
           setCurrentStep('SCAN_RESULT')
-          toast.info('Serial telah diproses. Silakan scan hasil print dan lanjutkan QC.')
+          toast.info('Serial has been processed. Please scan print result and continue QC.')
         } else {
           // Update step ke PRINT_READY (tampilkan PLN dan tombol print)
           setCurrentStep('PRINT_READY')
           setShowPrintButton(true)
           setForceShowQuestions(false)
-          toast.success('PLN Serial berhasil di-generate! Silakan klik tombol Print.')
+          toast.success('PLN Serial generated successfully! Please click Print button.')
         }
       } else {
-        const errorMsg = response.data.message || 'Gagal generate PLN Serial'
+        const errorMsg = response.data.message || 'Failed to generate PLN Serial'
         setErrorMessage(errorMsg)
         setErrorSerialNumber(serialNumber)
         setSerialNumber('')
@@ -245,7 +248,7 @@ const PrintLaser = () => {
       }
     } catch (error) {
       console.error(error)
-      const errorMsg = error.response?.data?.message || 'Gagal generate PLN Serial'
+      const errorMsg = error.response?.data?.message || 'Failed to generate PLN Serial'
       setErrorMessage(errorMsg)
       setErrorSerialNumber(serialNumber)
       setSerialNumber('')
@@ -298,7 +301,7 @@ const PrintLaser = () => {
     setCurrentStep('PRINTING')
 
     if (!user || !user.name) {
-      toast.error('User tidak ditemukan di localStorage!')
+      toast.error('User not found in localStorage!')
       setCurrentStep('PRINT_READY')
       return
     }
@@ -311,52 +314,76 @@ const PrintLaser = () => {
       })
 
       if (response.data.success) {
-        toast.success('PRINT SELESAI! Silakan scan hasil print laser.')
+        toast.success('PRINT COMPLETED! Please scan barcode from print result.')
         setCurrentStep('SCAN_RESULT')
 
-        // Focus ke input scan hasil
+        // Focus ke input scan barcode
         setTimeout(() => {
-          scanResultInputRef.current?.focus()
+          barcodeInputRef.current?.focus()
         }, 100)
       } else {
-        toast.error(response.data.message || 'Print gagal')
+        toast.error(response.data.message || 'Print failed')
         setCurrentStep('PRINT_READY')
       }
     } catch (err) {
       console.error(err)
-      const errorMsg = err.response?.data?.message || 'Terjadi kesalahan saat print'
+      const errorMsg = err.response?.data?.message || 'Error occurred during print'
       toast.error(errorMsg)
       setCurrentStep('PRINT_READY')
     }
   }
 
-  // ============ STEP 7-8: Scan Hasil Print dan Compare, lalu tampilkan QC Questions ============
-  const handleScanResult = async (e) => {
-    e.preventDefault()
-
-    if (!scannedPlnSerial) {
-      toast.error('Silakan scan hasil print laser')
-      return
-    }
-
-    // Compare dengan PLN Serial yang di-generate
-    if (scannedPlnSerial.trim() === generatedPlnSerial.trim()) {
-      // SAMA - Tampilkan QC Questions
-      setCurrentStep('QC_QUESTIONS')
-      setForceShowQuestions(false)
+  // ============ STEP 7-8: Scan Barcode hasil print ============
+  const handleBarcodeScanned = (e) => {
+    // Auto-proceed ketika barcode terisi dan cocok
+    const barcodeValue = e.target.value.trim()
+    
+    if (barcodeValue && barcodeValue === generatedPlnSerial.trim()) {
+      // Barcode cocok, focus ke QR Code
       setErrorMessage(null)
-      toast.success('Serial cocok! Silakan jawab pertanyaan QC.')
-    } else {
-      // BEDA - Error
-      setErrorMessage(
-        `Serial tidak cocok!\nGenerated:\n${generatedPlnSerial}\nScanned:\n${scannedPlnSerial}`,
-      )
-      setErrorSerialNumber(scannedPlnSerial)
-      toast.error('Serial hasil print tidak sesuai!')
-      setScannedPlnSerial('')
+      toast.success('Barcode matched! Please scan QR Code.')
       setTimeout(() => {
-        scanResultInputRef.current?.focus()
+        qrCodeInputRef.current?.focus()
       }, 100)
+    } else if (barcodeValue && barcodeValue !== generatedPlnSerial.trim()) {
+      // Barcode tidak cocok
+      setErrorMessage(
+        `Barcode mismatch!\nExpected: ${generatedPlnSerial}\nScanned: ${barcodeValue}`,
+      )
+      setErrorSerialNumber(barcodeValue)
+      toast.error('Barcode print result does not match!')
+      setScannedBarcode('')
+    }
+  }
+
+  // ============ STEP 7-8: Scan QR Code hasil print ============
+  const handleQrCodeScanned = (e) => {
+    // Auto-proceed ketika QR code terisi dan cocok
+    const qrValue = e.target.value.trim()
+    
+    if (qrValue && qrValue === generatedPlnSerial.trim()) {
+      // QR Code cocok, cek apakah barcode juga sudah cocok
+      if (scannedBarcode.trim() === generatedPlnSerial.trim()) {
+        // Keduanya cocok - Tampilkan QC Questions
+        setCurrentStep('QC_QUESTIONS')
+        setForceShowQuestions(false)
+        setErrorMessage(null)
+        toast.success('Barcode and QR Code matched! Please answer QC questions.')
+      } else {
+        toast.error('Please scan Barcode correctly first!')
+        setScannedQrCode('')
+        setTimeout(() => {
+          barcodeInputRef.current?.focus()
+        }, 100)
+      }
+    } else if (qrValue && qrValue !== generatedPlnSerial.trim()) {
+      // QR Code tidak cocok
+      setErrorMessage(
+        `QR Code mismatch!\nExpected: ${generatedPlnSerial}\nScanned: ${qrValue}`,
+      )
+      setErrorSerialNumber(qrValue)
+      toast.error('QR Code print result does not match!')
+      setScannedQrCode('')
     }
   }
 
@@ -368,9 +395,9 @@ const PrintLaser = () => {
     const allPass = Object.values(answers).every((answer) => answer === true)
 
     if (!allPass) {
-      setErrorMessage('Tidak semua pertanyaan QC dijawab Ya (Pass). Tidak bisa submit!')
+      setErrorMessage('Not all QC questions are answered Yes (Pass). Cannot submit!')
       setErrorSerialNumber(serialNumber)
-      toast.error('QC tidak Pass! Perbaiki jawaban untuk melanjutkan.')
+      toast.error('QC did not Pass! Fix answers to continue.')
       return
     }
 
@@ -381,7 +408,7 @@ const PrintLaser = () => {
   // Submit QC ke backend setelah print berhasil
   const submitQcToBackend = async () => {
     if (!user || !user.id || !user.name) {
-      toast.error('User tidak ditemukan di localStorage!')
+      toast.error('User not found in localStorage!')
       return
     }
 
@@ -406,7 +433,7 @@ const PrintLaser = () => {
       const qcStatus = res.data?.data?.qcStatus ?? ''
       const messageShow = (
         <span>
-          {res.data?.message ?? 'QC Submit berhasil'}. QC Status:{' '}
+          {res.data?.message ?? 'QC submitted successfully'}. QC Status:{' '}
           <span style={{ color: qcStatus.toUpperCase() === 'FAIL' ? 'red' : 'green' }}>
             {qcStatus}
           </span>
@@ -426,7 +453,7 @@ const PrintLaser = () => {
       }, 0)
     } catch (error) {
       console.error('QC submit error:', error)
-      const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QC'
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to submit QC'
       setErrorMessage(errorMsg)
       setErrorSerialNumber(serialNumber)
       toast.error(errorMsg)
@@ -439,9 +466,23 @@ const PrintLaser = () => {
       e.preventDefault()
       if (currentStep === 'SCAN_SERIAL') {
         handleSerialScan(e)
-      } else if (currentStep === 'SCAN_RESULT') {
-        handleScanResult(e)
       }
+    }
+  }
+
+  // Handle keydown untuk barcode
+  const handleBarcodeKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleBarcodeScanned(e)
+    }
+  }
+
+  // Handle keydown untuk QR code
+  const handleQrCodeKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleQrCodeScanned(e)
     }
   }
 
@@ -484,19 +525,36 @@ const PrintLaser = () => {
                   />
                 </FormRow>
 
-            {/* Input Scan Hasil Print - muncul setelah print */}
+            {/* Input Scan Barcode - muncul setelah print */}
             {(currentStep === 'SCAN_RESULT' || forceShowQuestions) && (
-                  <FormRow label="Scan Hasil Print">
-                    <CFormInput
-                      name="scannedPlnSerial"
-                      placeholder="Scan hasil print laser"
-                      value={scannedPlnSerial}
-                      onChange={(e) => setScannedPlnSerial(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      ref={scanResultInputRef}
-                      autoComplete="off"
-                    />
-                  </FormRow>
+                  <>
+                    <FormRow label="Scan Barcode">
+                      <CFormInput
+                        name="scannedBarcode"
+                        placeholder="Scan barcode hasil print laser"
+                        value={scannedBarcode}
+                        onChange={(e) => setScannedBarcode(e.target.value)}
+                        onKeyDown={handleBarcodeKeyDown}
+                        onBlur={handleBarcodeScanned}
+                        ref={barcodeInputRef}
+                        autoComplete="off"
+                      />
+                    </FormRow>
+                    
+                    <FormRow label="Scan QR Code">
+                      <CFormInput
+                        name="scannedQrCode"
+                        placeholder="Scan QR code hasil print laser"
+                        value={scannedQrCode}
+                        onChange={(e) => setScannedQrCode(e.target.value)}
+                        onKeyDown={handleQrCodeKeyDown}
+                        onBlur={handleQrCodeScanned}
+                        ref={qrCodeInputRef}
+                        autoComplete="off"
+                        disabled={!scannedBarcode || scannedBarcode.trim() !== generatedPlnSerial.trim()}
+                      />
+                    </FormRow>
+                  </>
                 )}
 
                 <FormRow label="Notes">
