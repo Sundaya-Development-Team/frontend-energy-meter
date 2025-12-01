@@ -501,7 +501,7 @@ const PrintLaser = () => {
           )}
 
         <CRow className="g-4 align-items-stretch">
-          {/* Kolom Kiri - Form & Questions */}
+          {/* Kolom Kiri - Form & Questions Submit*/}
           <CCol md={8} className="d-flex flex-column">
             {/* Card Serial Number & Notes */}
             <CCard className="mb-4 flex-grow-1 d-flex flex-column">
