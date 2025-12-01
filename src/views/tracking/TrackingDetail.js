@@ -126,7 +126,7 @@ const TrackingDetail = () => {
               </CCol>
               <CCol md={6}>
                 <div className="fw-semibold">PCB Serial Number</div>
-                <div>{detail.parentOf[0].component.serial_number || '-'}</div>
+                <div>{detail.parentOf?.[0]?.component?.serial_number || '-'}</div>
               </CCol>
             </CRow>
 
@@ -169,10 +169,8 @@ const TrackingDetail = () => {
                 <div>{detail.tracking_type || '-'}</div>
               </CCol>
               <CCol md={6}>
-                <div className="fw-semibold">Status</div>
-                <CBadge color={detail.status === 'delivered' ? 'success' : 'warning'}>
-                  {detail.status}
-                </CBadge>
+                <div className="fw-semibold">Vendor</div>
+                <div>{detail.parentOf?.[0]?.component?.product?.supplier?.name || '-'}</div>
               </CCol>
             </CRow>
 
@@ -180,6 +178,12 @@ const TrackingDetail = () => {
               <CCol md={6}>
                 <div className="fw-semibold">Created At</div>
                 <div>{formatDateTime(detail.created_at)}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">Status</div>
+                <CBadge color={detail.status === 'delivered' ? 'success' : 'warning'}>
+                  {detail.status}
+                </CBadge>
               </CCol>
             </CRow>
           </div>
