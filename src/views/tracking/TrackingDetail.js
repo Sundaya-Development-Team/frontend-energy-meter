@@ -121,8 +121,12 @@ const TrackingDetail = () => {
           <div className="mb-4 space-y-2">
             <CRow className="mb-3">
               <CCol md={6}>
-                <div className="fw-semibold">ID</div>
+                <div className="fw-semibold">Tracking ID</div>
                 <div>{detail.id}</div>
+              </CCol>
+              <CCol md={6}>
+                <div className="fw-semibold">PCB Serial Number</div>
+                <div>{detail.parentOf[0].component.serial_number || '-'}</div>
               </CCol>
             </CRow>
 
@@ -148,7 +152,7 @@ const TrackingDetail = () => {
               </CCol>
             </CRow>
 
-            <CRow className="mb-3">
+            {/* <CRow className="mb-3">
               <CCol md={6}>
                 <div className="fw-semibold">Quantity</div>
                 <div>{detail.original_quantity}</div>
@@ -157,7 +161,7 @@ const TrackingDetail = () => {
                 <div className="fw-semibold">Serialized</div>
                 <div>{detail.is_serialize ? 'Yes' : 'No'}</div>
               </CCol>
-            </CRow>
+            </CRow> */}
 
             <CRow className="mb-3">
               <CCol md={6}>
@@ -205,7 +209,7 @@ const TrackingDetail = () => {
                 {detail.qc_results.map((qc, index) => (
                   <CTableRow key={index}>
                     <CTableDataCell>{qc.qc_name}</CTableDataCell>
-                    <CTableDataCell>{formatDateTime(qc.created_at)}</CTableDataCell>
+                    <CTableDataCell>{formatDateTime(qc.inspection_date)}</CTableDataCell>
                     <CTableDataCell>{qc.inspector_by || '-'}</CTableDataCell>
                     <CTableDataCell
                       className={
