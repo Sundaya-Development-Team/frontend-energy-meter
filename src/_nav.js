@@ -36,16 +36,17 @@ const _nav = [
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     permissions: [
       'DASHBOARD',
-      'QC_ENGINEER',
+      'ADMIN',
       'PO_RECEIVING',
       'QC_RECEIVING',
       'QC_SUB_ASSEMBLY',
       'QC_ASSEMBLY',
       'ON_TEST',
       'HIPOT_TEST',
+      'PIC_HIPOT',
       'TEST_BENCH1',
       'ULTRA_SONIC',
-      'QC_RES_METER',
+      'QC_REF_METER',
       'TEST_BENCH2',
       'AGING_TEST',
       'LASER_PRINT',
@@ -58,70 +59,70 @@ const _nav = [
   {
     component: CNavTitle,
     name: 'Receiving Products',
-    permissions: ['QC_ENGINEER', 'PO_RECEIVING'],
+    permissions: ['ADMIN', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Purchase Order',
     to: '/receiving/purchaseOrder',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'PO_RECEIVING'],
+    permissions: ['ADMIN', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Receiving Products',
     to: '/receiving/receivingHeader',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'PO_RECEIVING'], // multi permission bisa akses
+    permissions: ['ADMIN', 'PO_RECEIVING'], // multi permission bisa akses
   },
   {
     component: CNavItem,
     name: 'Receiving List',
     to: '/receiving/receivingList',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'PO_RECEIVING'],
+    permissions: ['ADMIN', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Receiving Serial QC',
     to: '/receiving/receivingserialqc',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
+    permissions: ['ADMIN', 'QC_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Non Serial QC List',
     to: '/receiving/receivingnonseriallist',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
+    permissions: ['ADMIN', 'QC_RECEIVING'],
   },
 
   // Tracking
   {
     component: CNavTitle,
     name: 'Tracking',
-    permissions: ['QC_ENGINEER', 'SPV_QC'],
+    permissions: ['ADMIN'],
   },
   {
     component: CNavItem,
     name: 'Tracking Production List',
     to: '/tracking/list',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
+    permissions: ['ADMIN', 'QC_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Tracking Final Product',
     to: '/tracking/finalproduct',
     icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
-    permissions: ['QC_ENGINEER', 'QC_RECEIVING'],
+    permissions: ['ADMIN', 'QC_RECEIVING'],
   },
 
   // Production
   {
     component: CNavTitle,
     name: 'Production',
-    permissions: ['QC_ENGINEER', 'SPV_QC'],
+    permissions: ['ADMIN'],
   },
   // Assembly
   {
@@ -130,16 +131,15 @@ const _nav = [
     to: '/production/assembly',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
     permissions: [
-      'QC_ENGINEER',
+      'ADMIN',
       'SPV_QC',
       'QC_SUB_ASSEMBLY',
-
       'QC_ASSEMBLY',
       'ON_TEST',
       'HIPOT_TEST',
       'TEST_BENCH1',
       'ULTRA_SONIC',
-      'QC_RES_METER',
+      'QC_REF_METER',
       'TEST_BENCH2',
       'AGING_TEST',
       'LASER_PRINT',
@@ -151,19 +151,19 @@ const _nav = [
         component: CNavItem,
         name: 'Create PLN Order',
         to: '/production/assembly/plnorder',
-        permissions: ['QC_ENGINEER', 'SPV_QC'],
+        permissions: ['ADMIN'],
       },
       {
         component: CNavItem,
         name: 'Req. Assembly Order',
         to: '/production/assembly/assemblyorder',
-        permissions: ['QC_ENGINEER', 'SPV_QC'],
+        permissions: ['ADMIN'],
       },
       {
         component: CNavItem,
         name: 'Assembly Serial List',
         to: '/production/assembly/assemblyseriallist',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY'],
+        permissions: ['ADMIN', 'QC_SUB_ASSEMBLY'],
       },
       // {
       //   component: CNavItem,
@@ -174,13 +174,13 @@ const _nav = [
         component: CNavItem,
         name: 'QC Base Sub Assy',
         to: '/production/serialnoaql/QC-SA002/Base Sub Assy/QC Station Sub Assembly',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY'],
+        permissions: ['ADMIN', 'QC_SUB_ASSEMBLY'],
       },
       {
         component: CNavItem,
         name: 'Matching Assy & PCB',
         to: '/production/assembly/matchingassypcb',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'QC_ASSEMBLY'],
+        permissions: ['ADMIN', 'QC_ASSEMBLY'],
       },
       // {
       //   component: CNavItem,
@@ -191,7 +191,7 @@ const _nav = [
         component: CNavItem,
         name: 'QC Assembly',
         to: '/production/serialnoaql/QC-AT003/Assembly/QC Station Assembly',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'QC_ASSEMBLY'],
+        permissions: ['ADMIN', 'QC_ASSEMBLY'],
       },
       // {
       //   component: CNavItem,
@@ -207,29 +207,14 @@ const _nav = [
     name: 'On Test',
     to: '/production/on',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'ON_TEST'],
     items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/on/before',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Quality Control',
-      //   to: '/production/on/qc',
-      // },
       {
         component: CNavItem,
         name: 'QC Test ON',
         to: '/production/serialnoaql/QC-OT004/Test ON/Testing Station On Test',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'ON_TEST'],
+        permissions: ['ADMIN', 'ON_TEST'],
       },
-
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan After',
-      //   to: '/production/on/after',
-      // },
     ],
   },
 
@@ -239,28 +224,14 @@ const _nav = [
     name: 'Hipot Test',
     to: '/production/hipot',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'HIPOT_TEST','PIC_HIPOT'],
     items: [
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan Before',
-      //   to: '/production/hipot/before',
-      // },
-      // {
-      //   component: CNavItem,
-      //   name: 'Quality Control',
-      //   to: '/production/hipot/qc',
-      // },
       {
         component: CNavItem,
         name: 'QC Hipot Test',
         to: '/production/serialnoaql/QC-HT005/Hipot Test/Testing Station Hipot Test',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'HIPOT_TEST'],
+        permissions: ['ADMIN', 'HIPOT_TEST','PIC_HIPOT'],
       },
-      // {
-      //   component: CNavItem,
-      //   name: 'Scan After',
-      //   to: '/production/hipot/after',
-      // },
     ],
   },
 
@@ -275,9 +246,8 @@ const _nav = [
         component: CNavItem,
         name: 'QC Test Bench 1',
         to: '/production/serialnoaql/QC-TB1006/Test Bench 1/Testing Station Test Bench1',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'TEST_BENCH1'],
+        permissions: ['ADMIN',  'TEST_BENCH1'],
       },
-      
     ],
   },
 
@@ -287,12 +257,13 @@ const _nav = [
     name: 'Ultrasonic',
     to: '/production/ultrasonic',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'ULTRA_SONIC'],
     items: [
       {
         component: CNavItem,
         name: 'QC Ultrasonic',
         to: '/production/serialnoaql/QC-U015/Ultrasonic Test/Testing Station Ultra Sonic',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'ULTRA_SONIC'],
+        permissions: ['ADMIN', 'ULTRA_SONIC'],
       },
     ],
   },
@@ -303,12 +274,13 @@ const _nav = [
     name: 'Ref. Meter',
     to: '/production/refmeter',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN',  'QC_REF_METER'],
     items: [
       {
         component: CNavItem,
         name: 'QC Ref. Meter',
         to: '/production/serialnoaql/QC-RM013/QC Ref. Meter/QC Station Ref Meter',
-        permissions: ['QC_ENGINEER', 'SPV_QC', 'QC_SUB_ASSEMBLY', 'ULTRA_SONIC'],
+        permissions: ['ADMIN',  'QC_REF_METER'],
       },
     ],
   },
@@ -317,11 +289,13 @@ const _nav = [
     name: 'Test Bench 2',
     to: '/production/calibration',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN',  'TEST_BENCH2'],
     items: [
       {
         component: CNavItem,
         name: 'QC Test Bench 2',
         to: '/production/serialnoaql/QC-TB2014/Test Bench 2/Testing Station Test Bench2',
+        permissions: ['ADMIN',  'TEST_BENCH2'],
       },
     ],
   },
@@ -369,16 +343,19 @@ const _nav = [
     name: 'Laser Print',
     to: '/production/finishing',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN',  'LASER_PRINT1','LASER_PRINT2','LASER_PRINT'],
     items: [
       {
         component: CNavItem,
         name: 'Print Laser Post 1',
         to: '/production/finishing/printlaser/QC-LE016-1/Post 1/Printing Station 1',
+        permissions: ['ADMIN',  'LASER_PRINT1','LASER_PRINT'],
       },
       {
         component: CNavItem,
         name: 'Print Laser Post 2',
         to: '/production/finishing/printlaser/QC-LE016-2/Post 2/Printing Station 2',
+        permissions: ['ADMIN',  'LASER_PRINT2','LASER_PRINT'],
       },
       // {
       //   component: CNavItem,
@@ -392,6 +369,7 @@ const _nav = [
     name: 'Finishing',
     to: '/production/finishing',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN',  'QC_COVER', 'GENERATE_BOX'],
     items: [
       // {
       //   component: CNavItem,
@@ -402,83 +380,99 @@ const _nav = [
         component: CNavItem,
         name: 'QC Cover & Finishing',
         to: '/production/serialnoaql/QC-C001/QC Cover & Finishing/QC Cover and Finishing',
+        permissions: ['ADMIN',  'QC_COVER'],
       },
       {
         component: CNavItem,
         name: 'Generate Box Serial',
         to: '/production/finishing/generateboxserial',
+        permissions: ['ADMIN',  'GENERATE_BOX'],
       },
     ],
   },
   {
     component: CNavTitle,
     name: 'Repair',
+    permissions: ['ADMIN',  'QC_REPAIR'],
   },
   {
     component: CNavItem,
     name: 'QC Repair',
     to: '/repair/QC-R015/QC Repair/Workshop Repair',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    permissions: ['ADMIN',  'QC_REPAIR'],
+    
   },
   {
     component: CNavTitle,
     name: 'Shipping',
+    permissions: ['ADMIN'],
   },
   {
     component: CNavItem,
     name: 'Shipping Order',
     to: '/shipping/shippingorder',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    permissions: ['ADMIN'],
   },
   {
     component: CNavTitle,
     name: 'Master Data',
+    permissions: ['ADMIN'],
   },
   {
     component: CNavItem,
     name: 'Master Product',
     to: '/masterdata/product',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    permissions: ['ADMIN'],
   },
   {
     component: CNavItem,
     name: 'Master Supplier',
     to: '/masterdata/supplier',
     icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    permissions: ['ADMIN'],
   },
   {
     component: CNavTitle,
     name: 'Warehouse',
+    permissions: ['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
     component: CNavItem,
     name: 'Acc. Assembly Order',
     to: '/warehouse/outgoing/assemblyorder',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
     component: CNavItem,
     name: 'WH Stock (Opname)',
     to: '/warehouse/stock/warehouseStock',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
     component: CNavItem,
     name: 'WH Data Master',
     to: '/warehouse/warehouseMaster',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
     component: CNavItem,
     name: 'Req. Receiving to WH',
     to: '/warehouse/receivingwhrequest',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
     component: CNavItem,
     name: 'Req. Assembly to WH',
     to: '/warehouse/assemblywhrequest',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
 
   {
@@ -486,6 +480,7 @@ const _nav = [
     name: 'Serial Stock Confirm',
     to: '/warehouse/serialstockconfirm',
     icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
 
   // {

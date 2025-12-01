@@ -86,10 +86,8 @@ const routes = [
     element: (
       <PrivateRoutes
         requiredPermission={[
-          'QC_ENGINEER',
           'QC_RECEIVING',
           'ADMIN',
-          'SPV_QC',
           'PRODUKSI_ELEKTRONIK:SOLDER_RELAY',
           'PRODUKSI_ELEKTRONIK:SOLDER_PAPAN_TOMBOL',
           'PRODUKSI_ELEKTRONIK:PASANG_COVER',
@@ -105,7 +103,7 @@ const routes = [
           'HIPOT_TEST',
           'TEST_BENCH1',
           'ULTRA_SONIC',
-          'QC_RES_METER',
+          'QC_REF_METER',
           'TEST_BENCH2',
           'AGING_TEST',
           'LASER_PRINT',
@@ -125,7 +123,7 @@ const routes = [
     path: '/receiving/purchaseOrder',
     name: 'Purchase Order',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <PurchaseOrder />
         </DefaultLayout>
@@ -136,7 +134,7 @@ const routes = [
     path: '/receiving/receivingHeader',
     name: 'Receving Header',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <ReceivingHeader />
         </DefaultLayout>
@@ -147,7 +145,7 @@ const routes = [
     path: '/receiving/receivingList',
     name: 'Receiving List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <ReceivingList />
         </DefaultLayout>
@@ -158,7 +156,7 @@ const routes = [
     path: '/receiving/receivingDetail/:receivingHeaderId',
     name: 'Receiving Detail',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'PO_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'PO_RECEIVING']}>
         <DefaultLayout>
           <ReceivingDetail />
         </DefaultLayout>
@@ -169,7 +167,7 @@ const routes = [
     path: '/receiving/receivingserialqc',
     name: 'Receiving Serial QC',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <ReceivingSerialQc />
         </DefaultLayout>
@@ -180,7 +178,7 @@ const routes = [
     path: '/receiving/receivingnonseriallist',
     name: 'Non Serial QC List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <ReceivingNonSerialList />
         </DefaultLayout>
@@ -191,7 +189,7 @@ const routes = [
     path: '/receiving/detailnonserialqc/:trackingId',
     name: 'Reciving Non Serial Detail',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <DetailNonSerialQc />
         </DefaultLayout>
@@ -204,7 +202,7 @@ const routes = [
     path: '/tracking/list',
     name: 'Tracking Product List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <TrackingList />
         </DefaultLayout>
@@ -215,7 +213,7 @@ const routes = [
     path: '/tracking/detail/:trackingId',
     name: 'Tracking Detail',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <TrackingDetail />
         </DefaultLayout>
@@ -226,7 +224,7 @@ const routes = [
     path: '/tracking/finalproduct',
     name: 'Tracking Final Product',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <TrackingFinalProduct />
         </DefaultLayout>
@@ -242,7 +240,7 @@ const routes = [
     path: '/production/assembly/plnorder',
     name: 'Create PLN Order',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <PlnOrder />
         </DefaultLayout>
@@ -253,7 +251,7 @@ const routes = [
     path: '/production/assembly/assemblyorder',
     name: 'Req. Assembly Order',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <AssemblyOrder />
         </DefaultLayout>
@@ -264,7 +262,7 @@ const routes = [
     path: '/production/assembly/assemblyseriallist',
     name: 'Assembly Serial List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_SUB_ASSEMBLY']}>
         <DefaultLayout>
           <AssemblySerialList />
         </DefaultLayout>
@@ -275,7 +273,7 @@ const routes = [
     path: '/production/assembly/validateAssemblySerial',
     name: 'Validate Serial',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_ASSEMBLY']}>
         <DefaultLayout>
           <ValidateAssemblySerial />
         </DefaultLayout>
@@ -286,7 +284,7 @@ const routes = [
     path: '/production/assembly/matchingassypcb',
     name: 'Matching Assy & PCB Serial',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_ASSEMBLY']}>
         <DefaultLayout>
           <MatchingAssemblyPcbSerial />
         </DefaultLayout>
@@ -298,9 +296,9 @@ const routes = [
   { path: '/production/serialaql', name: '' },
   {
     path: '/production/serialaql/:qcIdParams/:qcNameParams/:qcPlaceParams',
-    name: 'Scan Before',
+    name: '',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <ProdQcSerialAql />
         </DefaultLayout>
@@ -314,18 +312,24 @@ const routes = [
     path: '/production/serialnoaql/:qcIdParams/:qcNameParams/:qcPlaceParams',
     name: '',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
-        <DefaultLayout>
-          <ProdQcSerialNoAql />
-        </DefaultLayout>
-      </PrivateRoutes>
-    ),
-  },
-  {
-    path: '/production/serialnoaql/:qcIdParams/:qcNameParams/:qcPlaceParams',
-    name: '',
-    element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'ON_TEST',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'QC_RECEIVING',
+        ]}
+      >
         <DefaultLayout>
           <ProdQcSerialNoAql />
         </DefaultLayout>
@@ -337,7 +341,7 @@ const routes = [
     path: '/production/aging/before',
     name: 'Scan Before Aging Test',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <ScanBeforeAging />
         </DefaultLayout>
@@ -350,7 +354,7 @@ const routes = [
     path: '/production/plnserial/scansidepln',
     name: 'SCAN PLN & Production Barcode',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <SidePlnSerial />
         </DefaultLayout>
@@ -363,7 +367,7 @@ const routes = [
     path: '/production/finishing/printlaser/:qcIdParams/:postNameParams/:qcPlaceParams',
     name: 'Print Laser',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN','LASER_PRINT','LASER_PRINT1','LASER_PRINT2']}>
         <DefaultLayout>
           <PrintLaser />
         </DefaultLayout>
@@ -374,7 +378,7 @@ const routes = [
     path: '/production/finishing/comparePlnSerial',
     name: 'Check Side & Cover Serial',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <PlnSerialComparator />
         </DefaultLayout>
@@ -385,7 +389,7 @@ const routes = [
     path: '/production/finishing/generateboxserial',
     name: 'Generate Box Serial',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <GenerateBoxSerial />
         </DefaultLayout>
@@ -398,7 +402,7 @@ const routes = [
     path: '/repair/:qcIdParams/:qcNameParams/:qcPlaceParams',
     name: '',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <ProdQcRepair />
         </DefaultLayout>
@@ -412,7 +416,7 @@ const routes = [
     path: '/masterdata/product',
     name: 'Product',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <Product />
         </DefaultLayout>
@@ -424,7 +428,7 @@ const routes = [
     path: '/masterdata/supplier',
     name: 'Supplier',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <Supplier />
         </DefaultLayout>
@@ -441,7 +445,7 @@ const routes = [
     path: '/warehouse/outgoing/assemblyorder',
     name: 'Acc. Assembly order',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <AssemblyOrderConfirmation />
         </DefaultLayout>
@@ -455,7 +459,7 @@ const routes = [
     path: '/warehouse/stock/warehouseStock',
     name: 'Stock Opname',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <WarehouseStock />
         </DefaultLayout>
@@ -466,7 +470,7 @@ const routes = [
     path: '/warehouse/warehouseMaster',
     name: 'Warehouse Data Master',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <WarehouseMaster />
         </DefaultLayout>
@@ -477,7 +481,7 @@ const routes = [
     path: '/warehouse/receivingwhrequest',
     name: 'Receiving to WH Request List',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <ReceivingWhRequest />
         </DefaultLayout>
@@ -488,7 +492,7 @@ const routes = [
     path: '/warehouse/assemblywhrequest',
     name: 'Assembly to WH Request',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <AssemblyWhRequest />
         </DefaultLayout>
@@ -499,7 +503,7 @@ const routes = [
     path: '/warehouse/serialstockconfirm',
     name: 'Assembly Order Confirmation',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <SerialStockConfirm />
         </DefaultLayout>
@@ -514,7 +518,7 @@ const routes = [
     path: '/admin/generate/plnserial',
     name: 'Geneare PLN Serial',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <GeneratePlnSerial />
         </DefaultLayout>
@@ -527,7 +531,7 @@ const routes = [
     path: '/shipping/shippingorder',
     name: 'Shipping Order',
     element: (
-      <PrivateRoutes requiredPermission={['SPV_QC', 'ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <ShippingHeader />
         </DefaultLayout>
