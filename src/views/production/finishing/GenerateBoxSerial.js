@@ -176,10 +176,10 @@ const GenerateBoxSerial = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {codesInBox.map((code, index) => (
+                  {[...codesInBox].reverse().map((code, index) => (
                     <CTableRow key={`${code.partialCode}-${index}`}>
                       <CTableHeaderCell scope="row" className="text-center">
-                        {index + 1}
+                        {codesInBox.length - index}
                       </CTableHeaderCell>
                       <CTableDataCell>{code.partialCode || '-'}</CTableDataCell>
                       <CTableDataCell>{code.fullCode || '-'}</CTableDataCell>
