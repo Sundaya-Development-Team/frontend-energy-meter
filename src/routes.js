@@ -118,7 +118,17 @@ const routes = [
     ),
   },
   //Receiving
-  { path: '/receiving', name: 'Receiving' },
+  { 
+    path: '/receiving', 
+    name: 'Receiving',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN', 'PO_RECEIVING']}>
+        <DefaultLayout>
+          <ReceivingList />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
   {
     path: '/receiving/purchaseOrder',
     name: 'Purchase Order',
@@ -197,7 +207,17 @@ const routes = [
     ),
   },
   //Tracking
-  { path: '/tracking', name: 'Tracking' },
+  { 
+    path: '/tracking', 
+    name: 'Tracking',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
+        <DefaultLayout>
+          <TrackingList />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
   {
     path: '/tracking/list',
     name: 'Tracking Product List',
@@ -232,10 +252,73 @@ const routes = [
     ),
   },
   //Production
-  { path: '/production', name: 'Production' },
+  { 
+    path: '/production', 
+    name: 'Production',
+    element: (
+      <PrivateRoutes
+        requiredPermission={[
+          'QC_RECEIVING',
+          'ADMIN',
+          'PRODUKSI_ELEKTRONIK:SOLDER_RELAY',
+          'PRODUKSI_ELEKTRONIK:SOLDER_PAPAN_TOMBOL',
+          'PRODUKSI_ELEKTRONIK:PASANG_COVER',
+          'PRODUKSI_ELEKTRONIK:TEST_ON',
+          'PIC_HIPOT',
+          'PIC_CHAMBER',
+          'GUDANG_ELEKTRONIK',
+          'GUDANG_NON_ELEKTRONIK',
+          'PO_RECEIVING',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'ON_TEST',
+          'HIPOT_TEST',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'GENERATE_BOX',
+        ]}
+      >
+        <DefaultLayout>
+          <Dashboard />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
 
   //Producrion - Assembly
-  { path: '/production/assembly', name: 'Assembly' },
+  { 
+    path: '/production/assembly', 
+    name: 'Assembly',
+    element: (
+      <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'SPV_QC',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'ON_TEST',
+          'HIPOT_TEST',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'GENERATE_BOX',
+        ]}
+      >
+        <DefaultLayout>
+          <Dashboard />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
   {
     path: '/production/assembly/plnorder',
     name: 'Create PLN Order',
