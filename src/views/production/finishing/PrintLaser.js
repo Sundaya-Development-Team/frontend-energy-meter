@@ -43,7 +43,6 @@ const PrintLaser = () => {
   const [scannedQrCode, setScannedQrCode] = useState('')
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
-  const [forceShowQuestions, setForceShowQuestions] = useState(false)
 
   // States untuk QC
   const [questionData, setQuestionData] = useState([])
@@ -56,11 +55,14 @@ const PrintLaser = () => {
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
   const [isSerialLocked, setIsSerialLocked] = useState(false)
   const [showPrintButton, setShowPrintButton] = useState(false)
+  const [isBarcodeLocked, setIsBarcodeLocked] = useState(false)
+  const [isQrCodeLocked, setIsQrCodeLocked] = useState(false)
 
   // Refs
   const serialInputRef = useRef(null)
   const barcodeInputRef = useRef(null)
   const qrCodeInputRef = useRef(null)
+  const qcQuestionsRef = useRef(null)
 
   // Tentukan post dari params
   // Cara 1: Dari postNameParams (contoh: "Post 1" atau "Post 2")
@@ -118,7 +120,6 @@ const PrintLaser = () => {
     if (!preserveTracking) {
       setTrackingProduct(null)
     }
-    setForceShowQuestions(false)
     setQuestionData([])
     setAnswers({})
     setQcName('')
@@ -127,6 +128,8 @@ const PrintLaser = () => {
     setErrorSerialNumber(null)
     setIsSerialLocked(false)
     setShowPrintButton(false)
+    setIsBarcodeLocked(false)
+    setIsQrCodeLocked(false)
     serialInputRef.current?.focus()
   }
 
@@ -227,16 +230,18 @@ const PrintLaser = () => {
         const normalizedStatus = currentStatus?.toUpperCase()
 
         if (normalizedStatus === 'LASERED') {
-          // Serial sudah pernah selesai proses print laser, lanjutkan langsung ke scan hasil
+          // Serial sudah pernah selesai proses print laser, langsung ke scan hasil tanpa print ulang
           setShowPrintButton(false)
-          setForceShowQuestions(true)
           setCurrentStep('SCAN_RESULT')
-          toast.info('Serial has been processed. Please scan print result and continue QC.')
+          toast.info('Serial has been processed. Please scan Barcode and QR Code to continue QC.')
+          // Focus ke barcode input
+          setTimeout(() => {
+            barcodeInputRef.current?.focus()
+          }, 100)
         } else {
           // Update step ke PRINT_READY (tampilkan PLN dan tombol print)
           setCurrentStep('PRINT_READY')
           setShowPrintButton(true)
-          setForceShowQuestions(false)
           toast.success('PLN Serial generated successfully! Please click Print button.')
         }
       } else {
@@ -339,8 +344,9 @@ const PrintLaser = () => {
     const barcodeValue = e.target.value.trim()
     
     if (barcodeValue && barcodeValue === generatedPlnSerial.trim()) {
-      // Barcode cocok, focus ke QR Code
+      // Barcode cocok, lock input barcode dan focus ke QR Code
       setErrorMessage(null)
+      setIsBarcodeLocked(true)
       toast.success('Barcode matched! Please scan QR Code.')
       setTimeout(() => {
         qrCodeInputRef.current?.focus()
@@ -353,6 +359,7 @@ const PrintLaser = () => {
       setErrorSerialNumber(barcodeValue)
       toast.error('Barcode print result does not match!')
       setScannedBarcode('')
+      setIsBarcodeLocked(false)
     }
   }
 
@@ -360,30 +367,74 @@ const PrintLaser = () => {
   const handleQrCodeScanned = (e) => {
     // Auto-proceed ketika QR code terisi dan cocok
     const qrValue = e.target.value.trim()
+    const plnSerial = generatedPlnSerial.trim()
+    const barcodeValue = scannedBarcode.trim()
     
-    if (qrValue && qrValue === generatedPlnSerial.trim()) {
-      // QR Code cocok, cek apakah barcode juga sudah cocok
-      if (scannedBarcode.trim() === generatedPlnSerial.trim()) {
-        // Keduanya cocok - Tampilkan QC Questions
-        setCurrentStep('QC_QUESTIONS')
-        setForceShowQuestions(false)
-        setErrorMessage(null)
-        toast.success('Barcode and QR Code matched! Please answer QC questions.')
+    if (!qrValue) return
+    
+    // Validasi QR Code dengan PLN Serial
+    const qrMatchesPln = qrValue === plnSerial
+    // Validasi Barcode dengan PLN Serial
+    const barcodeMatchesPln = barcodeValue === plnSerial
+    // Validasi QR Code dengan Barcode
+    const qrMatchesBarcode = qrValue === barcodeValue
+    
+    if (qrMatchesPln && barcodeMatchesPln && qrMatchesBarcode) {
+      // Semua cocok - Lock QR Code dan Tampilkan QC Questions
+      setIsQrCodeLocked(true)
+      setCurrentStep('QC_QUESTIONS')
+      setErrorMessage(null)
+      toast.success(
+        `✓ QR Code MATCHED with Barcode and PLN Serial!\n` +
+        `PLN: ${plnSerial}\n` +
+        `All validations passed. Please answer QC questions.`
+      )
+      
+      // Auto scroll ke QC Questions section
+      setTimeout(() => {
+        qcQuestionsRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start'
+        })
+      }, 300)
+    } else {
+      // Ada yang tidak cocok - tampilkan detail error
+      let errorDetails = []
+      
+      if (!qrMatchesPln) {
+        errorDetails.push(`✗ QR Code does NOT match PLN Serial`)
+        errorDetails.push(`  Expected PLN: ${plnSerial}`)
+        errorDetails.push(`  Scanned QR: ${qrValue}`)
       } else {
-        toast.error('Please scan Barcode correctly first!')
-        setScannedQrCode('')
+        errorDetails.push(`✓ QR Code matches PLN Serial`)
+      }
+      
+      if (!barcodeMatchesPln) {
+        errorDetails.push(`✗ Barcode does NOT match PLN Serial`)
+        errorDetails.push(`  Expected PLN: ${plnSerial}`)
+        errorDetails.push(`  Scanned Barcode: ${barcodeValue}`)
+      } else {
+        errorDetails.push(`✓ Barcode matches PLN Serial`)
+      }
+      
+      if (!qrMatchesBarcode) {
+        errorDetails.push(`✗ QR Code does NOT match Barcode`)
+      } else {
+        errorDetails.push(`✓ QR Code matches Barcode`)
+      }
+      
+      const errorMsg = errorDetails.join('\n')
+      setErrorMessage(errorMsg)
+      setErrorSerialNumber(qrValue)
+      toast.error('QR Code validation failed! Check details below.')
+      setScannedQrCode('')
+      
+      // Focus kembali ke input yang bermasalah
+      if (!barcodeMatchesPln) {
         setTimeout(() => {
           barcodeInputRef.current?.focus()
         }, 100)
       }
-    } else if (qrValue && qrValue !== generatedPlnSerial.trim()) {
-      // QR Code tidak cocok
-      setErrorMessage(
-        `QR Code mismatch!\nExpected: ${generatedPlnSerial}\nScanned: ${qrValue}`,
-      )
-      setErrorSerialNumber(qrValue)
-      toast.error('QR Code print result does not match!')
-      setScannedQrCode('')
     }
   }
 
@@ -525,8 +576,8 @@ const PrintLaser = () => {
                   />
                 </FormRow>
 
-            {/* Input Scan Barcode - muncul setelah print */}
-            {(currentStep === 'SCAN_RESULT' || forceShowQuestions) && (
+            {/* Input Scan Barcode - muncul setelah print dan tetap tampil saat QC */}
+            {(currentStep === 'SCAN_RESULT' || currentStep === 'QC_QUESTIONS') && (
                   <>
                     <FormRow label="Scan Barcode">
                       <CFormInput
@@ -535,9 +586,9 @@ const PrintLaser = () => {
                         value={scannedBarcode}
                         onChange={(e) => setScannedBarcode(e.target.value)}
                         onKeyDown={handleBarcodeKeyDown}
-                        onBlur={handleBarcodeScanned}
                         ref={barcodeInputRef}
                         autoComplete="off"
+                        disabled={isBarcodeLocked}
                       />
                     </FormRow>
                     
@@ -548,10 +599,9 @@ const PrintLaser = () => {
                         value={scannedQrCode}
                         onChange={(e) => setScannedQrCode(e.target.value)}
                         onKeyDown={handleQrCodeKeyDown}
-                        onBlur={handleQrCodeScanned}
                         ref={qrCodeInputRef}
                         autoComplete="off"
-                        disabled={!scannedBarcode || scannedBarcode.trim() !== generatedPlnSerial.trim()}
+                        disabled={isQrCodeLocked || !scannedBarcode || scannedBarcode.trim() !== generatedPlnSerial.trim()}
                       />
                     </FormRow>
                   </>
@@ -600,8 +650,8 @@ const PrintLaser = () => {
             )}
 
             {/* Card QC Questions - muncul setelah scan hasil print cocok */}
-            {(currentStep === 'QC_QUESTIONS' || forceShowQuestions) && (
-              <CCard className="mb-4 flex-grow-1">
+            {currentStep === 'QC_QUESTIONS' && (
+              <CCard className="mb-4 flex-grow-1" ref={qcQuestionsRef}>
                 <CCardHeader>
                   <strong>Quality Control - {qcName}</strong>
                 </CCardHeader>
