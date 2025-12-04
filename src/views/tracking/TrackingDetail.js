@@ -214,7 +214,7 @@ const TrackingDetail = () => {
                   <CTableRow key={index}>
                     <CTableDataCell>{qc.qc_name}</CTableDataCell>
                     <CTableDataCell>{formatDateTime(qc.inspection_date)}</CTableDataCell>
-                    <CTableDataCell>{qc.inspector_by || '-'}</CTableDataCell>
+                    <CTableDataCell>{qc.inspector_name || '-'}</CTableDataCell>
                     <CTableDataCell
                       className={
                         qc.result === 'PASS'
