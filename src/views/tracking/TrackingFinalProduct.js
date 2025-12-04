@@ -34,12 +34,13 @@ const TrackingFinalProduct = () => {
     { code: 'QC-AT003', label: 'Assembly' },
     { code: 'QC-OT004', label: 'ON Test' },
     { code: 'QC-HT005', label: 'Hippot' },
-    { code: 'QC-CT1006', label: 'Test Bench 1' },
+    { code: 'QC-TB1006', label: 'Test Bench 1' },
     { code: 'QC-U015', label: 'Ultrasonic' },
     { code: 'QC-RM013', label: 'Ref. Meter' },
-    { code: 'QC-CT2014', label: 'Test Bench 2' },
+    { code: 'QC-TB2014', label: 'Test Bench 2' },
     // { code: 'QC-AT007', label: 'Aging' }, // temporarily hidden
-    { code: 'QC-LG016', label: 'Laser Engraving' },
+    { code: 'QC-LE016', label: 'Laser Engraving' },
+    { code: 'QC-C001', label: 'Cover & Finishing' },
   ]
 
   // === FILTER STATE PER KOLOM ===
@@ -181,7 +182,7 @@ const TrackingFinalProduct = () => {
     }
 
     // Header CSV
-    const headers = ['No', 'Serial Number', 'PLN Serial', ...qcColumns.map((qc) => qc.label)]
+    const headers = ['No', 'Assembly Serial', 'PLN Serial', ...qcColumns.map((qc) => qc.label)]
 
     // Isi baris CSV
     const rows = exportData.map((row, index) => [

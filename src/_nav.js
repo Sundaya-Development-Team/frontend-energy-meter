@@ -4,27 +4,48 @@ import {
   cilBarcode,
   cilBell,
   cilCalculator,
+  cilCart,
   cilChartLine,
   cilChartPie,
   cilCheckAlt,
+  cilCheckCircle,
+  cilClipboard,
   cilCog,
   cilCursor,
   cilDescription,
   cilDrop,
   cilExternalLink,
   cilFactory,
+  cilFindInPage,
+  cilFlipToBack,
   cilGroup,
+  cilHistory,
+  cilInbox,
+  cilIndustry,
+  cilLayers,
+  cilLibrary,
+  cilList,
+  cilLocationPin,
+  cilMediaPlay,
   cilNotes,
   cilPencil,
+  cilPrint,
   cilPuzzle,
+  cilReload,
+  cilScreenDesktop,
+  cilSettings,
   cilShareBoxed,
+  cilShieldAlt,
   cilSpeedometer,
   cilSpreadsheet,
   cilStar,
   cilStorage,
+  cilSync,
   cilTag,
   cilTask,
+  cilTransfer,
   cilTruck,
+  cilWc,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -65,35 +86,35 @@ const _nav = [
     component: CNavItem,
     name: 'Purchase Order',
     to: '/receiving/purchaseOrder',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Receiving Products',
     to: '/receiving/receivingHeader',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilInbox} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'PO_RECEIVING'], // multi permission bisa akses
   },
   {
     component: CNavItem,
     name: 'Receiving List',
     to: '/receiving/receivingList',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilList} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'PO_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Receiving Serial QC',
     to: '/receiving/receivingserialqc',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilBarcode} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'QC_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Non Serial QC List',
     to: '/receiving/receivingnonseriallist',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'QC_RECEIVING'],
   },
 
@@ -105,16 +126,16 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Tracking Production List',
+    name: 'Tracking Prod Process',
     to: '/tracking/list',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilFindInPage} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'QC_RECEIVING'],
   },
   {
     component: CNavItem,
     name: 'Tracking Final Product',
     to: '/tracking/finalproduct',
-    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'QC_RECEIVING'],
   },
 
@@ -129,7 +150,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Assembly',
     to: '/production/assembly',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilLayers} customClassName="nav-icon" />,
     permissions: [
       'ADMIN',
       'SPV_QC',
@@ -206,7 +227,7 @@ const _nav = [
     component: CNavGroup,
     name: 'On Test',
     to: '/production/on',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilMediaPlay} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'ON_TEST'],
     items: [
       {
@@ -223,7 +244,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Hipot Test',
     to: '/production/hipot',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilShieldAlt} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'HIPOT_TEST','PIC_HIPOT'],
     items: [
       {
@@ -240,7 +261,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Test Bench 1',
     to: '/production/calibration',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilScreenDesktop} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -256,7 +277,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Ultrasonic',
     to: '/production/ultrasonic',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilSync} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'ULTRA_SONIC'],
     items: [
       {
@@ -273,7 +294,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Ref. Meter',
     to: '/production/refmeter',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     permissions: ['ADMIN',  'QC_REF_METER'],
     items: [
       {
@@ -288,7 +309,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Test Bench 2',
     to: '/production/calibration',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCalculator} customClassName="nav-icon" />,
     permissions: ['ADMIN',  'TEST_BENCH2'],
     items: [
       {
@@ -342,7 +363,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Laser Print',
     to: '/production/finishing',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilPrint} customClassName="nav-icon" />,
     permissions: ['ADMIN',  'LASER_PRINT1','LASER_PRINT2','LASER_PRINT'],
     items: [
       {
@@ -368,7 +389,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Finishing',
     to: '/production/finishing',
-    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCheckCircle} customClassName="nav-icon" />,
     permissions: ['ADMIN',  'QC_COVER', 'GENERATE_BOX'],
     items: [
       // {
@@ -399,7 +420,7 @@ const _nav = [
     component: CNavItem,
     name: 'QC Repair',
     to: '/repair/QC-R015/QC Repair/Workshop Repair',
-    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
     permissions: ['ADMIN',  'QC_REPAIR'],
     
   },
@@ -412,7 +433,7 @@ const _nav = [
     component: CNavItem,
     name: 'Shipping Order',
     to: '/shipping/shippingorder',
-    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilTruck} customClassName="nav-icon" />,
     permissions: ['ADMIN'],
   },
   {
@@ -424,14 +445,14 @@ const _nav = [
     component: CNavItem,
     name: 'Master Product',
     to: '/masterdata/product',
-    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilLibrary} customClassName="nav-icon" />,
     permissions: ['ADMIN'],
   },
   {
     component: CNavItem,
     name: 'Master Supplier',
     to: '/masterdata/supplier',
-    icon: <CIcon icon={cilTag} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
     permissions: ['ADMIN'],
   },
   {
@@ -443,7 +464,7 @@ const _nav = [
     component: CNavItem,
     name: 'Acc. Assembly Order',
     to: '/warehouse/outgoing/assemblyorder',
-    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilTask} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
@@ -457,21 +478,21 @@ const _nav = [
     component: CNavItem,
     name: 'WH Data Master',
     to: '/warehouse/warehouseMaster',
-    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilSpreadsheet} customClassName="nav-icon" />,
     permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
     component: CNavItem,
     name: 'Req. Receiving to WH',
     to: '/warehouse/receivingwhrequest',
-    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
     permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
   {
     component: CNavItem,
     name: 'Req. Assembly to WH',
     to: '/warehouse/assemblywhrequest',
-    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilTransfer} customClassName="nav-icon" />,
     permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
 
@@ -479,7 +500,7 @@ const _nav = [
     component: CNavItem,
     name: 'Serial Stock Confirm',
     to: '/warehouse/serialstockconfirm',
-    icon: <CIcon icon={cilStorage} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCheckAlt} customClassName="nav-icon" />,
     permissions: ['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK'],
   },
 
