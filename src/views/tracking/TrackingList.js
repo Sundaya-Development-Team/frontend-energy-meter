@@ -18,10 +18,12 @@ import { backendTracking } from '../../api/axios'
 const TrackingList = () => {
   const [loading, setLoading] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState('')
+  const [searchInput, setSearchInput] = useState('') // input sementara sebelum submit
   const [data, setData] = useState([])
+  const [totalRecords, setTotalRecords] = useState(0)
 
   const [currentPage, setCurrentPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [rowsPerPage, setRowsPerPage] = useState(20)
   const navigate = useNavigate()
 
   const handleDetail = (row) => {
@@ -50,57 +52,62 @@ const TrackingList = () => {
   )
 
   // === FETCH DATA ===
-  useEffect(() => {
-    const fetchAllData = async () => {
-      setLoading(true)
-      try {
-        let allRecords = []
-        let page = 1
-        const limit = 100
-        let hasMore = true
-
-        while (hasMore) {
-          const res = await backendTracking.post('/qc-results/history', {
-            page,
-            limit,
-            is_serial: true,
-            tracking_type: 'assembly',
-          })
-
-          // Debug: lihat struktur response dari API
-          console.log(`Page ${page} FULL response:`, res.data)
-          console.log(`Page ${page} res.data.data:`, res.data?.data)
-          console.log(`Page ${page} res.data.data keys:`, res.data?.data ? Object.keys(res.data.data) : 'N/A')
-
-          const result = res.data?.data?.records ?? []
-          const total = res.data?.data?.total ?? res.data?.data?.totalRecords ?? res.data?.data?.count ?? 0
-          const totalPages = res.data?.data?.total_pages ?? res.data?.data?.totalPages ?? Math.ceil(total / limit)
-          
-          console.log(`Page ${page}: got ${result.length} records, total: ${total}, totalPages: ${totalPages}`)
-
-          allRecords = [...allRecords, ...result]
-
-          // Gunakan total_pages atau total untuk menentukan apakah masih ada data
-          if (totalPages > 0) {
-            hasMore = page < totalPages
-          } else {
-            // Fallback: jika tidak ada info total, gunakan logika lama
-            hasMore = result.length === limit
-          }
-          page++
-        }
-
-        setData(allRecords)
-      } catch (err) {
-        console.error('Gagal fetch data:', err)
-        setData([])
-      } finally {
-        setLoading(false)
+  const fetchData = async (page = 1, limit = 20, serialNumber = '') => {
+    setLoading(true)
+    try {
+      const payload = {
+        page,
+        limit,
+        is_serial: true,
+        tracking_type: 'assembly',
       }
-    }
 
-    fetchAllData()
-  }, [])
+      // Jika ada serial number, tambahkan ke payload
+      if (serialNumber.trim()) {
+        payload.serial_number = serialNumber.trim()
+      }
+
+      const res = await backendTracking.post('/qc-results/history', payload)
+
+      const result = res.data?.data?.records ?? []
+      const total = res.data?.data?.pagination?.total ?? 0
+
+      setData(result)
+      setTotalRecords(total)
+    } catch (err) {
+      console.error('Gagal fetch data:', err)
+      setData([])
+      setTotalRecords(0)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Fetch data when page, rowsPerPage, or searchKeyword changes
+  useEffect(() => {
+    fetchData(currentPage, rowsPerPage, searchKeyword)
+  }, [currentPage, rowsPerPage, searchKeyword])
+
+  // Handle search submit
+  const handleSearch = () => {
+    setCurrentPage(1) // Reset ke halaman 1 saat search
+    setSearchKeyword(searchInput) // useEffect akan trigger fetchData
+  }
+
+  // Handle enter key pada input search
+  const handleKeyPress = (e) => {
+    console.log("Search nih")
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
+  // Handle clear search
+  const handleClearSearch = () => {
+    setSearchInput('')
+    setCurrentPage(1)
+    setSearchKeyword('') // useEffect akan trigger fetchData
+  }
 
   // untuk event double-click resize
   useEffect(() => {
@@ -162,33 +169,22 @@ const TrackingList = () => {
     return () => table.removeEventListener('dblclick', handleDoubleClick)
   }, [])
 
-  // === FILTER LOGIC ===
+  // === FILTER LOGIC (hanya untuk filter QC status, search sudah via API) ===
   const filteredData = useMemo(() => {
     return data.filter((row) => {
-      const keyword = searchKeyword.toLowerCase()
-      const matchesSearch =
-        keyword === '' ||
-        Object.values(row).some((val) =>
-          String(val || '')
-            .toLowerCase()
-            .includes(keyword),
-        )
-
       const matchesFilters = Object.entries(filters).every(([qcKey, qcValue]) => {
         if (qcValue === '') return true
         return row.qc_history?.[qcKey]?.status === qcValue
       })
 
-      return matchesSearch && matchesFilters
+      return matchesFilters
     })
-  }, [data, searchKeyword, filters])
+  }, [data, filters])
 
-  // === GET DATA YANG SEDANG TAMPIL DI PAGE ===
+  // === GET DATA YANG SEDANG TAMPIL DI PAGE (untuk download) ===
   const currentPageData = useMemo(() => {
-    const start = (currentPage - 1) * rowsPerPage
-    const end = start + rowsPerPage
-    return filteredData.slice(start, end)
-  }, [filteredData, currentPage, rowsPerPage])
+    return filteredData
+  }, [filteredData])
 
   // === DOWNLOAD CSV ===
   const exportToCSV = (exportData, filenameSuffix) => {
@@ -357,16 +353,28 @@ const TrackingList = () => {
       <CCardBody>
         {/* Search + Download */}
         <CRow className="mb-3 align-items-center">
-          <CCol md={4} sm={6}>
-            <CFormInput
-              type="text"
-              placeholder="Search..."
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              size="sm"
-            />
+          <CCol md={5} sm={6}>
+            <div className="d-flex gap-2">
+              <CFormInput
+                type="text"
+                placeholder="Search serial number..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                size="sm"
+                style={{ flex: 1 }}
+              />
+              <CButton color="primary" size="sm" onClick={handleSearch} disabled={loading}>
+                Search
+              </CButton>
+              {searchKeyword && (
+                <CButton color="secondary" size="sm" onClick={handleClearSearch} disabled={loading}>
+                  Clear
+                </CButton>
+              )}
+            </div>
           </CCol>
-          <CCol md={8} sm={6} className="text-end">
+          <CCol md={7} sm={6} className="text-end">
             <CButton
               color="primary"
               size="sm"
@@ -414,12 +422,18 @@ const TrackingList = () => {
           progressPending={loading}
           progressComponent={<CSpinner size="sm" />}
           pagination
+          paginationServer
+          paginationTotalRows={totalRecords}
+          paginationPerPage={rowsPerPage}
+          paginationRowsPerPageOptions={[10, 20, 50, 100]}
+          onChangePage={(page) => setCurrentPage(page)}
+          onChangeRowsPerPage={(newPerPage) => {
+            setRowsPerPage(newPerPage)
+            setCurrentPage(1)
+          }}
           highlightOnHover
           persistTableHead
           noDataComponent="No data available"
-          paginationPerPage={rowsPerPage}
-          onChangePage={(page) => setCurrentPage(page)}
-          onChangeRowsPerPage={(newPerPage) => setRowsPerPage(newPerPage)}
           fixedHeader
           fixedHeaderScrollHeight="500px"
         />
