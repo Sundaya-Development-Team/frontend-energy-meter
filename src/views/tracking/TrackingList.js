@@ -96,7 +96,7 @@ const TrackingList = () => {
 
   // Handle enter key pada input search
   const handleKeyPress = (e) => {
-    console.log("Search nih")
+  
     if (e.key === 'Enter') {
       handleSearch()
     }
