@@ -27,7 +27,7 @@ const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc
 
 //QCPerformance
 const PerformaceSampling = React.lazy(() => import('./views/performance/ScanSamplingPerformance'))
-const QCPerformanceAql = React.lazy(() => import('./views/performance/QCPerformanceAql'))
+const QCPerformanceAql = React.lazy(() => import('./views/performance/QcPerformanceAql'))
 
 // Assembly
 const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder'))
