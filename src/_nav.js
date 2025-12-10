@@ -413,6 +413,20 @@ const _nav = [
   },
   {
     component: CNavTitle,
+    name: 'Performance',
+    permissions: ['ADMIN',  'QC_REPAIR'],
+  },
+  {
+    component: CNavItem,
+    name: 'Performance Test',
+    to: '/performance/sampling/QC-PTS001/QC Performance/QC Performance Stage',
+    icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
+    permissions: ['ADMIN'],
+    
+  },
+
+  {
+    component: CNavTitle,
     name: 'Repair',
     permissions: ['ADMIN',  'QC_REPAIR'],
   },

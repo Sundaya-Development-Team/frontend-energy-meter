@@ -25,6 +25,9 @@ const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQ
 const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql'))
 const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc'))
 
+//QCPerformance
+const PerformaceSampling = React.lazy(() => import('./views/performance/ScanSamplingPerformance'))
+
 // Assembly
 const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder'))
 const AssemblyOrder = React.lazy(() => import('./views/production/assembly/AssemblyOrder'))
@@ -479,7 +482,61 @@ const routes = [
       </PrivateRoutes>
     ),
   },
-
+  { path: '/performance', name: 'Performance' , element: (
+    <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'ON_TEST',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'QC_RECEIVING',
+        ]}
+      >
+      <DefaultLayout>
+        <Dashboard />
+      </DefaultLayout>
+    </PrivateRoutes>
+  ) },
+  { path: '/performance/sampling', name: 'Sampling', element: (
+    <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'ON_TEST',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'QC_RECEIVING',
+        ]}
+      >
+      <DefaultLayout>
+        <Dashboard />
+      </DefaultLayout>
+    </PrivateRoutes>
+  ) },
+  { path: '/performance/sampling/:qcIdParams/:qcNameParams/:qcPlaceParams', name: 'Sampling Unit', element: (
+    <PrivateRoutes requiredPermission={['ADMIN']}>
+      <DefaultLayout>
+        <PerformaceSampling />
+      </DefaultLayout>
+    </PrivateRoutes>
+  ) },
   { path: '/repair', name: 'Repair' },
   {
     path: '/repair/:qcIdParams/:qcNameParams/:qcPlaceParams',
