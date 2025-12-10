@@ -391,7 +391,7 @@ const PrintLaser = () => {
         `Please answer QC questions.`
       )
       
-      // Auto scroll ke QC Questions section
+      // Auto scroll ke QC Questions section - tambahan
       setTimeout(() => {
         qcQuestionsRef.current?.scrollIntoView({ 
           behavior: 'smooth', 
