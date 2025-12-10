@@ -322,26 +322,26 @@ const _nav = [
   },
 
   // Aging Test
-  // {
-  //   component: CNavGroup,
-  //   name: 'Aging Test',
-  //   to: '/production/aging',
-  //   icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
-  //   items: [
+  {
+    component: CNavGroup,
+    name: 'Aging Test',
+    to: '/production/aging',
+    icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    items: [
      
-  //     {
-  //       component: CNavItem,
-  //       name: 'Scan Before',
-  //       to: '/production/aging/before',
-  //     },
-  //     {
-  //       component: CNavItem,
-  //       name: 'QC Aging',
-  //       to: '/production/serialaql/QC-AT007/Aging/Testing Station Aging Test',
-  //     },
+      {
+        component: CNavItem,
+        name: 'Scan Before',
+        to: '/production/aging/before',
+      },
+      {
+        component: CNavItem,
+        name: 'QC Aging',
+        to: '/production/serialaql/QC-AT007/Aging/Testing Station Aging Test',
+      },
      
-  //   ],
-  // },
+    ],
+  },
 
   // Matching Assy & PLN
   // {
