@@ -233,7 +233,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test ON',
-        to: '/production/serialnoaql/QC-OT004/Test ON/Testing Station On Test',
+        to: '/production/serialnoaql/QC-OT004/Test ON/QC Station On Test',
         permissions: ['ADMIN', 'ON_TEST'],
       },
     ],
@@ -250,7 +250,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Hipot Test',
-        to: '/production/serialnoaql/QC-HT005/Hipot Test/Testing Station Hipot Test',
+        to: '/production/serialnoaql/QC-HT005/Hipot Test/QC Station Hipot Test',
         permissions: ['ADMIN', 'HIPOT_TEST','PIC_HIPOT'],
       },
     ],
@@ -266,7 +266,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test Bench 1',
-        to: '/production/serialnoaql/QC-TB1006/Test Bench 1/Testing Station Test Bench1',
+        to: '/production/serialnoaql/QC-TB1006/Test Bench 1/QC Station Test Bench1',
         permissions: ['ADMIN',  'TEST_BENCH1'],
       },
     ],
@@ -283,7 +283,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Ultrasonic',
-        to: '/production/serialnoaql/QC-U015/Ultrasonic Test/Testing Station Ultra Sonic',
+        to: '/production/serialnoaql/QC-U015/Ultrasonic Test/QC Station Ultra Sonic',
         permissions: ['ADMIN', 'ULTRA_SONIC'],
       },
     ],
@@ -315,7 +315,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test Bench 2',
-        to: '/production/serialnoaql/QC-TB2014/Test Bench 2/Testing Station Test Bench2',
+        to: '/production/serialnoaql/QC-TB2014/Test Bench 2/QC Station Test Bench2',
         permissions: ['ADMIN',  'TEST_BENCH2'],
       },
     ],
@@ -399,8 +399,8 @@ const _nav = [
       // },
       {
         component: CNavItem,
-        name: 'QC Cover & Finishing',
-        to: '/production/serialnoaql/QC-C001/QC Cover & Finishing/QC Cover and Finishing',
+        name: 'QC Cover',
+        to: '/production/serialnoaql/QC-C001/QC Cover/QC Cover',
         permissions: ['ADMIN',  'QC_COVER'],
       },
       {
@@ -418,8 +418,16 @@ const _nav = [
   },
   {
     component: CNavItem,
+    name: 'Sampling',
+    to: '/performance/sampling/QC-PTS001/QC Performance Sampling/QC Performance',
+    icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
+    permissions: ['ADMIN'],
+    
+  },
+  {
+    component: CNavItem,
     name: 'Performance Test',
-    to: '/performance/sampling/QC-PTS001/QC Performance/QC Performance Stage',
+    to: '/performance/QC-PT001/QC Performance/QC Station Performance Test',
     icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
     permissions: ['ADMIN'],
     

@@ -27,6 +27,7 @@ const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc
 
 //QCPerformance
 const PerformaceSampling = React.lazy(() => import('./views/performance/ScanSamplingPerformance'))
+const QCPerformanceAql = React.lazy(() => import('./views/performance/QCPerformanceAql'))
 
 // Assembly
 const PlnOrder = React.lazy(() => import('./views/production/assembly/PlnOrder'))
@@ -506,6 +507,13 @@ const routes = [
       </DefaultLayout>
     </PrivateRoutes>
   ) },
+  { path: '/performance/:qcIdParams/:qcNameParams/:qcPlaceParams', name: 'Qc Performance', element: (
+    <PrivateRoutes requiredPermission={['ADMIN']}>
+      <DefaultLayout>
+        <QCPerformanceAql />
+      </DefaultLayout>
+    </PrivateRoutes>
+  ) },
   { path: '/performance/sampling', name: 'Sampling', element: (
     <PrivateRoutes
         requiredPermission={[
@@ -537,6 +545,7 @@ const routes = [
       </DefaultLayout>
     </PrivateRoutes>
   ) },
+  
   { path: '/repair', name: 'Repair' },
   {
     path: '/repair/:qcIdParams/:qcNameParams/:qcPlaceParams',
