@@ -340,24 +340,25 @@ const PrintLaser = () => {
 
   // ============ STEP 7-8: Scan Barcode hasil print ============
   const handleBarcodeScanned = (e) => {
-    // Auto-proceed ketika barcode terisi dan cocok
+    // Auto-proceed ketika barcode terisi dan cocok dengan Serial Number
     const barcodeValue = e.target.value.trim()
+    const expectedSerial = serialNumber.trim()
     
-    if (barcodeValue && barcodeValue === generatedPlnSerial.trim()) {
-      // Barcode cocok, lock input barcode dan focus ke QR Code
+    if (barcodeValue && barcodeValue === expectedSerial) {
+      // Barcode cocok dengan Serial Number, lock input barcode dan focus ke QR Code
       setErrorMessage(null)
       setIsBarcodeLocked(true)
-      toast.success('Barcode matched! Please scan QR Code.')
+      toast.success('Barcode matched with Serial Number! Please scan QR Code.')
       setTimeout(() => {
         qrCodeInputRef.current?.focus()
       }, 100)
-    } else if (barcodeValue && barcodeValue !== generatedPlnSerial.trim()) {
-      // Barcode tidak cocok
+    } else if (barcodeValue && barcodeValue !== expectedSerial) {
+      // Barcode tidak cocok dengan Serial Number
       setErrorMessage(
-        `Barcode mismatch!\nExpected: ${generatedPlnSerial}\nScanned: ${barcodeValue}`,
+        `Barcode mismatch!\nExpected Serial Number: ${expectedSerial}\nScanned Barcode: ${barcodeValue}`,
       )
       setErrorSerialNumber(barcodeValue)
-      toast.error('Barcode print result does not match!')
+      toast.error('Barcode does not match Serial Number!')
       setScannedBarcode('')
       setIsBarcodeLocked(false)
     }
@@ -365,29 +366,29 @@ const PrintLaser = () => {
 
   // ============ STEP 7-8: Scan QR Code hasil print ============
   const handleQrCodeScanned = (e) => {
-    // Auto-proceed ketika QR code terisi dan cocok
+    // Auto-proceed ketika QR code terisi dan cocok dengan PLN Serial
     const qrValue = e.target.value.trim()
     const plnSerial = generatedPlnSerial.trim()
     const barcodeValue = scannedBarcode.trim()
+    const expectedSerial = serialNumber.trim()
     
     if (!qrValue) return
     
     // Validasi QR Code dengan PLN Serial
     const qrMatchesPln = qrValue === plnSerial
-    // Validasi Barcode dengan PLN Serial
-    const barcodeMatchesPln = barcodeValue === plnSerial
-    // Validasi QR Code dengan Barcode
-    const qrMatchesBarcode = qrValue === barcodeValue
+    // Validasi Barcode dengan Serial Number (sudah divalidasi sebelumnya, tapi double check)
+    const barcodeMatchesSerial = barcodeValue === expectedSerial
     
-    if (qrMatchesPln && barcodeMatchesPln && qrMatchesBarcode) {
+    if (qrMatchesPln && barcodeMatchesSerial) {
       // Semua cocok - Lock QR Code dan Tampilkan QC Questions
       setIsQrCodeLocked(true)
       setCurrentStep('QC_QUESTIONS')
       setErrorMessage(null)
       toast.success(
-        `✓ QR Code MATCHED with Barcode and PLN Serial!\n` +
-        `PLN: ${plnSerial}\n` +
-        `All validations passed. Please answer QC questions.`
+        `✓ Validation Passed!\n` +
+        `Barcode matches Serial Number: ${expectedSerial}\n` +
+        `QR Code matches PLN Serial: ${plnSerial}\n` +
+        `Please answer QC questions.`
       )
       
       // Auto scroll ke QC Questions section
@@ -401,6 +402,14 @@ const PrintLaser = () => {
       // Ada yang tidak cocok - tampilkan detail error
       let errorDetails = []
       
+      if (!barcodeMatchesSerial) {
+        errorDetails.push(`✗ Barcode does NOT match Serial Number`)
+        errorDetails.push(`  Expected Serial: ${expectedSerial}`)
+        errorDetails.push(`  Scanned Barcode: ${barcodeValue}`)
+      } else {
+        errorDetails.push(`✓ Barcode matches Serial Number`)
+      }
+      
       if (!qrMatchesPln) {
         errorDetails.push(`✗ QR Code does NOT match PLN Serial`)
         errorDetails.push(`  Expected PLN: ${plnSerial}`)
@@ -409,28 +418,16 @@ const PrintLaser = () => {
         errorDetails.push(`✓ QR Code matches PLN Serial`)
       }
       
-      if (!barcodeMatchesPln) {
-        errorDetails.push(`✗ Barcode does NOT match PLN Serial`)
-        errorDetails.push(`  Expected PLN: ${plnSerial}`)
-        errorDetails.push(`  Scanned Barcode: ${barcodeValue}`)
-      } else {
-        errorDetails.push(`✓ Barcode matches PLN Serial`)
-      }
-      
-      if (!qrMatchesBarcode) {
-        errorDetails.push(`✗ QR Code does NOT match Barcode`)
-      } else {
-        errorDetails.push(`✓ QR Code matches Barcode`)
-      }
-      
       const errorMsg = errorDetails.join('\n')
       setErrorMessage(errorMsg)
       setErrorSerialNumber(qrValue)
-      toast.error('QR Code validation failed! Check details below.')
+      toast.error('Validation failed! Check details below.')
       setScannedQrCode('')
       
       // Focus kembali ke input yang bermasalah
-      if (!barcodeMatchesPln) {
+      if (!barcodeMatchesSerial) {
+        setScannedBarcode('')
+        setIsBarcodeLocked(false)
         setTimeout(() => {
           barcodeInputRef.current?.focus()
         }, 100)
@@ -601,7 +598,7 @@ const PrintLaser = () => {
                         onKeyDown={handleQrCodeKeyDown}
                         ref={qrCodeInputRef}
                         autoComplete="off"
-                        disabled={isQrCodeLocked || !scannedBarcode || scannedBarcode.trim() !== generatedPlnSerial.trim()}
+                        disabled={isQrCodeLocked || !isBarcodeLocked}
                       />
                     </FormRow>
                   </>
