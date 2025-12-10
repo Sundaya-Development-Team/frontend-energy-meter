@@ -337,7 +337,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Aging',
-        to: '/production/serialaql/QC-AT007/Aging/Testing Station Aging Test',
+        to: '/production/serialaql/QC-AT007/Aging/Aging Test Station',
       },
      
     ],

@@ -401,6 +401,7 @@ const QcSerialNoAql = () => {
             <CCard className="mb-4">
               <CCardHeader>
                 <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
+                <div className="small text-muted">{qcPlaceParams}</div>
               </CCardHeader>
               <CCardBody>
                 <FormRow label="Production Serial Number">

@@ -105,7 +105,7 @@ const ScanBeforePerformance = () => {
         <CCard className="mb-4 h-100">
           <CCardHeader>
             <strong>{qcNameParams || 'QC Performance Test Sample'}</strong>
-            <div className="small text-muted">{qcPlaceParams}</div>
+            <div className="small text-muted">{qcPlaceParams} - Sampling Unit</div>
           </CCardHeader>
           <CCardBody>
             <FormRow label="Product Serial Number">
