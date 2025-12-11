@@ -327,17 +327,20 @@ const _nav = [
     name: 'Aging Test',
     to: '/production/aging',
     icon: <CIcon icon={cilCog} customClassName="nav-icon" />,
+    permissions: ['ADMIN',  'AGING_TEST'],
     items: [
      
       {
         component: CNavItem,
         name: 'Scan Before',
         to: '/production/aging/before',
+        permissions: ['ADMIN',  'AGING_TEST'],
       },
       {
         component: CNavItem,
         name: 'QC Aging',
         to: '/production/serialaql/QC-AT007/Aging/Aging Test Station',
+        permissions: ['ADMIN',  'AGING_TEST'],
       },
      
     ],
