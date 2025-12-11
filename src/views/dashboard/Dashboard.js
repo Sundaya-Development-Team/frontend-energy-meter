@@ -153,11 +153,24 @@ const DashboardPLN = () => {
 
                     <CCollapse visible={expanded[asm.assembly_id]}>
                       <CListGroup>
-                        {asm.qc_status_breakdown.map((qc) => (
-                          <CListGroupItem key={qc.qc_id}>
-                            {qc.qc_name} : <strong>{qc.count}</strong>
-                          </CListGroupItem>
-                        ))}
+                        {asm.qc_progress_by_id.map((qc) => {
+                          const isQcCompleted = qc.completed === qc.total && qc.total > 0
+                          return (
+                            <CListGroupItem
+                              key={qc.qc_id}
+                              className="d-flex justify-content-between align-items-center"
+                            >
+                              <span>
+                                {qc.qc_name} : <strong>{qc.completed} / {qc.total}</strong>
+                              </span>
+                              {/* {isQcCompleted ? (
+                                <span className="badge bg-success">Completed</span>
+                              ) : (
+                                <span className="badge bg-info">Running</span>
+                              )} */}
+                            </CListGroupItem>
+                          )
+                        })}
                       </CListGroup>
                     </CCollapse>
                   </div>
