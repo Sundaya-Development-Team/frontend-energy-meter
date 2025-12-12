@@ -226,7 +226,21 @@ const routes = [
     path: '/tracking/list',
     name: 'Tracking Product List',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN',
+      'PO_RECEIVING',
+      'QC_RECEIVING',
+      'QC_SUB_ASSEMBLY',
+      'QC_ASSEMBLY',
+      'ON_TEST',
+      'HIPOT_TEST',
+      'PIC_HIPOT',
+      'TEST_BENCH1',
+      'ULTRA_SONIC',
+      'QC_REF_METER',
+      'TEST_BENCH2',
+      'AGING_TEST',
+      'LASER_PRINT',
+      'QC_COVER']}>
         <DefaultLayout>
           <TrackingList />
         </DefaultLayout>
@@ -237,7 +251,21 @@ const routes = [
     path: '/tracking/detail/:trackingId',
     name: 'Tracking Detail',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
+      <PrivateRoutes requiredPermission={['ADMIN',
+      'PO_RECEIVING',
+      'QC_RECEIVING',
+      'QC_SUB_ASSEMBLY',
+      'QC_ASSEMBLY',
+      'ON_TEST',
+      'HIPOT_TEST',
+      'PIC_HIPOT',
+      'TEST_BENCH1',
+      'ULTRA_SONIC',
+      'QC_REF_METER',
+      'TEST_BENCH2',
+      'AGING_TEST',
+      'LASER_PRINT',
+      'QC_COVER']}>
         <DefaultLayout>
           <TrackingDetail />
         </DefaultLayout>
