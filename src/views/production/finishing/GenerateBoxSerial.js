@@ -22,7 +22,7 @@ const getOperatorName = () => {
   try {
     return localStorage.getItem('name') || 'Unknown Operator'
   } catch (error) {
-    console.error('Failed to read operator name:', error)
+    // console.error('Failed to read operator name:', error)
     return 'Unknown Operator'
   }
 }
@@ -65,12 +65,15 @@ const GenerateBoxSerial = () => {
 
       toast.success(response.data?.message || responseData?.message || 'Scan berhasil!')
     } catch (error) {
-      console.error('Error scanning box serial:', error)
+      // console.error('Error scanning box serial:', error)
       toast.error(error.response?.data?.message || 'Scan gagal, silakan coba lagi')
+      
     } finally {
       setIsSubmitting(false)
       setScanValue('')
-      scanInputRef.current?.focus()
+      setTimeout(() => {
+        scanInputRef.current?.focus()
+      }, 100)
     }
   }, [])
 
