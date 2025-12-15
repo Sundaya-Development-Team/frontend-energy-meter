@@ -12,6 +12,11 @@ import {
   CButton,
   CFormTextarea,
   CFormSwitch,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
 import { backendGenerate, backendQc, backendTracking } from '../../../api/axios'
@@ -57,6 +62,7 @@ const PrintLaser = () => {
   const [showPrintButton, setShowPrintButton] = useState(false)
   const [isBarcodeLocked, setIsBarcodeLocked] = useState(false)
   const [isQrCodeLocked, setIsQrCodeLocked] = useState(false)
+  const [showPrintConfirmModal, setShowPrintConfirmModal] = useState(false)
 
   // Refs
   const serialInputRef = useRef(null)
@@ -130,6 +136,7 @@ const PrintLaser = () => {
     setShowPrintButton(false)
     setIsBarcodeLocked(false)
     setIsQrCodeLocked(false)
+    setShowPrintConfirmModal(false)
     serialInputRef.current?.focus()
   }
 
@@ -302,7 +309,19 @@ const PrintLaser = () => {
   }
 
   // ============ STEP 5-6: Print Laser (kirim perintah ke mesin) ============
+  // Fungsi untuk membuka popup konfirmasi print
+  const openPrintConfirmModal = () => {
+    setShowPrintConfirmModal(true)
+  }
+
+  // Fungsi untuk menutup popup konfirmasi print
+  const closePrintConfirmModal = () => {
+    setShowPrintConfirmModal(false)
+  }
+
+  // Fungsi untuk melakukan print setelah konfirmasi
   const handlePrintLaser = async () => {
+    setShowPrintConfirmModal(false)
     setCurrentStep('PRINTING')
 
     if (!user || !user.name) {
@@ -624,13 +643,43 @@ const PrintLaser = () => {
                 </CCardHeader>
                 <CCardBody>
                   <div className="d-grid gap-2">
-                    <CButton color="success" onClick={handlePrintLaser} size="lg">
+                    <CButton color="success" onClick={openPrintConfirmModal} size="lg">
                       🖨️ Print Laser {postName}
                     </CButton>
                   </div>
                 </CCardBody>
               </CCard>
             )}
+
+            {/* Print Confirmation Modal */}
+            <CModal visible={showPrintConfirmModal} onClose={closePrintConfirmModal} alignment="center">
+              <CModalHeader>
+                <CModalTitle>Print Laser Confirmation</CModalTitle>
+              </CModalHeader>
+              <CModalBody>
+                <div className="text-center">
+                  <p className="mb-3">
+                    <strong>Are you sure you want to print the laser label?</strong>
+                  </p>
+                  <div className="bg-light p-3 rounded mb-3">
+                    <p className="mb-1"><strong>Serial Number:</strong> {serialNumber}</p>
+                    <p className="mb-1"><strong>PLN Serial:</strong> {generatedPlnSerial}</p>
+                    <p className="mb-0"><strong>Station:</strong> {postName}</p>
+                  </div>
+                  <p className="text-muted small">
+                    Please ensure the laser machine is ready and the material is properly installed.
+                  </p>
+                </div>
+              </CModalBody>
+              <CModalFooter>
+                <CButton color="secondary" onClick={closePrintConfirmModal}>
+                  Cancel
+                </CButton>
+                <CButton color="success" onClick={handlePrintLaser}>
+                  🖨️ Yes, Print Now
+                </CButton>
+              </CModalFooter>
+            </CModal>
 
             {/* Status Printing */}
             {currentStep === 'PRINTING' && (
