@@ -17,6 +17,7 @@ import {
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard6 } from '../../components/CounterCard'
+import ErrorCard from '../../components/ErrorCard'
 import SuccessCard from '../../components/SuccessCard'
 import '../../../scss/style.scss'
 
@@ -394,7 +395,7 @@ const QcAqlSerial = () => {
             </CCard>
 
             {/* Quality Control */}
-            <CCard className="mb-4 flex-grow-1">
+            <CCard>
               <CCardHeader>
                 <strong>Quality Control</strong>
               </CCardHeader>
@@ -444,29 +445,19 @@ const QcAqlSerial = () => {
           <CCol md={4} className="d-flex flex-column">
             {errorMessage ? (
               /* Error Card */
-              <CCard className="mb-4 h-100 d-flex flex-column error-card">
-                <CCardHeader className="error-card-header">
-                  <strong>⚠️ Error</strong>
-                </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center align-items-center flex-grow-1 error-card-body">
-                  <div className="text-center">
-                    <div className="error-icon">❌</div>
-                    <h4 className="error-title">ERROR</h4>
-                    {errorSerialNumber && (
-                      <div className="error-serial-number">Serial: {errorSerialNumber}</div>
-                    )}
-                    <p className="error-message">{errorMessage}</p>
-                  </div>
-                </CCardBody>
-              </CCard>
+              <ErrorCard
+                serialNumber={errorSerialNumber}
+                message={errorMessage}
+                fullHeight={true}
+              />
             ) : (
               <div className="h-100 d-flex flex-column">
                 {/* Counter Card */}
-                <CCard className="mb-4 flex-grow-1 d-flex flex-column">
+                <CCard className={`d-flex flex-column ${successValidation ? 'mb-4' : 'h-100'}`}>
                   <CCardHeader>
                     <strong>Counter</strong>
                   </CCardHeader>
-                  <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
+                  <CCardBody className={`${!successValidation ? 'd-flex flex-column justify-content-center flex-grow-1' : ''}`}>
                     <CRow className="mb-3">
                       <CounterCard6
                         title="Required Sample"
@@ -490,10 +481,13 @@ const QcAqlSerial = () => {
 
                 {/* Success Card */}
                 {successValidation && (
-                  <SuccessCard
-                    serialNumber={successValidation.serialNumber}
-                    message={successValidation.message}
-                  />
+                  <div className="flex-grow-1">
+                    <SuccessCard
+                      serialNumber={successValidation.serialNumber}
+                      message={successValidation.message}
+                      fullHeight={true}
+                    />
+                  </div>
                 )}
               </div>
             )}

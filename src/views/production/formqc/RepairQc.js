@@ -18,7 +18,6 @@ import {
   cilBarcode,
   cilSettings,
   cilCheckCircle,
-  cilXCircle,
   cilNotes,
   cilInfo,
   cilWarning,
@@ -27,7 +26,7 @@ import {
 
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
-import SuccessCard from '../../components/SuccessCard'
+import StatusCard from '../../components/StatusCard'
 import { useAuth } from '../../../context/AuthContext'
 import '../../../scss/style.scss'
 
@@ -53,20 +52,6 @@ const styles = {
     fontSize: '1rem',
     fontWeight: '500',
     color: '#212529',
-  },
-  statusCard: {
-    minHeight: '280px',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  iconWrapper: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 auto 16px',
   },
 }
 
@@ -297,7 +282,7 @@ const QcAqlSerial = () => {
           <CCardHeader className="d-flex align-items-center gap-2">
             <CIcon icon={cilBarcode} />
             <strong>Scan & Input</strong>
-          </CCardHeader>
+              </CCardHeader>
               <CCardBody>
             {/* Product Name Badge */}
             <div className="text-center mb-4">
@@ -361,17 +346,17 @@ const QcAqlSerial = () => {
                 <CIcon icon={cilTask} size="sm" className="me-1" />
                 Repair Notes <span className="text-danger">*</span>
               </CFormLabel>
-              <CFormTextarea
-                rows={3}
+                  <CFormTextarea
+                    rows={3}
                 name="repairNotes"
                 value={formData.repairNotes}
-                onChange={handleInput}
+                    onChange={handleInput}
                 placeholder="Describe the repair action taken..."
                 ref={repairNotesRef}
                 style={{
                   resize: 'none',
                 }}
-              />
+                  />
             </div>
               </CCardBody>
             </CCard>
@@ -383,7 +368,7 @@ const QcAqlSerial = () => {
           <CCardHeader className="d-flex align-items-center gap-2">
             <CIcon icon={cilInfo} />
             <strong>Repair Details</strong>
-          </CCardHeader>
+              </CCardHeader>
               <CCardBody>
             {/* Item Code */}
             <div style={styles.infoItem}>
@@ -443,84 +428,13 @@ const QcAqlSerial = () => {
 
       {/* Status Card */}
       <CCol lg={4} md={12}>
-            {errorMessage ? (
-          /* Error Card - Merah */
-          <CCard className="h-100" style={styles.statusCard}>
-            <CCardHeader className="bg-danger text-white d-flex align-items-center gap-2">
-              <CIcon icon={cilXCircle} />
-              <strong>Error</strong>
-                </CCardHeader>
-            <CCardBody className="d-flex flex-column justify-content-center align-items-center">
-              <div
-                style={{
-                  ...styles.iconWrapper,
-                  backgroundColor: 'rgba(229, 83, 83, 0.15)',
-                }}
-              >
-                <CIcon icon={cilXCircle} size="3xl" style={{ color: '#e55353' }} />
-              </div>
-                    {errorSerialNumber && (
-                <CBadge color="danger" className="mb-3 px-3 py-2">
-                  Serial: {errorSerialNumber}
-                </CBadge>
-              )}
-              <p
-                className="text-center text-danger mb-0"
-                style={{ fontSize: '1rem', fontWeight: '500' }}
-              >
-                {errorMessage}
-              </p>
-                </CCardBody>
-              </CCard>
-            ) : successValidation ? (
-          /* Success Card - Hijau */
-          <CCard className="h-100" style={styles.statusCard}>
-            <CCardHeader className="bg-success text-white d-flex align-items-center gap-2">
-              <CIcon icon={cilCheckCircle} />
-              <strong>Valid</strong>
-            </CCardHeader>
-            <CCardBody className="d-flex flex-column justify-content-center align-items-center">
-              <div
-                style={{
-                  ...styles.iconWrapper,
-                  backgroundColor: 'rgba(46, 184, 92, 0.15)',
-                }}
-              >
-                <CIcon icon={cilCheckCircle} size="3xl" style={{ color: '#2eb85c' }} />
-              </div>
-              <CBadge color="success" className="mb-3 px-3 py-2">
-                Serial: {successValidation.serialNumber}
-              </CBadge>
-              <p
-                className="text-center text-success mb-0"
-                style={{ fontSize: '1rem', fontWeight: '500' }}
-              >
-                {successValidation.message}
-              </p>
-            </CCardBody>
-          </CCard>
-        ) : (
-          /* Status Info Card - Abu-abu */
-          <CCard className="h-100" style={styles.statusCard}>
-            <CCardHeader className="d-flex align-items-center gap-2">
-              <CIcon icon={cilBarcode} />
-              <strong>Status</strong>
-            </CCardHeader>
-            <CCardBody className="d-flex flex-column justify-content-center align-items-center">
-              <div
-                style={{
-                  ...styles.iconWrapper,
-                  backgroundColor: 'rgba(108, 117, 125, 0.1)',
-                }}
-              >
-                <CIcon icon={cilBarcode} size="3xl" style={{ color: '#6c757d' }} />
-                  </div>
-              <p className="text-center text-muted mb-0" style={{ fontSize: '1rem' }}>
-                Scan serial number to start QC Repair
-              </p>
-                </CCardBody>
-              </CCard>
-            )}
+        <StatusCard
+          errorMessage={errorMessage}
+          errorSerialNumber={errorSerialNumber}
+          successValidation={successValidation}
+          waitingMessage="Scan serial number to start QC Repair"
+          waitingTitle="Status"
+        />
       </CCol>
 
       {/* Submit Repair Card */}
@@ -537,7 +451,7 @@ const QcAqlSerial = () => {
                   <div>
                     <span className="text-muted">Ready to submit repair for </span>
                     <strong>{productData?.serial_number}</strong>
-                  </div>
+                    </div>
                   <CButton type="submit" color="primary">
                     <CIcon icon={cilCheckCircle} className="me-2" />
                     Submit Repair
