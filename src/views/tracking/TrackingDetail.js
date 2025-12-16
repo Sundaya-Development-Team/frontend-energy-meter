@@ -107,6 +107,14 @@ const TrackingDetail = () => {
     }
   }
 
+  const handleProductDetail = () => {
+    if (detail?.product?.sap_code) {
+      navigate(`/masterdata/product/detail/${detail.product.sap_code}`)
+    } else {
+      toast.error('SAP Code tidak tersedia')
+    }
+  }
+
   return (
     <>
       {/* Card Detail */}
@@ -121,8 +129,8 @@ const TrackingDetail = () => {
           <div className="mb-4 space-y-2">
             <CRow className="mb-3">
               <CCol md={6}>
-                <div className="fw-semibold">Tracking ID</div>
-                <div>{detail.id}</div>
+                <div className="fw-semibold">Tracking ID / SAP Code</div>
+                <div>{detail.id} / {detail.product?.sap_code}</div>
               </CCol>
               <CCol md={6}>
                 <div className="fw-semibold">PCB Serial Number</div>
@@ -185,6 +193,14 @@ const TrackingDetail = () => {
                   {detail.status}
                 </CBadge>
               </CCol>
+            </CRow>
+
+            <CRow className="mb-3">
+              <CCol md={6}>
+                <div className="fw-semibold">Detail Product</div>
+                <div> <CButton size="sm" color="primary" onClick={handleProductDetail}>Detail</CButton></div>
+              </CCol>
+              
             </CRow>
           </div>
         </CCardBody>

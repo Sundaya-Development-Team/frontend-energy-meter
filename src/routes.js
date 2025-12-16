@@ -66,6 +66,7 @@ const GenerateBoxSerial = React.lazy(() => import('./views/production/finishing/
 //Master Data
 //Master Product
 const Product = React.lazy(() => import('./views/admins/product/ProductPage'))
+const ProductDetail = React.lazy(() => import('./views/admins/product/ProductDetail'))
 
 //MAster Supplier
 const Supplier = React.lazy(() => import('./views/admins/supplier/SupplierPage'))
@@ -596,6 +597,31 @@ const routes = [
       <PrivateRoutes requiredPermission={['ADMIN']}>
         <DefaultLayout>
           <Product />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/masterdata/product/detail/:sapCode',
+    name: 'Product Detail',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN',
+      'PO_RECEIVING',
+      'QC_RECEIVING',
+      'QC_SUB_ASSEMBLY',
+      'QC_ASSEMBLY',
+      'ON_TEST',
+      'HIPOT_TEST',
+      'PIC_HIPOT',
+      'TEST_BENCH1',
+      'ULTRA_SONIC',
+      'QC_REF_METER',
+      'TEST_BENCH2',
+      'AGING_TEST',
+      'LASER_PRINT',
+      'QC_COVER']}>
+        <DefaultLayout>
+          <ProductDetail />
         </DefaultLayout>
       </PrivateRoutes>
     ),

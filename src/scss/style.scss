@@ -364,3 +364,178 @@ body {
 /* ==========================
    END Success Card Styles
    ========================== */
+
+/* ==========================
+   Not Found Card Styles - NotFoundCard.js
+   ========================== */
+
+/* Container utama untuk not found content */
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  min-height: 300px;
+}
+
+/* Wrapper untuk icon warning */
+.not-found-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #fff3cd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Icon warning */
+.not-found-icon {
+  width: 40px;
+  height: 40px;
+  color: #856404;
+}
+
+/* Title untuk not found */
+.not-found-title {
+  color: #495057;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Message untuk not found */
+.not-found-message {
+  color: #6c757d;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+/* Search value yang di-highlight */
+.not-found-search-value {
+  color: #495057;
+}
+
+/* Container untuk action buttons */
+.not-found-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ==========================
+   END Not Found Card Styles
+   ========================== */
+
+/* ==========================
+   Product Detail Styles - ProductDetail.js
+   ========================== */
+
+/* Label untuk detail info */
+.product-detail-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Separator/pemisah titik dua */
+.product-detail-separator {
+  color: #6c757d;
+}
+
+/* Value untuk detail info */
+.product-detail-value {
+  color: #212529;
+  font-weight: 500;
+}
+
+/* Container gambar produk */
+.product-image-container {
+  text-align: center;
+}
+
+/* Gambar produk thumbnail */
+.product-image-thumbnail {
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  max-height: 250px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  padding: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-image-thumbnail:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Placeholder ketika tidak ada gambar */
+.product-image-placeholder {
+  width: 200px;
+  height: 200px;
+  background-color: #f8f9fa;
+  border: 1px dashed #dee2e6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Text hint di bawah gambar */
+.product-image-hint {
+  margin-top: 0.5rem;
+}
+
+/* Gambar di modal */
+.product-modal-image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+/* ==========================
+   END Product Detail Styles
+   ========================== */
+
+/* ==========================
+   Common Utility Classes
+   ========================== */
+
+/* Loading container */
+.loading-container {
+  height: 300px;
+}
+
+/* Cursor utilities */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+/* Table column widths */
+.table-col-no {
+  width: 60px;
+}
+
+.table-col-action {
+  width: 100px;
+}
+
+/* Pagination select */
+.pagination-select {
+  width: 80px;
+}
+
+/* ==========================
+   END Common Utility Classes
+   ========================== */
