@@ -6,59 +6,95 @@ import {
   CCol,
   CCardBody,
   CCardHeader,
-  CBadge,
   CFormLabel,
   CFormInput,
   CButton,
   CForm,
   CFormTextarea,
-  CFormSwitch,
+  CBadge,
 } from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import {
+  cilBarcode,
+  cilSettings,
+  cilCheckCircle,
+  cilXCircle,
+  cilNotes,
+  cilInfo,
+  cilWarning,
+  cilTask,
+} from '@coreui/icons'
 
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
-import { CounterCard6 } from '../../components/CounterCard'
 import SuccessCard from '../../components/SuccessCard'
 import { useAuth } from '../../../context/AuthContext'
 import '../../../scss/style.scss'
 
-const FormRow = ({ label, children }) => (
-  <CRow className="mb-3 align-items-center">
-    <CCol md={4}>
-      <CFormLabel className="fw-semibold">{label}</CFormLabel>
-    </CCol>
-    <CCol md={8}>{children}</CCol>
-  </CRow>
-)
+// Custom styles for RepairQc
+const styles = {
+  infoItem: {
+    padding: '12px 16px',
+    borderRadius: '8px',
+    backgroundColor: '#f8f9fa',
+    marginBottom: '12px',
+    border: '1px solid #e9ecef',
+    transition: 'all 0.2s ease',
+  },
+  infoLabel: {
+    fontSize: '0.75rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    color: '#6c757d',
+    marginBottom: '4px',
+    fontWeight: '600',
+  },
+  infoValue: {
+    fontSize: '1rem',
+    fontWeight: '500',
+    color: '#212529',
+  },
+  statusCard: {
+    minHeight: '280px',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  iconWrapper: {
+    width: '80px',
+    height: '80px',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 auto 16px',
+  },
+}
 
 const QcAqlSerial = () => {
   const { user } = useAuth()
   const { qcIdParams, qcPlaceParams } = useParams()
   const [productData, setProductData] = useState(null)
-  // const [trackingProduct, setTrackingProduct] = useState(null)
-  const [answers, setAnswers] = useState({})
-  const [questionData, setQuestionData] = useState([])
   const [qcName, setQcName] = useState([])
   const qcCodeSerial = qcIdParams
-  const [formData, setFormData] = useState({ serialNumber: '' })
+  const [formData, setFormData] = useState({ serialNumber: '', repairNotes: '' })
   const [isFormLocked, setIsFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
+  const repairNotesRef = useRef(null)
   const [repairInfo, setRepairInfo] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
-  const [successValidation, setSuccessValidation] = useState(null) // untuk success card
+  const [successValidation, setSuccessValidation] = useState(null)
+  const [existingNotes, setExistingNotes] = useState('') // Notes from database
 
   const resetStates = () => {
     setProductData(null)
-    // setTrackingProduct(null)
-    setQuestionData([])
-    setAnswers({})
     setRepairInfo(null)
-    setFormData({ serialNumber: '', notes: '' })
+    setFormData({ serialNumber: '', repairNotes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
     setSuccessValidation(null)
     setIsFormLocked(false)
+    setExistingNotes('')
   }
 
   useEffect(() => {
@@ -72,24 +108,24 @@ const QcAqlSerial = () => {
   }
 
   const handleSerial = () => {
-    console.log('Serial Number di-scan:', formData.serialNumber)
+    console.log('Serial Number scanned:', formData.serialNumber)
 
-    // Simpan serial number sebelum reset
+    // Save serial number before reset
     const currentSerialNumber = formData.serialNumber
 
-    // Bersihkan semua state dan clear input field
+    // Clear all states and input field
     setProductData(null)
-    setQuestionData([])
-    setAnswers({})
     setRepairInfo(null)
     setErrorMessage(null)
     setErrorSerialNumber(null)
     setSuccessValidation(null)
-    setFormData({ serialNumber: '', notes: '' })
+    setFormData({ serialNumber: '', repairNotes: '' })
+    setExistingNotes('')
 
-    // Panggil fetch validasi serial
+    // Call fetch validation serial
     fetchValidationSnumb(currentSerialNumber)
   }
+
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
     console.log('qcCodeSerial :', qcCodeSerial)
@@ -105,27 +141,15 @@ const QcAqlSerial = () => {
         setErrorMessage(null)
         setErrorSerialNumber(null)
 
-        // Set success validation untuk success card
+        // Set success validation for success card
         setSuccessValidation({
           serialNumber: serialNumber,
           message: response.data.message ?? 'Serial number valid for repair',
         })
 
-        const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
-          id: Number(id),
-          question: text,
-        }))
-
         setQcName(response.data.fail_qc_name)
-        setQuestionData(convertedQuestions)
 
-        const initialAnswers = {}
-        convertedQuestions.forEach((q) => {
-          initialAnswers[q.id] = true
-        })
-        setAnswers(initialAnswers)
-
-        // simpan info mode repair
+        // Save repair mode info
         setRepairInfo({
           mode: response.data.mode,
           message: response.data.message,
@@ -133,26 +157,25 @@ const QcAqlSerial = () => {
           fail_qc_name: response.data.fail_qc_name,
         })
 
+        // Save notes from database if available
+        setExistingNotes(response.data.notes ?? '')
+
         fetchProduct(serialNumber)
       } else {
         const errorMsg = response.data.message ?? 'Serial number already scan'
         setErrorMessage(errorMsg)
-        // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
         setErrorSerialNumber(serialNumber)
-        // toast.error(errorMsg)
       }
     } catch (error) {
       console.log('ERROR')
       const errorMsg = error.response?.data?.message || 'Serial Number Validation Failed'
       setErrorMessage(errorMsg)
-      // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
       setErrorSerialNumber(serialNumber)
-      // toast.error(errorMsg)
     }
   }
 
   const fetchProduct = async (serialNumber) => {
-    console.log('masuk fetch product')
+    console.log('Fetching product data')
     try {
       const response = await backendTracking.get(`/serial/${serialNumber}`)
 
@@ -160,79 +183,64 @@ const QcAqlSerial = () => {
         // toast.success(response.data.message || 'Serial number valid')
         setProductData(response.data.data)
 
-        // isi kembali serial number di form
+        // Refill serial number in form
         setFormData((prev) => ({
           ...prev,
           serialNumber: serialNumber,
         }))
 
-        // Lock serial number field setelah berhasil fetch data
+        // Lock serial number field after successful fetch
         setIsFormLocked(true)
+
+        // Focus to repair notes after successful fetch
+        setTimeout(() => {
+          repairNotesRef.current?.focus()
+        }, 100)
 
         const assemblyId = response.data.data.assembly_id
         console.log('assemblyId :', assemblyId)
       } else {
-        const errorMsg = response.data.message || 'Failed get product data'
+        const errorMsg = response.data.message || 'Failed to get product data'
         setErrorMessage(errorMsg)
-        // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+        // Save serial number for error card display (input field remains empty)
         setErrorSerialNumber(serialNumber)
-        // toast.error(errorMsg)
       }
     } catch (error) {
-      const errorMsg = error.response?.data?.message || 'ERROR get data product'
+      const errorMsg = error.response?.data?.message || 'Error getting product data'
       setErrorMessage(errorMsg)
-      // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
+      // Save serial number for error card display (input field remains empty)
       setErrorSerialNumber(serialNumber)
-      // toast.error(errorMsg)
-    }
-  }
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'pending':
-        return <CBadge color="warning">Pending</CBadge>
-      case 'complete':
-        return <CBadge color="success">Complete</CBadge>
-      case 'reject':
-        return <CBadge color="danger">Reject</CBadge>
-      default:
-        return <CBadge color="secondary">{status}</CBadge>
     }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    // Validasi field wajib
+    // Validate required fields
     if (!productData?.serial_number) {
-      const errorMsg = 'Serial number wajib diisi!'
+      const errorMsg = 'Serial number is required!'
       setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
       return
     }
     if (!user || !user.id || !user.username) {
-      const errorMsg = 'User tidak ditemukan, silakan login kembali!'
+      const errorMsg = 'User not found, please login again!'
       setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
       return
     }
     if (!qcName) {
-      const errorMsg = 'QC Name wajib diisi!'
+      const errorMsg = 'QC Name is required!'
       setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
       return
     }
     if (!qcCodeSerial) {
-      const errorMsg = 'QC ID wajib diisi!'
+      const errorMsg = 'QC ID is required!'
       setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
       return
     }
 
-    if (Object.keys(answers).length === 0) {
-      const errorMsg = 'Jawaban pertanyaan QC wajib diisi!'
+    if (!formData.repairNotes || formData.repairNotes.trim() === '') {
+      const errorMsg = 'Repair notes is required!'
       setErrorMessage(errorMsg)
-      // toast.error(errorMsg)
       return
     }
 
@@ -245,10 +253,9 @@ const QcAqlSerial = () => {
       qc_place: qcPlaceParams || 'Workshop Repair',
       tracking_id: productData.id,
       batch: productData.batch,
-      notes: formData.notes,
+      notes: formData.repairNotes,
       fail_qc_id: repairInfo.fail_qc_id,
       fail_qc_name: repairInfo.fail_qc_name,
-      answers,
     }
 
     try {
@@ -269,33 +276,46 @@ const QcAqlSerial = () => {
       serialNumberInputRef.current.focus()
     } catch (error) {
       console.error('QC submit error:', error)
-      const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QC'
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to submit QC'
       setErrorMessage(errorMsg)
-      // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
       const currentSerialNumber = productData?.serial_number || formData.serialNumber
       if (currentSerialNumber) {
         setErrorSerialNumber(currentSerialNumber)
       }
-      // toast.error(errorMsg)
-      return // Jangan reset states jika ada error
+      return
     }
 
-    // Bersihkan semua state hanya jika submit berhasil
+    // Clear all states only if submit is successful
     resetStates()
   }
 
   return (
-    <CRow>
-      <CCol xs={12}>
-        <CRow className="g-4 mb-4">
-          {/* Scan Serial Number */}
-          <CCol md={4}>
-            <CCard className="mb-4 h-100">
-              <CCardHeader>
-                <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
-              </CCardHeader>
+    <CRow className="g-4">
+      {/* Scan Serial Number Card */}
+      <CCol lg={4} md={6}>
+        <CCard className="h-100">
+          <CCardHeader className="d-flex align-items-center gap-2">
+            <CIcon icon={cilBarcode} />
+            <strong>Scan & Input</strong>
+          </CCardHeader>
               <CCardBody>
-                <FormRow label="Production Serial Number">
+            {/* Product Name Badge */}
+            <div className="text-center mb-4">
+              <CBadge
+                color={productData ? 'success' : 'secondary'}
+                className="px-3 py-2"
+                style={{ fontSize: '0.9rem' }}
+              >
+                {productData?.product?.name ?? 'No Product Selected'}
+              </CBadge>
+            </div>
+
+            {/* Serial Number Input */}
+            <div className="mb-4">
+              <CFormLabel className="fw-semibold small text-uppercase">
+                <CIcon icon={cilBarcode} size="sm" className="me-1" />
+                Production Serial Number
+              </CFormLabel>
                   <CFormInput
                     name="serialNumber"
                     value={formData.serialNumber}
@@ -308,144 +328,230 @@ const QcAqlSerial = () => {
                     }}
                     ref={serialNumberInputRef}
                     disabled={isFormLocked}
-                  />
-                </FormRow>
-                <FormRow label="Notes">
-                  <CFormTextarea
-                    rows={3}
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleInput}
-                  />
-                </FormRow>
+                placeholder="Scan or enter serial number..."
+                className="form-control-lg"
+                style={{
+                  border: isFormLocked ? '2px solid #2eb85c' : '1px solid #ced4da',
+                }}
+              />
+            </div>
+
+            {/* Notes from DB */}
+            <div className="mb-4">
+              <CFormLabel className="fw-semibold small text-uppercase">
+                <CIcon icon={cilNotes} size="sm" className="me-1" />
+                Previous Notes
+              </CFormLabel>
+              <CFormTextarea
+                rows={3}
+                value={existingNotes}
+                readOnly
+                disabled
+                placeholder="Notes from database will appear here..."
+                style={{
+                  backgroundColor: '#ebedef',
+                  resize: 'none',
+                }}
+              />
+            </div>
+
+            {/* Repair Notes */}
+            <div>
+              <CFormLabel className="fw-semibold small text-uppercase">
+                <CIcon icon={cilTask} size="sm" className="me-1" />
+                Repair Notes <span className="text-danger">*</span>
+              </CFormLabel>
+              <CFormTextarea
+                rows={3}
+                name="repairNotes"
+                value={formData.repairNotes}
+                onChange={handleInput}
+                placeholder="Describe the repair action taken..."
+                ref={repairNotesRef}
+                style={{
+                  resize: 'none',
+                }}
+              />
+            </div>
               </CCardBody>
             </CCard>
           </CCol>
 
-          {/* Detail */}
-          <CCol md={4}>
-            <CCard className="mb-4 h-100">
-              <CCardHeader>
-                <strong>Detail</strong>
-              </CCardHeader>
+      {/* Detail Card */}
+      <CCol lg={4} md={6}>
+        <CCard className="h-100">
+          <CCardHeader className="d-flex align-items-center gap-2">
+            <CIcon icon={cilInfo} />
+            <strong>Repair Details</strong>
+          </CCardHeader>
               <CCardBody>
-                <FormRow label="Product Detail :"></FormRow>
-                <CRow className="mb-3">
-                  <CCol md={12}>
-                    <div className="fw-semibold">Item Code</div>
-                    <div> {productData?.code_item ?? '-'}</div>
+            {/* Item Code */}
+            <div style={styles.infoItem}>
+              <div style={styles.infoLabel}>Item Code</div>
+              <div style={styles.infoValue}>{productData?.code_item ?? '-'}</div>
+            </div>
+
+            {/* Mode, Fail QC ID, Fail QC Name in grid */}
+            <CRow className="g-3 mb-3">
+              <CCol xs={12}>
+                <div style={styles.infoItem} className="mb-0">
+                  <div style={styles.infoLabel}>Mode</div>
+                  <div style={styles.infoValue}>
+                    {repairInfo?.mode ? (
+                      <CBadge color="warning" className="px-2 py-1">
+                        {repairInfo.mode}
+                      </CBadge>
+                    ) : (
+                      '-'
+                    )}
+                  </div>
+                </div>
+                  </CCol>
+              <CCol xs={6}>
+                <div style={styles.infoItem} className="mb-0">
+                  <div style={styles.infoLabel}>Fail QC ID</div>
+                  <div style={styles.infoValue}>{repairInfo?.fail_qc_id ?? '-'}</div>
+                </div>
+                  </CCol>
+              <CCol xs={6}>
+                <div style={styles.infoItem} className="mb-0">
+                  <div style={styles.infoLabel}>Fail QC Name</div>
+                  <div style={styles.infoValue}>{repairInfo?.fail_qc_name ?? '-'}</div>
+                </div>
                   </CCol>
                 </CRow>
 
-                <CRow className="mb-3">
-                  <CCol md={4}>
-                    <div className="fw-semibold">Mode</div>
-                    <div>{repairInfo?.mode ?? '-'}</div>
-                  </CCol>
-                  <CCol md={4}>
-                    <div className="fw-semibold">Fail QC ID</div>
-                    <div>{repairInfo?.fail_qc_id ?? '-'}</div>
-                  </CCol>
-                  <CCol md={4}>
-                    <div className="fw-semibold">Fail QC Name</div>
-                    <div>{repairInfo?.fail_qc_name ?? '-'}</div>
-                  </CCol>
-                </CRow>
-
-                <CRow className="mb-3">
-                  {' '}
-                  <CCol md={12}>
-                    <div className="fw-semibold">Message Status</div>
-                    <div>{repairInfo?.message ?? '-'}</div>
-                  </CCol>
-                </CRow>
+            {/* Message Status */}
+            <div
+              style={{
+                ...styles.infoItem,
+                backgroundColor: repairInfo?.message ? '#fff3cd' : '#f8f9fa',
+                borderColor: repairInfo?.message ? '#f9b115' : '#e9ecef',
+              }}
+            >
+              <div style={styles.infoLabel}>
+                <CIcon icon={cilWarning} size="sm" className="me-1" />
+                Message Status
+              </div>
+              <div style={{ ...styles.infoValue, fontSize: '0.9rem' }}>
+                {repairInfo?.message ?? 'No message available'}
+              </div>
+            </div>
               </CCardBody>
             </CCard>
           </CCol>
 
-          {/* Error Card, Success Card, atau Status Info */}
-          <CCol md={4}>
+      {/* Status Card */}
+      <CCol lg={4} md={12}>
             {errorMessage ? (
-              /* Error Card */
-              <CCard className="mb-4 h-100 d-flex flex-column error-card">
-                <CCardHeader className="error-card-header">
-                  <strong>⚠️ Error</strong>
+          /* Error Card - Merah */
+          <CCard className="h-100" style={styles.statusCard}>
+            <CCardHeader className="bg-danger text-white d-flex align-items-center gap-2">
+              <CIcon icon={cilXCircle} />
+              <strong>Error</strong>
                 </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center align-items-center flex-grow-1 error-card-body">
-                  <div className="text-center">
-                    <div className="error-icon">❌</div>
-                    <h4 className="error-title">ERROR</h4>
+            <CCardBody className="d-flex flex-column justify-content-center align-items-center">
+              <div
+                style={{
+                  ...styles.iconWrapper,
+                  backgroundColor: 'rgba(229, 83, 83, 0.15)',
+                }}
+              >
+                <CIcon icon={cilXCircle} size="3xl" style={{ color: '#e55353' }} />
+              </div>
                     {errorSerialNumber && (
-                      <div className="error-serial-number">Serial: {errorSerialNumber}</div>
-                    )}
-                    <p className="error-message">{errorMessage}</p>
-                  </div>
+                <CBadge color="danger" className="mb-3 px-3 py-2">
+                  Serial: {errorSerialNumber}
+                </CBadge>
+              )}
+              <p
+                className="text-center text-danger mb-0"
+                style={{ fontSize: '1rem', fontWeight: '500' }}
+              >
+                {errorMessage}
+              </p>
                 </CCardBody>
               </CCard>
             ) : successValidation ? (
-              /* Success Card */
-              <SuccessCard
-                serialNumber={successValidation.serialNumber}
-                message={successValidation.message}
-              />
-            ) : (
-              /* Status Info Card */
-              <CCard className="mb-4 h-100">
-                <CCardHeader>
-                  <strong>Status</strong>
-                </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center">
-                  <div className="text-center text-muted">
-                    <p>Scan serial number untuk memulai QC Repair</p>
+          /* Success Card - Hijau */
+          <CCard className="h-100" style={styles.statusCard}>
+            <CCardHeader className="bg-success text-white d-flex align-items-center gap-2">
+              <CIcon icon={cilCheckCircle} />
+              <strong>Valid</strong>
+            </CCardHeader>
+            <CCardBody className="d-flex flex-column justify-content-center align-items-center">
+              <div
+                style={{
+                  ...styles.iconWrapper,
+                  backgroundColor: 'rgba(46, 184, 92, 0.15)',
+                }}
+              >
+                <CIcon icon={cilCheckCircle} size="3xl" style={{ color: '#2eb85c' }} />
+              </div>
+              <CBadge color="success" className="mb-3 px-3 py-2">
+                Serial: {successValidation.serialNumber}
+              </CBadge>
+              <p
+                className="text-center text-success mb-0"
+                style={{ fontSize: '1rem', fontWeight: '500' }}
+              >
+                {successValidation.message}
+              </p>
+            </CCardBody>
+          </CCard>
+        ) : (
+          /* Status Info Card - Abu-abu */
+          <CCard className="h-100" style={styles.statusCard}>
+            <CCardHeader className="d-flex align-items-center gap-2">
+              <CIcon icon={cilBarcode} />
+              <strong>Status</strong>
+            </CCardHeader>
+            <CCardBody className="d-flex flex-column justify-content-center align-items-center">
+              <div
+                style={{
+                  ...styles.iconWrapper,
+                  backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                }}
+              >
+                <CIcon icon={cilBarcode} size="3xl" style={{ color: '#6c757d' }} />
                   </div>
+              <p className="text-center text-muted mb-0" style={{ fontSize: '1rem' }}>
+                Scan serial number to start QC Repair
+              </p>
                 </CCardBody>
               </CCard>
             )}
-          </CCol>
-        </CRow>
       </CCol>
 
-      {/* Quality Control Assembly */}
+      {/* Submit Repair Card */}
       <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>Quality Control</strong>
+        <CCard>
+          <CCardHeader className="d-flex align-items-center gap-2">
+            <CIcon icon={cilSettings} />
+            <strong>Submit Repair</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={handleSubmit}>
-              {questionData.length === 0 ? (
-                <p className="text-muted">Questions not yet available...</p>
-              ) : (
-                questionData.map((q) => {
-                  const isYes = answers[q.id] === true // memastikan boolean
-
-                  return (
-                    <div
-                      key={q.id}
-                      className="border rounded p-3 mb-3 d-flex align-items-center justify-content-between"
-                    >
-                      <CFormLabel className="mb-0">{q.question}</CFormLabel>
-                      <CFormSwitch
-                        name={`question-${q.id}`}
-                        label={answers[q.id] ? 'Ya' : 'Tidak'}
-                        checked={!!answers[q.id]}
-                        onChange={(e) =>
-                          setAnswers((prev) => ({
-                            ...prev,
-                            [q.id]: e.target.checked, // true kalau on, false kalau off
-                          }))
-                        }
-                      />
-                    </div>
-                  )
-                })
-              )}
-              {/* Tombol Submit hanya muncul jika ada questions dan tidak ada error */}
-              {questionData.length > 0 && !errorMessage && (
-                <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                  <CButton color="primary" type="submit">
-                    Submit
+              {productData && !errorMessage && formData.repairNotes?.trim() ? (
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <span className="text-muted">Ready to submit repair for </span>
+                    <strong>{productData?.serial_number}</strong>
+                  </div>
+                  <CButton type="submit" color="primary">
+                    <CIcon icon={cilCheckCircle} className="me-2" />
+                    Submit Repair
                   </CButton>
+                </div>
+              ) : productData && !errorMessage ? (
+                <div className="text-center py-3">
+                  <CIcon icon={cilTask} size="xl" className="text-warning mb-2" />
+                  <p className="text-muted mb-0">Please fill in the repair notes to submit...</p>
+                </div>
+              ) : (
+                <div className="text-center py-3">
+                  <CIcon icon={cilBarcode} size="xl" className="text-muted mb-2" />
+                  <p className="text-muted mb-0">Scan serial number to start repair...</p>
                 </div>
               )}
             </CForm>
