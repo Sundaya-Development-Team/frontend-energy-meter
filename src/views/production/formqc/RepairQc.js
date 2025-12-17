@@ -241,6 +241,7 @@ const QcAqlSerial = () => {
       notes: formData.repairNotes,
       fail_qc_id: repairInfo.fail_qc_id,
       fail_qc_name: repairInfo.fail_qc_name,
+      result: "REPAIRED",
     }
 
     try {
@@ -407,7 +408,7 @@ const QcAqlSerial = () => {
                 </CRow>
 
             {/* Message Status */}
-            <div
+            {/* <div
               style={{
                 ...styles.infoItem,
                 backgroundColor: repairInfo?.message ? '#fff3cd' : '#f8f9fa',
@@ -421,7 +422,7 @@ const QcAqlSerial = () => {
               <div style={{ ...styles.infoValue, fontSize: '0.9rem' }}>
                 {repairInfo?.message ?? 'No message available'}
               </div>
-            </div>
+            </div> */}
               </CCardBody>
             </CCard>
           </CCol>
@@ -449,7 +450,7 @@ const QcAqlSerial = () => {
               {productData && !errorMessage && formData.repairNotes?.trim() ? (
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
-                    <span className="text-muted">Ready to submit repair for </span>
+                    <span className="text-muted">Ready to submit repair for serial number : </span>
                     <strong>{productData?.serial_number}</strong>
                     </div>
                   <CButton type="submit" color="primary">
