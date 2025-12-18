@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { backendTracking, backendUploadFile } from '../../api/axios'
 import {
@@ -16,6 +16,9 @@ import {
   CRow,
   CCol,
   CBadge,
+  CPagination,
+  CPaginationItem,
+  CFormSelect,
 } from '@coreui/react'
 import { toast } from 'react-toastify'
 const VITE_SERVER_DATA = import.meta.env.VITE_SERVER_DATA
@@ -25,6 +28,10 @@ const TrackingDetail = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [detail, setDetail] = useState(null)
+  
+  // Pagination state untuk QC Results
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -42,6 +49,18 @@ const TrackingDetail = () => {
     fetchDetail()
   }, [fetchDetail])
 
+  // Pagination logic untuk QC Results - harus dipanggil sebelum early return
+  const qcResults = detail?.qc_results || []
+  const totalItems = qcResults.length
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1
+  
+  const paginatedQcResults = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return qcResults.slice(startIndex, endIndex)
+  }, [qcResults, currentPage, itemsPerPage])
+
+  // Early returns setelah semua hooks
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
@@ -113,6 +132,44 @@ const TrackingDetail = () => {
     } else {
       toast.error('SAP Code tidak tersedia')
     }
+  }
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value))
+    setCurrentPage(1) // Reset ke halaman pertama
+  }
+
+  // Generate page numbers untuk pagination
+  const getPageNumbers = () => {
+    const pages = []
+    const maxVisiblePages = 5
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i)
+        pages.push('...')
+        pages.push(totalPages)
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1)
+        pages.push('...')
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i)
+      } else {
+        pages.push(1)
+        pages.push('...')
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i)
+        pages.push('...')
+        pages.push(totalPages)
+      }
+    }
+    return pages
   }
 
   return (
@@ -208,15 +265,15 @@ const TrackingDetail = () => {
 
       {/* Card QC Results */}
       {detail.qc_results?.length > 0 && (
-        <CCard className="mt-4">
+        <CCard className="mt-4 mb-4">
           <CCardHeader>
-            <strong>QC Results</strong>
+            <strong>QC Results <div className="text-muted small">Serial Number : {detail.serial_number || '-'}</div></strong>
           </CCardHeader>
           <CCardBody>
-            <CTable bordered>
+            <CTable bordered className="mb-0">
               <CTableHead>
                 <CTableRow>
-                  <CTableHeaderCell>Stage</CTableHeaderCell>
+                  {/* <CTableHeaderCell>Stage</CTableHeaderCell> */}
                   <CTableHeaderCell>Checked At</CTableHeaderCell>
                   <CTableHeaderCell>PIC</CTableHeaderCell>
                   <CTableHeaderCell>Result</CTableHeaderCell>
@@ -226,9 +283,9 @@ const TrackingDetail = () => {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {detail.qc_results.map((qc, index) => (
+                {paginatedQcResults.map((qc, index) => (
                   <CTableRow key={index}>
-                    <CTableDataCell>{qc.qc_name}</CTableDataCell>
+                    {/* <CTableDataCell>{qc.qc_name}</CTableDataCell> */}
                     <CTableDataCell>{formatDateTime(qc.inspection_date)}</CTableDataCell>
                     <CTableDataCell>{qc.inspector_name || '-'}</CTableDataCell>
                     <CTableDataCell
@@ -267,6 +324,70 @@ const TrackingDetail = () => {
                 ))}
               </CTableBody>
             </CTable>
+
+            {/* Pagination Controls - selalu tampil */}
+            <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top flex-wrap gap-2">
+              <div className="d-flex align-items-center gap-2">
+                <span className="text-muted small">Rows per page:</span>
+                <CFormSelect
+                  size="sm"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                  style={{ width: 'auto' }}
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </CFormSelect>
+                <span className="text-muted small ms-2">
+                  Showing {totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
+                </span>
+              </div>
+              
+              <CPagination aria-label="QC Results pagination" size="sm" className="mb-0">
+                <CPaginationItem
+                  aria-label="First"
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(1)}
+                >
+                  «
+                </CPaginationItem>
+                <CPaginationItem
+                  aria-label="Previous"
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  ‹
+                </CPaginationItem>
+                
+                {getPageNumbers().map((page, idx) => (
+                  <CPaginationItem
+                    key={idx}
+                    active={page === currentPage}
+                    disabled={page === '...'}
+                    onClick={() => page !== '...' && handlePageChange(page)}
+                  >
+                    {page}
+                  </CPaginationItem>
+                ))}
+                
+                <CPaginationItem
+                  aria-label="Next"
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  ›
+                </CPaginationItem>
+                <CPaginationItem
+                  aria-label="Last"
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(totalPages)}
+                >
+                  »
+                </CPaginationItem>
+              </CPagination>
+            </div>
           </CCardBody>
         </CCard>
       )}
