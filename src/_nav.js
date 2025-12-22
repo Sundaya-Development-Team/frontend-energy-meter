@@ -237,7 +237,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Base Sub Assy',
-        to: '/production/serialnoaql/QC-SA002/Base Sub Assy/QC Station Sub Assembly',
+        to: '/production/serialnoaql/QC-SA002/Base Sub Assy/QC Line 1 Sub Assembly',
         permissions: ['ADMIN', 'QC_SUB_ASSEMBLY'],
       },
       {
@@ -254,7 +254,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Assembly',
-        to: '/production/serialnoaql/QC-AT003/Assembly/QC Station Assembly',
+        to: '/production/serialnoaql/QC-AT003/Assembly/QC Line 2 Final Assembly',
         permissions: ['ADMIN', 'QC_ASSEMBLY'],
       },
       // {
@@ -276,7 +276,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test ON',
-        to: '/production/serialnoaql/QC-OT004/Test ON/QC Station On Test',
+        to: '/production/serialnoaql/QC-OT004/Test ON/QC Line 3 ON Test',
         permissions: ['ADMIN', 'ON_TEST'],
       },
     ],
@@ -293,7 +293,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Hipot Test',
-        to: '/production/serialnoaql/QC-HT005/Hipot Test/QC Station Hipot Test',
+        to: '/production/serialnoaql/QC-HT005/Hipot Test/QC Line 4 HiPot Test',
         permissions: ['ADMIN', 'HIPOT_TEST','PIC_HIPOT'],
       },
     ],
@@ -309,7 +309,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test Bench 1',
-        to: '/production/serialnoaql/QC-TB1006/Test Bench 1/QC Station Test Bench1',
+        to: '/production/serialnoaql/QC-TB1006/Test Bench 1/QC Line 5 Test Bench 1',
         permissions: ['ADMIN',  'TEST_BENCH1'],
       },
     ],
@@ -326,7 +326,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Ultrasonic',
-        to: '/production/serialnoaql/QC-U015/Ultrasonic Test/QC Station Ultra Sonic',
+        to: '/production/serialnoaql/QC-U015/Ultrasonic Test/QC Line 6 Ultrasonik',
         permissions: ['ADMIN', 'ULTRA_SONIC'],
       },
     ],
@@ -343,7 +343,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Ref. Meter',
-        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter/QC Station Ref Meter',
+        to: '/production/serialnoaql/QC-RM013/QC Ref. Meter/QC Line 7 Referensi Meter',
         permissions: ['ADMIN',  'QC_REF_METER'],
       },
     ],
@@ -358,7 +358,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Test Bench 2',
-        to: '/production/serialnoaql/QC-TB2014/Test Bench 2/QC Station Test Bench2',
+        to: '/production/serialnoaql/QC-TB2014/Test Bench 2/QC Line 8 Test Bench 2',
         permissions: ['ADMIN',  'TEST_BENCH2'],
       },
     ],
@@ -382,7 +382,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Aging',
-        to: '/production/serialaql/QC-AT007/Aging/Aging Test Station',
+        to: '/production/serialaql/QC-AT007/Aging/QC Line 9 Aging Test',
         permissions: ['ADMIN',  'AGING_TEST'],
       },
      
@@ -415,13 +415,13 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Print Laser Post 1',
-        to: '/production/finishing/printlaser/QC-LE016-1/Post 1/Printing Station 1',
+        to: '/production/finishing/printlaser/QC-LE016-1/Post 1/QC Line 10 Laser Engrave Post 1',
         permissions: ['ADMIN',  'LASER_PRINT1','LASER_PRINT'],
       },
       {
         component: CNavItem,
         name: 'Print Laser Post 2',
-        to: '/production/finishing/printlaser/QC-LE016-2/Post 2/Printing Station 2',
+        to: '/production/finishing/printlaser/QC-LE016-2/Post 2/QC Line 10 Laser Engrave Post 2',
         permissions: ['ADMIN',  'LASER_PRINT2','LASER_PRINT'],
       },
       // {
@@ -446,7 +446,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Cover',
-        to: '/production/serialnoaql/QC-C001/QC Cover/QC Cover',
+        to: '/production/serialnoaql/QC-C001/QC Cover/QC Line 11 Cover',
         permissions: ['ADMIN',  'QC_COVER'],
       },
       {
@@ -465,7 +465,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Sampling',
-    to: '/performance/sampling/QC-PTS001/QC Performance Sampling/QC Performance',
+    to: '/performance/sampling/QC-PTS001/QC Performance Sampling/QC Line 12 Performance',
     icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
     permissions: ['ADMIN'],
     
@@ -473,7 +473,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Performance Test',
-    to: '/performance/QC-PT001/QC Performance/QC Station Performance Test',
+    to: '/performance/QC-PT001/QC Performance/QC Line 12 Performance',
     icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
     permissions: ['ADMIN'],
     
