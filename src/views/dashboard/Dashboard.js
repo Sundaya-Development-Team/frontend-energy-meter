@@ -161,7 +161,11 @@ const DashboardPLN = () => {
                               className="d-flex justify-content-between align-items-center"
                             >
                               <span>
-                                {qc.qc_name} : <strong>{qc.completed} / {qc.total}</strong>
+                                {' '}
+                                {qc.qc_name} :{' '}
+                                <strong>
+                                  {qc.completed} / {qc.total}
+                                </strong>
                               </span>
                               {isQcCompleted ? (
                                 <span className="badge bg-success">Completed</span>
