@@ -299,22 +299,6 @@ const _nav = [
     ],
   },
 
-  // Test Bench 1
-  {
-    component: CNavGroup,
-    name: 'Test Bench 1',
-    to: '/production/calibration',
-    icon: <CIcon icon={cilScreenDesktop} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'QC Test Bench 1',
-        to: '/production/serialnoaql/QC-TB1006/Test Bench 1/QC Line 5 Test Bench 1',
-        permissions: ['ADMIN',  'TEST_BENCH1'],
-      },
-    ],
-  },
-
   // Ultrasonic
   {
     component: CNavGroup,
@@ -348,6 +332,24 @@ const _nav = [
       },
     ],
   },
+
+  // Test Bench 1
+  {
+    component: CNavGroup,
+    name: 'Test Bench 1',
+    to: '/production/calibration',
+    icon: <CIcon icon={cilScreenDesktop} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'QC Test Bench 1',
+        to: '/production/serialnoaql/QC-TB1006/Test Bench 1/QC Line 5 Test Bench 1',
+        permissions: ['ADMIN',  'TEST_BENCH1'],
+      },
+    ],
+  },
+
+  // Test Bench 2
   {
     component: CNavGroup,
     name: 'Test Bench 2',
