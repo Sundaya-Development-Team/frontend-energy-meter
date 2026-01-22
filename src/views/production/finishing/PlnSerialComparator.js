@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow } from '@coreui/react'
 import { toast } from 'react-toastify'
-import ImageContainer from '../../../components/common/ImageContainer' // ✅ Import komponen reusable
+import ImageContainer from '../../components/ImageContainer' // ✅ Import komponen reusable
 
 const PlnSerialComparator = () => {
   const [formData, setFormData] = useState({

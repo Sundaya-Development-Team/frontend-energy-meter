@@ -29,6 +29,23 @@ import avatar8 from './../../assets/images/avatars/8.jpg'
 const AppHeaderDropdown = () => {
   const { logout } = useAuth()
   const navigate = useNavigate()
+  
+  // Ambil user dari localStorage dan parse JSON
+  const getUserName = () => {
+    try {
+      const userStr = localStorage.getItem('user')
+      if (userStr) {
+        const user = JSON.parse(userStr)
+        return user.name || 'User'
+      }
+      return 'User'
+    } catch (error) {
+      console.error('Error parsing user data:', error)
+      return 'User'
+    }
+  }
+  
+  const userName = getUserName()
 
   const handleLogout = () => {
     logout() // clear user & token
@@ -42,6 +59,11 @@ const AppHeaderDropdown = () => {
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-body-secondary fw-semibold mb-2">Account</CDropdownHeader>
+        <CDropdownItem href="#">
+          <CIcon icon={cilUser} className="me-2" />
+          {userName}
+        </CDropdownItem>
+        <CDropdownDivider />
         {/* <CDropdownItem href="#">
           <CIcon icon={cilBell} className="me-2" />
           Updates

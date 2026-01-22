@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import {
   CRow,
-  CCol,
   CCard,
+  CCol,
   CCardBody,
   CCardHeader,
   CFormLabel,
@@ -15,7 +16,7 @@ import {
 
 import { backendQc, backendTracking } from '../../api/axios'
 import { toast } from 'react-toastify'
-import ErrorCard from '../components/ErrorCard'
+import { CounterCard6 } from '../components/CounterCard'
 import SuccessCard from '../components/SuccessCard'
 import '../../scss/style.scss'
 
@@ -28,31 +29,20 @@ const FormRow = ({ label, children }) => (
   </CRow>
 )
 
-const CounterCard = ({ title, value }) => (
-  <CCol md={6}>
-    {' '}
-    <CCard className="mb-3">
-      <CCardBody>
-        <h6 className="text-muted">{title}</h6>
-        <h4>{value}</h4>
-      </CCardBody>
-    </CCard>
-  </CCol>
-)
-
-const ReceivingSerialQc = () => {
+const QcAqlSerial = () => {
+  const { qcIdParams, qcPlaceParams } = useParams()
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
   const [answers, setAnswers] = useState({})
   const [questionData, setQuestionData] = useState([])
   const [qcName, setQcName] = useState([])
-  const qcIdReceivingSerial = 'QC-SPS-PCBA-001'
+  const qcCodeSerial = qcIdParams
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [isFormLocked, setIsFormLocked] = useState(false)
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
-  const [successValidation, setSuccessValidation] = useState(null)
+  const [successValidation, setSuccessValidation] = useState(null) // untuk success card
 
   // Ambil user dari localStorage
   const getUserFromStorage = () => {
@@ -69,6 +59,7 @@ const ReceivingSerialQc = () => {
   }
 
   const user = getUserFromStorage()
+
   const resetStates = () => {
     setProductData(null)
     // setTrackingProduct(null)
@@ -85,7 +76,7 @@ const ReceivingSerialQc = () => {
     resetStates()
     serialNumberInputRef.current.focus()
     console.clear()
-  }, [qcIdReceivingSerial])
+  }, [qcIdParams, qcPlaceParams])
 
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -112,11 +103,12 @@ const ReceivingSerialQc = () => {
   }
   // Fetch validation serial number
   const fetchValidationSnumb = async (serialNumber) => {
+    console.log('qcCodeSerial :', qcCodeSerial)
     try {
       const response = await backendQc.get('/validation', {
         params: {
           serial_number: serialNumber,
-          qc_id: qcIdReceivingSerial,
+          qc_id: qcCodeSerial,
         },
       })
 
@@ -124,10 +116,8 @@ const ReceivingSerialQc = () => {
         // toast.success(response.data.message ?? 'Serial number valid')
         setErrorMessage(null)
         setErrorSerialNumber(null)
-        setSuccessValidation({
-          serialNumber: serialNumber,
-          message: response.data.message ?? 'Serial number valid',
-        })
+
+        // Set success validation untuk success card
         setSuccessValidation({
           serialNumber: serialNumber,
           message: response.data.message ?? 'Serial number valid',
@@ -157,7 +147,6 @@ const ReceivingSerialQc = () => {
         setErrorMessage(errorMsg)
         // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
         setErrorSerialNumber(serialNumber)
-        setSuccessValidation(null)
         // toast.error(errorMsg)
       }
     } catch (error) {
@@ -166,12 +155,12 @@ const ReceivingSerialQc = () => {
       setErrorMessage(errorMsg)
       // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
       setErrorSerialNumber(serialNumber)
-      setSuccessValidation(null)
       // toast.error(errorMsg)
     }
   }
 
   const fetchProduct = async (serialNumber) => {
+    console.log('masuk fetch product')
     try {
       const response = await backendTracking.get(`/serial/${serialNumber}`)
 
@@ -188,16 +177,15 @@ const ReceivingSerialQc = () => {
         // Lock serial number field setelah berhasil fetch data
         setIsFormLocked(true)
 
-        const receivingItemId = response.data.data.receiving_item_id
-        console.log('receiving_item_id :', receivingItemId)
+        const assemblyId = response.data.data.assembly_id
+        console.log('assemblyId :', assemblyId)
 
-        fetchTrackingProduct(receivingItemId)
+        fetchTrackingProduct(assemblyId)
       } else {
         const errorMsg = response.data.message || 'Failed get product data'
         setErrorMessage(errorMsg)
         // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
         setErrorSerialNumber(serialNumber)
-        setSuccessValidation(null)
         // toast.error(errorMsg)
       }
     } catch (error) {
@@ -205,40 +193,34 @@ const ReceivingSerialQc = () => {
       setErrorMessage(errorMsg)
       // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
       setErrorSerialNumber(serialNumber)
-      setSuccessValidation(null)
       // toast.error(errorMsg)
     }
   }
 
-  const fetchTrackingProduct = async (receivingItemId) => {
+  const fetchTrackingProduct = async (assemblyId) => {
     try {
       const response = await backendTracking.get('/sample-inspections/aql-summary', {
         params: {
-          receiving_item_id: receivingItemId,
-          qc_id: qcIdReceivingSerial, //cek kembali ini nanti
+          assembly_id: assemblyId,
+          qc_id: qcCodeSerial, //cek kembali ini nanti
         },
       })
-      const canContinue = response.data.data.aql_status.can_continue
-      console.log('canContinue : ', canContinue)
-      if (canContinue === false) {
-        const errorMsg = 'SAMPLING SUDAH CUKUP !!'
+      const remainingSample = response.data.data.inspection_summary.remaining_samples
+      console.log('remaining Sample : ', remainingSample)
+      if (remainingSample <= 0) {
+        const errorMsg = 'SAMPLE SUDAH CUKUP !!'
         setErrorMessage(errorMsg)
-        toast.error(
-          <span>
-            <span style={{ color: 'red', fontWeight: 'bold' }}> {errorMsg}</span>
-          </span>,
-        )
-        // Simpan serial number sebelum update state
-          const currentSerialNumber = productData?.serial_number
-        // Update state
-        setTrackingProduct(response.data.data)
-        setQuestionData([])
-        setAnswers({})
-        // Set serial number untuk error card (input field sudah kosong)
-        if (currentSerialNumber) {
-          setErrorSerialNumber(currentSerialNumber)
-        }
-        setSuccessValidation(null)
+        // toast.error(
+        //   <span>
+        //     <span style={{ color: 'red', fontWeight: 'bold' }}> {errorMsg}</span>
+        //   </span>,
+        // )
+        // Simpan serial number sebelum reset states
+        const currentSerialNumber = productData?.serial_number || formData.serialNumber
+        // Bersihkan page
+        resetStates()
+        // Set serial number untuk error card (input field tetap kosong)
+        setErrorSerialNumber(currentSerialNumber)
       } else {
         console.log('LANJUT')
         setTrackingProduct(response.data.data)
@@ -256,11 +238,10 @@ const ReceivingSerialQc = () => {
       const errorMsg = error.response?.data?.message || 'Failed Validation'
       setErrorMessage(errorMsg)
       // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
-      const currentSerialNumber = productData?.serial_number
+      const currentSerialNumber = productData?.serial_number || formData.serialNumber
       if (currentSerialNumber) {
         setErrorSerialNumber(currentSerialNumber)
       }
-      setSuccessValidation(null)
       // toast.error(errorMsg)
     }
   }
@@ -287,16 +268,18 @@ const ReceivingSerialQc = () => {
       // toast.error(errorMsg)
       return
     }
-    if (!qcIdReceivingSerial) {
+    if (!qcCodeSerial) {
       const errorMsg = 'QC ID wajib diisi!'
       setErrorMessage(errorMsg)
       // toast.error(errorMsg)
       return
     }
+
     // if (!formData.notes) {
     //   toast.error('Notes wajib diisi!')
     //   return
     // }
+
     if (Object.keys(answers).length === 0) {
       const errorMsg = 'Jawaban pertanyaan QC wajib diisi!'
       setErrorMessage(errorMsg)
@@ -309,8 +292,8 @@ const ReceivingSerialQc = () => {
       inspector_by: user.id,
       inspector_name: user.name,
       qc_name: qcName, // sementara hardcode
-      qc_id: qcIdReceivingSerial,
-      qc_place: 'Workshop A', // sementara hardcode
+      qc_id: qcCodeSerial,
+      qc_place: qcPlaceParams || 'Workshop A',
       tracking_id: productData.id,
       batch: productData.batch,
       notes: formData.notes,
@@ -336,13 +319,13 @@ const ReceivingSerialQc = () => {
       setErrorMessage(null)
 
       // Fetch counter terbaru setelah submit berhasil
-      const receivingItemId = productData.receiving_item_id
-      if (receivingItemId) {
+      const assemblyId = productData.assembly_id
+      if (assemblyId) {
         try {
           const counterResponse = await backendTracking.get('/sample-inspections/aql-summary', {
             params: {
-              receiving_item_id: receivingItemId,
-              qc_id: qcIdReceivingSerial,
+              assembly_id: assemblyId,
+              qc_id: qcCodeSerial,
             },
           })
           // Update counter dengan data terbaru
@@ -376,14 +359,15 @@ const ReceivingSerialQc = () => {
       <CCol xs={12}>
         <CRow className="g-4 align-items-stretch">
           {/* Kolom Kiri - Scan Serial + Quality Control */}
-          <CCol md={8}>
+          <CCol md={8} className="d-flex flex-column">
             {/* Scan Serial Number */}
             <CCard className="mb-4">
               <CCardHeader>
                 <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
+                <div className="small text-muted">{qcPlaceParams}</div>
               </CCardHeader>
               <CCardBody>
-                <FormRow label="Serial Number">
+                <FormRow label="Production Serial Number">
                   <CFormInput
                     name="serialNumber"
                     value={formData.serialNumber}
@@ -410,7 +394,7 @@ const ReceivingSerialQc = () => {
             </CCard>
 
             {/* Quality Control */}
-            <CCard>
+            <CCard className="mb-4 flex-grow-1">
               <CCardHeader>
                 <strong>Quality Control</strong>
               </CCardHeader>
@@ -460,33 +444,43 @@ const ReceivingSerialQc = () => {
           <CCol md={4} className="d-flex flex-column">
             {errorMessage ? (
               /* Error Card */
-              <ErrorCard
-                serialNumber={errorSerialNumber}
-                message={errorMessage}
-                fullHeight={true}
-              />
+              <CCard className="mb-4 h-100 d-flex flex-column error-card">
+                <CCardHeader className="error-card-header">
+                  <strong>⚠️ Error</strong>
+                </CCardHeader>
+                <CCardBody className="d-flex flex-column justify-content-center align-items-center flex-grow-1 error-card-body">
+                  <div className="text-center">
+                    <div className="error-icon">❌</div>
+                    <h4 className="error-title">ERROR</h4>
+                    {errorSerialNumber && (
+                      <div className="error-serial-number">Serial: {errorSerialNumber}</div>
+                    )}
+                    <p className="error-message">{errorMessage}</p>
+                  </div>
+                </CCardBody>
+              </CCard>
             ) : (
               <div className="h-100 d-flex flex-column">
                 {/* Counter Card */}
-                <CCard className={`d-flex flex-column ${successValidation ? 'mb-4' : 'h-100'}`}>
+                <CCard className="mb-4 flex-grow-1 d-flex flex-column">
                   <CCardHeader>
                     <strong>Counter</strong>
                   </CCardHeader>
-                  <CCardBody className={`${!successValidation ? 'd-flex flex-column justify-content-center flex-grow-1' : ''}`}>
+                  <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
                     <CRow className="mb-3">
-                      <CounterCard
+                      <CounterCard6
                         title="Required Sample"
                         value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
                       />
-                      <CounterCard
+                      <CounterCard6
                         title="Remaining Samples"
                         value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
                       />
-                      <CounterCard
+                      <CounterCard6
                         title="Max Fail"
                         value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
                       />
-                      <CounterCard
+                      <CounterCard6
                         title="Fail Count"
                         value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
                       />
@@ -496,13 +490,10 @@ const ReceivingSerialQc = () => {
 
                 {/* Success Card */}
                 {successValidation && (
-                  <div className="flex-grow-1">
-                    <SuccessCard
-                      serialNumber={successValidation.serialNumber}
-                      message={successValidation.message}
-                      fullHeight={true}
-                    />
-                  </div>
+                  <SuccessCard
+                    serialNumber={successValidation.serialNumber}
+                    message={successValidation.message}
+                  />
                 )}
               </div>
             )}
@@ -513,4 +504,4 @@ const ReceivingSerialQc = () => {
   )
 }
 
-export default ReceivingSerialQc
+export default QcAqlSerial

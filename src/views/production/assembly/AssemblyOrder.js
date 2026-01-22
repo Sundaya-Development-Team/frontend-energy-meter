@@ -277,7 +277,14 @@ const OrderForm = () => {
                   type="text"
                   name="order_number"
                   value={formData.order_number}
-                  onChange={handleInput}
+                  onChange={(e) => {
+                    const rawValue = e.target.value
+                    const value = rawValue.replace(/\D/g, '')
+                    if (rawValue !== value) {
+                      toast.warn('AO can only contain numbers')
+                    }
+                    setFormData((prev) => ({ ...prev, order_number: value }))
+                  }}
                   placeholder="AO"
                   required
                 />

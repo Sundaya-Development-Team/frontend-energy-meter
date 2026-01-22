@@ -37,6 +37,12 @@ export const backendQc = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v1/quality-service`,
 })
 
+//Backend QC
+export const backendQualityService = axios.create({
+  baseURL: QUALITY_SERVICE,
+})
+
+
 //Warehouse
 // export const backendWh = axios.create({
 //   baseURL: `${VITE_SERVER_DATA}/api/v2/warehouse`,
@@ -80,10 +86,6 @@ export const cdnBackend = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/cdn`,
 })
 
-//Backend QC
-export const backendQualityService = axios.create({
-  baseURL: QUALITY_SERVICE,
-})
 
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,

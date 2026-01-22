@@ -17,6 +17,8 @@ import {
 import { backendQc, backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import { CounterCard6 } from '../../components/CounterCard'
+import ErrorCard from '../../components/ErrorCard'
+import SuccessCard from '../../components/SuccessCard'
 import '../../../scss/style.scss'
 
 const FormRow = ({ label, children }) => (
@@ -29,7 +31,7 @@ const FormRow = ({ label, children }) => (
 )
 
 const QcAqlSerial = () => {
-  const { qcIdParams } = useParams()
+  const { qcIdParams, qcPlaceParams } = useParams()
   const [productData, setProductData] = useState(null)
   const [trackingProduct, setTrackingProduct] = useState(null)
   const [answers, setAnswers] = useState({})
@@ -41,6 +43,7 @@ const QcAqlSerial = () => {
   const serialNumberInputRef = useRef(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [errorSerialNumber, setErrorSerialNumber] = useState(null)
+  const [successValidation, setSuccessValidation] = useState(null) // untuk success card
 
   // Ambil user dari localStorage
   const getUserFromStorage = () => {
@@ -66,6 +69,7 @@ const QcAqlSerial = () => {
     setFormData({ serialNumber: '', notes: '' })
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setIsFormLocked(false)
   }
 
@@ -73,7 +77,7 @@ const QcAqlSerial = () => {
     resetStates()
     serialNumberInputRef.current.focus()
     console.clear()
-  }, [qcIdParams])
+  }, [qcIdParams, qcPlaceParams])
 
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -92,6 +96,7 @@ const QcAqlSerial = () => {
     setAnswers({})
     setErrorMessage(null)
     setErrorSerialNumber(null)
+    setSuccessValidation(null)
     setFormData({ serialNumber: '', notes: '' })
 
     // Panggil fetch validasi serial
@@ -112,6 +117,12 @@ const QcAqlSerial = () => {
         // toast.success(response.data.message ?? 'Serial number valid')
         setErrorMessage(null)
         setErrorSerialNumber(null)
+
+        // Set success validation untuk success card
+        setSuccessValidation({
+          serialNumber: serialNumber,
+          message: response.data.message ?? 'Serial number valid',
+        })
 
         // Convert object questions → array
         const convertedQuestions = Object.entries(response.data.questions).map(([id, text]) => ({
@@ -283,7 +294,7 @@ const QcAqlSerial = () => {
       inspector_name: user.name,
       qc_name: qcName, // sementara hardcode
       qc_id: qcCodeSerial,
-      qc_place: 'Workshop A', // sementara hardcode
+      qc_place: qcPlaceParams || 'Workshop A',
       tracking_id: productData.id,
       batch: productData.batch,
       notes: formData.notes,
@@ -354,6 +365,7 @@ const QcAqlSerial = () => {
             <CCard className="mb-4">
               <CCardHeader>
                 <strong>Product Name : {productData?.product?.name ?? '-'}</strong>
+                <div className="small text-muted">{qcPlaceParams}</div>
               </CCardHeader>
               <CCardBody>
                 <FormRow label="Production Serial Number">
@@ -383,7 +395,7 @@ const QcAqlSerial = () => {
             </CCard>
 
             {/* Quality Control */}
-            <CCard className="mb-4 flex-grow-1">
+            <CCard>
               <CCardHeader>
                 <strong>Quality Control</strong>
               </CCardHeader>
@@ -429,52 +441,55 @@ const QcAqlSerial = () => {
             </CCard>
           </CCol>
 
-          {/* Kolom Kanan - Counter atau Error */}
+          {/* Kolom Kanan - Counter + Success Card atau Error */}
           <CCol md={4} className="d-flex flex-column">
             {errorMessage ? (
               /* Error Card */
-              <CCard className="mb-4 h-100 d-flex flex-column error-card">
-                <CCardHeader className="error-card-header">
-                  <strong>⚠️ Error</strong>
-                </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center align-items-center flex-grow-1 error-card-body">
-                  <div className="text-center">
-                    <div className="error-icon">❌</div>
-                    <h4 className="error-title">ERROR</h4>
-                    {errorSerialNumber && (
-                      <div className="error-serial-number">Serial: {errorSerialNumber}</div>
-                    )}
-                    <p className="error-message">{errorMessage}</p>
-                  </div>
-                </CCardBody>
-              </CCard>
+              <ErrorCard
+                serialNumber={errorSerialNumber}
+                message={errorMessage}
+                fullHeight={true}
+              />
             ) : (
-              /* Counter Card */
-              <CCard className="mb-4 h-100 d-flex flex-column">
-                <CCardHeader>
-                  <strong>Counter</strong>
-                </CCardHeader>
-                <CCardBody className="d-flex flex-column justify-content-center flex-grow-1">
-                  <CRow className="mb-3">
-                    <CounterCard6
-                      title="Required Sample"
-                      value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
+              <div className="h-100 d-flex flex-column">
+                {/* Counter Card */}
+                <CCard className={`d-flex flex-column ${successValidation ? 'mb-4' : 'h-100'}`}>
+                  <CCardHeader>
+                    <strong>Counter</strong>
+                  </CCardHeader>
+                  <CCardBody className={`${!successValidation ? 'd-flex flex-column justify-content-center flex-grow-1' : ''}`}>
+                    <CRow className="mb-3">
+                      <CounterCard6
+                        title="Required Sample"
+                        value={trackingProduct?.inspection_summary?.required_sample ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Remaining Samples"
+                        value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Max Fail"
+                        value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
+                      />
+                      <CounterCard6
+                        title="Fail Count"
+                        value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
+                      />
+                    </CRow>
+                  </CCardBody>
+                </CCard>
+
+                {/* Success Card */}
+                {successValidation && (
+                  <div className="flex-grow-1">
+                    <SuccessCard
+                      serialNumber={successValidation.serialNumber}
+                      message={successValidation.message}
+                      fullHeight={true}
                     />
-                    <CounterCard6
-                      title="Remaining Samples"
-                      value={trackingProduct?.inspection_summary?.remaining_samples ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Max Fail"
-                      value={trackingProduct?.aql_configuration?.aql_accept ?? `-`}
-                    />
-                    <CounterCard6
-                      title="Fail Count"
-                      value={trackingProduct?.inspection_summary?.fail_count ?? `-`}
-                    />
-                  </CRow>
-                </CCardBody>
-              </CCard>
+                  </div>
+                )}
+              </div>
             )}
           </CCol>
         </CRow>
