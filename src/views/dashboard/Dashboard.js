@@ -99,7 +99,7 @@ const DashboardPLN = () => {
         orders.map((order) => (
           <CCard key={order.pln_order_id} className="mb-3 shadow-sm">
             <CCardHeader className="d-flex justify-content-between align-items-center">
-              <strong>PLN Order Code: {order.pln_order_details.order_number}</strong>
+              <strong>PLN Order Code xz: {order.pln_order_details.order_number}</strong>
               {/* Ubah dari Total Quantity ke Status Progress */}
               {getStatusBadge(order.pln_order_status)}
             </CCardHeader>
