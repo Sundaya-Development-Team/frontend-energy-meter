@@ -34,7 +34,7 @@ export const backendTracking = axios.create({
 //QC
 
 export const backendQc = axios.create({
-  baseURL: `${VITE_SERVER_DATA}/api/v1/quality-service`,
+  baseURL: `${QUALITY_SERVICE}/api/v1/quality-service`,
 })
 
 //Backend QC
