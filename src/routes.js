@@ -505,7 +505,7 @@ const routes = [
     path: '/production/finishing/generateboxserial',
     name: 'Generate Box Serial',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'GENERATE_BOX']}>
         <DefaultLayout>
           <GenerateBoxSerial />
         </DefaultLayout>
