@@ -35,6 +35,10 @@ export const backendTracking = axios.create({
 export const backendQc = axios.create({
   baseURL: `${QUALITY_SERVICE}/api/v1/quality-service`,
 })
+//QC Jika pakai 226 & 223 cukup pakai Vite Server Data
+// export const backendQc = axios.create({
+//   baseURL: `${VITE_SERVER_DATA}/api/v1/quality-service`,
+// })
 
 //Backend QC
 export const backendQualityService = axios.create({
