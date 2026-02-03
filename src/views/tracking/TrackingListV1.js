@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { backendTracking } from '../../api/axios'
 
-const TrackingFinalProduct = () => {
+const TrackingList = () => {
   const [loading, setLoading] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [searchInput, setSearchInput] = useState('') // input sementara sebelum submit
@@ -36,13 +36,14 @@ const TrackingFinalProduct = () => {
     { code: 'QC-AT003', label: 'Assembly' },
     { code: 'QC-OT004', label: 'ON Test' },
     { code: 'QC-HT005', label: 'Hippot' },
+    { code: 'QC-TB1006', label: 'Test Bench 1' },
     { code: 'QC-U015', label: 'Ultrasonic' },
     { code: 'QC-RM013', label: 'Ref. Meter' },
-    { code: 'QC-TB1006', label: 'Test Bench 1' },
     { code: 'QC-TB2014', label: 'Test Bench 2' },
     // { code: 'QC-AT007', label: 'Aging' }, // temporarily hidden
     { code: 'QC-LE016', label: 'Laser Engraving' },
     { code: 'QC-C001', label: 'Cover & Finishing' },
+   
   ]
 
   // === FILTER STATE PER KOLOM ===
@@ -58,7 +59,6 @@ const TrackingFinalProduct = () => {
         page,
         limit,
         is_serial: true,
-        is_pln_code: true,
         tracking_type: 'assembly',
       }
 
@@ -96,6 +96,7 @@ const TrackingFinalProduct = () => {
 
   // Handle enter key pada input search
   const handleKeyPress = (e) => {
+  
     if (e.key === 'Enter') {
       handleSearch()
     }
@@ -297,6 +298,11 @@ const TrackingFinalProduct = () => {
 
   const columns = [
     {
+      name: <span title="Assembly Serial">Assembly Serial</span>,
+      selector: (row) => row.serial_number || '-',
+      sortable: true,
+    },
+    {
       name: <span title="PLN Serial">PLN Serial</span>,
       selector: (row) => row.pln_code || '-',
       sortable: true,
@@ -436,4 +442,4 @@ const TrackingFinalProduct = () => {
   )
 }
 
-export default TrackingFinalProduct
+export default TrackingList

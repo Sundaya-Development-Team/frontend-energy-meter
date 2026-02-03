@@ -373,7 +373,15 @@ const QcSerialNoAql = () => {
         }
       }
 
-      serialNumberInputRef.current.focus()
+      // Bersihkan semua state hanya jika submit berhasil
+      resetStates()
+
+      // Set focus ke Production Serial Number setelah reset dan render selesai
+      setTimeout(() => {
+        if (serialNumberInputRef.current) {
+          serialNumberInputRef.current.focus()
+        }
+      }, 0)
     } catch (error) {
       console.error('QC submit error:', error)
       const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QC'
@@ -386,9 +394,6 @@ const QcSerialNoAql = () => {
       // toast.error(errorMsg)
       return // Jangan reset states jika ada error
     }
-
-    // Bersihkan semua state hanya jika submit berhasil
-    resetStates()
   }
 
   return (
