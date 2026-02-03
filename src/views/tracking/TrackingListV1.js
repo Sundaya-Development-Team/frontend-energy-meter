@@ -36,9 +36,9 @@ const TrackingList = () => {
     { code: 'QC-AT003', label: 'Assembly' },
     { code: 'QC-OT004', label: 'ON Test' },
     { code: 'QC-HT005', label: 'Hippot' },
+    { code: 'QC-TB1006', label: 'Test Bench 1' },
     { code: 'QC-U015', label: 'Ultrasonic' },
     { code: 'QC-RM013', label: 'Ref. Meter' },
-    { code: 'QC-TB1006', label: 'Test Bench 1' },
     { code: 'QC-TB2014', label: 'Test Bench 2' },
     // { code: 'QC-AT007', label: 'Aging' }, // temporarily hidden
     { code: 'QC-LE016', label: 'Laser Engraving' },
