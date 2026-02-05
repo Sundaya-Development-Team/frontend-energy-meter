@@ -208,9 +208,13 @@ const TrackingList = () => {
 
         if (date) {
           const d = new Date(date)
-          // Tambahkan 7 jam untuk WIB
-          d.setHours(d.getHours() + 7)
-          formattedDate = d.toISOString().slice(0, 19).replace('T', ' ')
+          const yyyy = d.getUTCFullYear()
+          const mm = String(d.getUTCMonth() + 1).padStart(2, '0')
+          const dd = String(d.getUTCDate()).padStart(2, '0')
+          const hh = String(d.getUTCHours()).padStart(2, '0')
+          const min = String(d.getUTCMinutes()).padStart(2, '0')
+          const ss = String(d.getUTCSeconds()).padStart(2, '0')
+          formattedDate = `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
         }
 
         return formattedDate !== '-' ? `${status} (${formattedDate})` : status
@@ -253,17 +257,17 @@ const TrackingList = () => {
 
     const style = badgeStyle[status] || { backgroundColor: '#6c757d', color: 'white' }
 
-    // ✅ Format tanggal + jam ke zona waktu lokal (WIB)
+    // Format tanggal sesuai nilai dari API (tanpa konversi timezone, agar tidak +7)
     const formattedDate = date
-      ? new Date(date).toLocaleString('id-ID', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-          timeZone: 'Asia/Jakarta',
-        })
+      ? (() => {
+          const d = new Date(date)
+          const day = String(d.getUTCDate()).padStart(2, '0')
+          const month = d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })
+          const year = d.getUTCFullYear()
+          const hh = String(d.getUTCHours()).padStart(2, '0')
+          const min = String(d.getUTCMinutes()).padStart(2, '0')
+          return `${day} ${month} ${year}, ${hh}:${min}`
+        })()
       : null
 
     return (
@@ -348,7 +352,7 @@ const TrackingList = () => {
   return (
     <CCard>
       <CCardHeader>
-        <strong>Tracking QC Final Product</strong>
+        <strong>Tracking QC Product Process</strong>
       </CCardHeader>
       <CCardBody>
         {/* Search + Download */}
