@@ -85,6 +85,19 @@ const TrackingDetail = () => {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
   }
 
+  // Format tanggal UTC agar inspection_date tidak bergeser +7 jam (backend UTC, browser UTC+7)
+  const formatDateTimeUTC = (dateString) => {
+    if (!dateString) return '-'
+    const date = new Date(dateString)
+    const yyyy = date.getUTCFullYear()
+    const mm = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const dd = String(date.getUTCDate()).padStart(2, '0')
+    const hh = String(date.getUTCHours()).padStart(2, '0')
+    const min = String(date.getUTCMinutes()).padStart(2, '0')
+    const ss = String(date.getUTCSeconds()).padStart(2, '0')
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`
+  }
+
   // const handleReport = async (qc) => {
   //   try {
   //     const res = await backendUploadFile.get(`/qc-test-report/stream`, {
@@ -286,7 +299,7 @@ const TrackingDetail = () => {
                 {paginatedQcResults.map((qc, index) => (
                   <CTableRow key={index}>
                     {/* <CTableDataCell>{qc.qc_name}</CTableDataCell> */}
-                    <CTableDataCell>{formatDateTime(qc.inspection_date)}</CTableDataCell>
+                    <CTableDataCell>{formatDateTimeUTC(qc.inspection_date)}</CTableDataCell>
                     <CTableDataCell>{qc.inspector_name || '-'}</CTableDataCell>
                     <CTableDataCell
                       className={
