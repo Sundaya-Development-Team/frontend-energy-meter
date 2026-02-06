@@ -1,5 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
+import { cilAlbum } from '@coreui/icons'
 import {
   cilBarcode,
   cilBell,
@@ -188,6 +189,22 @@ const _nav = [
       'QC_COVER',
       'GENERATE_BOX',],
   },
+   // Software burning
+   {
+    component: CNavGroup,
+    name: 'Software Burning',
+    to: '/production/softwareburning',
+    icon: <CIcon icon={cilAlbum} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'SOFTWARE_BURNING'],
+    items: [
+      {
+        component: CNavItem,
+        name: 'QC Software Burning',
+        to: '/production/softwareburning/QC-PSB001/Software Burning/QC Line 1 Software Burning',
+        permissions: ['ADMIN', 'SOFTWARE_BURNING'],
+      },
+    ],
+  },
   // Assembly
   {
     component: CNavGroup,
@@ -269,7 +286,7 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'On Test',
-    to: '/production/on',
+    to: '/production/ontest',
     icon: <CIcon icon={cilMediaPlay} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'ON_TEST'],
     items: [
