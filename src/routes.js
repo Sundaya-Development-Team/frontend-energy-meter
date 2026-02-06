@@ -23,6 +23,7 @@ const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingF
 //QCProd
 const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql'))
 const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql'))
+const ProdQcSoftwareBurningNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSoftwareBurningNoAql'))
 const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc'))
 
 //QCPerformance
@@ -421,7 +422,37 @@ const routes = [
       </PrivateRoutes>
     ),
   },
-
+ //QC SoftwareBurning
+ { path: '/production/softwareburning', name: 'QC Serial No AQL' },
+ {
+  path: '/production/softwareburning/:qcIdParams/:qcNameParams/:qcPlaceParams',
+  name: '',
+  element: (
+    <PrivateRoutes
+      requiredPermission={[
+        'ADMIN',
+        'ON_TEST',
+        'QC_SUB_ASSEMBLY',
+        'QC_ASSEMBLY',
+        'HIPOT_TEST',
+        'PIC_HIPOT',
+        'TEST_BENCH1',
+        'ULTRA_SONIC',
+        'QC_REF_METER',
+        'TEST_BENCH2',
+        'AGING_TEST',
+        'LASER_PRINT',
+        'QC_COVER',
+        'QC_RECEIVING',
+        'SOFTWARE_BURNING',
+      ]}
+    >
+      <DefaultLayout>
+        <ProdQcSoftwareBurningNoAql />
+      </DefaultLayout>
+    </PrivateRoutes>
+  ),
+},
   //QC Production No Aql Serial
   { path: '/production/serialnoaql', name: 'QC Serial No AQL' },
   {
@@ -444,6 +475,7 @@ const routes = [
           'LASER_PRINT',
           'QC_COVER',
           'QC_RECEIVING',
+          'SOFTWARE_BURNING',
         ]}
       >
         <DefaultLayout>
