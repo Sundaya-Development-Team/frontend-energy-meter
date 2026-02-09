@@ -55,6 +55,25 @@ const AssemblySerialList = () => {
     fetchRecords()
   }, [fetchRecords])
 
+  //Print Serial
+  const PrintSerial = async () => {
+    console.log("Print")
+    const payload = {
+      limit: 20,
+      printedBy: user?.name || 'Unknown User',
+      printNotes: "Print"
+    }
+
+    try {
+      await backendGenerate.post('/pln-codes/send-to-printer', payload)
+      toast.success('Print status updated successfully!')
+
+      fetchRecords()
+    } catch (error) {
+      console.error('Error update print status:', error)
+      toast.error(error.response?.data?.message || 'Failed to update print status')
+    }
+  }
   // Download CSV + update ke API
   const downloadCSV = async () => {
     if (records.length === 0) {
@@ -156,12 +175,23 @@ const AssemblySerialList = () => {
             <CButton
               color="success"
               className="text-white"
+              onClick={PrintSerial}
+              disabled={records.length === 0}
+            >
+              Print Serial
+            </CButton>
+          </CCol>
+
+          {/* <CCol className="d-flex justify-content-end">
+            <CButton
+              color="success"
+              className="text-white"
               onClick={downloadCSV}
               disabled={records.length === 0}
             >
               Download CSV
             </CButton>
-          </CCol>
+          </CCol> */}
         </CRow>
 
         <DataTable
