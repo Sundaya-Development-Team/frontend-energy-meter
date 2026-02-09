@@ -200,7 +200,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'QC Software Burning',
-        to: '/production/softwareburning/QC-PSB001/Software Burning/QC Line 1 Software Burning',
+        to: '/production/softwareburning/QC-PSB001/Software Burning/QC Line 0 PCBA Software Burning',
         permissions: ['ADMIN', 'SOFTWARE_BURNING'],
       },
     ],
