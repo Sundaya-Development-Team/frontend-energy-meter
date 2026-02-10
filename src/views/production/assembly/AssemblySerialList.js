@@ -59,7 +59,7 @@ const AssemblySerialList = () => {
   const PrintSerial = async () => {
     console.log("Print")
     const payload = {
-      limit: 20,
+      limit: 10,
       printedBy: user?.name || 'Unknown User',
       printNotes: "Print"
     }
