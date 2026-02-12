@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow } from '@coreui/react'
-import { backendTracking , backendQc} from '../../../api/axios'
+import { backendTracking } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import ImageContainer from '../../components/ImageContainer'
 import ValidationPopup from '../../components/ValidationPopup'
@@ -47,8 +47,6 @@ const ScanBeforeAssembly = () => {
   }
 
   const handlePcbSnumb = async () => {
-    // setiap kali scan baru, bersihkan popup lama
-    setFeedback(null)
     const currentSerial = formData.pcbSnumb?.trim()
 
     if (!currentSerial) {
@@ -61,92 +59,33 @@ const ScanBeforeAssembly = () => {
     }
 
     try {
-      const validateResponse = await backendQc.get('/validation', {
+      const validateResponse = await backendTracking.get('/validate', {
         params: {
           serial_number: currentSerial,
-          qc_id: 'QC-PSB001',
+          tracking_type: 'receiving',
         },
       })
 
-      const { valid, mode, message } = validateResponse.data
-
-      // 🟥 Mode blocked-fail → tampilkan message, TIDAK boleh lanjut
-      if (!valid && mode === 'blocked-fail') {
+      if (!validateResponse.data.data.isValid) {
         setFeedback({
-          title: 'PCB Blocked (Failed QC)',
-          message: message || 'PCB ini sudah gagal QC dan diblok untuk proses assembly.',
+          title: 'PCB Validation Failed',
+          message: validateResponse.data.message || 'PCB Serial Number is invalid!',
           serialNumber: currentSerial,
         })
         return
       }
 
-      // 🟥 Mode special-qc → tampilkan message, TIDAK boleh lanjut
-      if (valid && mode === 'special-qc') {
-        setFeedback({
-          title: 'PCB Perlu Burning Software',
-          message: 'PCB ini perlu burning software terlebih dahulu.',
-          serialNumber: currentSerial,
-        })
-        return
-      }
-
-      // ✅ Mode already-passed → BOLEH lanjut tanpa popup
-      if (!valid && mode === 'already-passed') {
-        // pastikan popup tidak tampil
-        setFeedback(null)
-        setPcbDisabled(true)
-        setSideCoverDisabled(false)
-        toast.success(validateResponse.data.message || 'PCB Serial Number is valid!')
-        
-      }
-
-      // Jika valid dan tidak ada mode khusus → boleh lanjut
-      // setFeedback(null)
-      // setPcbDisabled(true)
-      // setSideCoverDisabled(false)
-      // toast.success(message || 'PCB Serial Number is valid!')
+      setFeedback(null)
+      setPcbDisabled(true)
+      setSideCoverDisabled(false)
+      toast.success(validateResponse.data.message || 'PCB Serial Number is valid!')
     } catch (error) {
-      console.log('masuk catch', error)
-   
-      const respData = error.response?.data
-      const { valid, mode, message } =respData
-      // Jika backend kirim already-passed lewat response error (non-2xx),
-      // tetap perlakukan sebagai BOLEH lanjut.
-      if (!valid && mode === 'already-passed') {
-        setFeedback(null)
-        setPcbDisabled(true)
-        setSideCoverDisabled(false)
-        return
-      }
-
-      // Jika backend kirim blocked-fail via error
-      if (!valid && mode === 'blocked-fail') {
-        setFeedback({
-          title: 'PCB Blocked (Failed QC)',
-          message: message || 'PCB ini sudah gagal QC dan diblok untuk proses assembly.',
-          serialNumber: currentSerial,
-        })
-        return
-      }
-
-      // Jika backend kirim special-qc via error
-      if (valid && mode === 'special-qc') {
-        setFeedback({
-          title: 'PCB Perlu Burning Software',
-          message: 'PCB ini perlu burning software terlebih dahulu.',
-          serialNumber: currentSerial,
-        })
-        return
-      }
-
-      // Fallback generic error
       setFeedback({
         title: 'PCB Validation Error',
-        message: message || error.message || 'PCB validation failed!',
+        message: error.response?.data?.message || 'PCB validation failed!',
         serialNumber: currentSerial,
       })
     }
-    
   }
 
   const handleSideCover = async () => {
@@ -169,50 +108,46 @@ const ScanBeforeAssembly = () => {
     }
 
     try {
-      const assemblyResponse = await backendQc.get('/validation', {
+      const assemblyResponse = await backendTracking.get('/validate', {
         params: {
           serial_number: currentSerial,
-          qc_id: 'QC-AT003',
+          tracking_type: 'assembly',
         },
       })
 
-      const { valid, message } = assemblyResponse.data
-
-      if (!valid) {
+      if (!assemblyResponse.data.data.isValid) {
         setFeedback({
           title: 'Assembly Validation Failed',
-          message: message || 'Assembly Serial Number is invalid!',
+          message: assemblyResponse.data.message || 'Assembly Serial Number is invalid!',
           serialNumber: currentSerial,
         })
         return
       }
 
-      console.log('Lanjut')
-      // const payload = {
-      //   parent_serial_number: currentSerial,
-      //   component_serial_number: formData.pcbSnumb,
-      //   quantity: 1,
-      // }
+      const payload = {
+        parent_serial_number: currentSerial,
+        component_serial_number: formData.pcbSnumb,
+        quantity: 1,
+      }
 
-      // const res = await backendTracking.post('/assembly-components/by-serial', payload)
-      // const isSuccess = res.data?.success
+      const res = await backendTracking.post('/assembly-components/by-serial', payload)
+      const isSuccess = res.data?.success
 
-      // if (isSuccess === false) {
-      
-      //   const errorMessage = res.data?.message || 'Matching failed! Please try again.'
-      //   setFeedback({
-      //     title: 'Matching Failed',
-      //     message: errorMessage,
-      //     serialNumber: currentSerial,
-      //   })
-      //   toast.error(errorMessage)
-      //   resetForm()
-      //   return
-      // }
+      if (isSuccess === false) {
+        const errorMessage = res.data?.message || 'Matching failed! Please try again.'
+        setFeedback({
+          title: 'Matching Failed',
+          message: errorMessage,
+          serialNumber: currentSerial,
+        })
+        toast.error(errorMessage)
+        resetForm()
+        return
+      }
 
-      // setFeedback(null)
-      // toast.success(res.data?.message || 'Matching Successful! Data saved successfully!')
-      // resetForm()
+      setFeedback(null)
+      toast.success(res.data?.message || 'Matching Successful! Data saved successfully!')
+      resetForm()
     } catch (error) {
       console.log('error nih')
       setFeedback({

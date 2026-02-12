@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CForm, CFormInput, CRow } from '@coreui/react'
-import { backendTracking } from '../../../api/axios'
+import { backendTracking, backendQc } from '../../../api/axios'
 import { toast } from 'react-toastify'
 import ImageContainer from '../../components/ImageContainer'
 import ValidationPopup from '../../components/ValidationPopup'
@@ -33,7 +33,7 @@ const ScanBeforeAssembly = () => {
 
     const timer = setTimeout(() => {
       setFeedback(null)
-    }, 3000)
+    }, 5000)
 
     return () => clearTimeout(timer)
   }, [feedback])
@@ -59,26 +59,55 @@ const ScanBeforeAssembly = () => {
     }
 
     try {
-      const validateResponse = await backendTracking.get('/validate', {
+      const validateResponse = await backendQc.get('/validation', {
         params: {
           serial_number: currentSerial,
-          tracking_type: 'receiving',
+          qc_id: 'QC-MA001',
         },
       })
+      const { status, message, serial_number } = validateResponse.data
+      console.log('status : ', status)
+      console.log('message : ', message)
+      console.log('serial_number : ', serial_number)
 
-      if (!validateResponse.data.data.isValid) {
+      if (status === 'FAIL') {
         setFeedback({
           title: 'PCB Validation Failed',
-          message: validateResponse.data.message || 'PCB Serial Number is invalid!',
+          message: validateResponse.data.message || 'PCB Serial Number is FAIL!',
           serialNumber: currentSerial,
         })
         return
       }
 
-      setFeedback(null)
-      setPcbDisabled(true)
-      setSideCoverDisabled(false)
-      toast.success(validateResponse.data.message || 'PCB Serial Number is valid!')
+      if (status === 'not-serial-pcba') {
+        setFeedback({
+          title: 'PCB Validation Failed',
+          message: validateResponse.data.message || 'This is Not Serial For PCBA!',
+          serialNumber: currentSerial,
+        })
+        return
+      }
+
+      if (status === 'PASS') {
+        setFeedback(null)
+        setPcbDisabled(true)
+        setSideCoverDisabled(false)
+        toast.success(validateResponse.data.message || 'PCB Serial Number is valid!')
+      }
+
+      // if (!validateResponse.data.data.isValid) {
+      //   setFeedback({
+      //     title: 'PCB Validation Failed',
+      //     message: validateResponse.data.message || 'PCB Serial Number is invalid!',
+      //     serialNumber: currentSerial,
+      //   })
+      //   return
+      // }
+
+      // setFeedback(null)
+      // setPcbDisabled(true)
+      // setSideCoverDisabled(false)
+      // toast.success(validateResponse.data.message || 'PCB Serial Number is valid!')
     } catch (error) {
       setFeedback({
         title: 'PCB Validation Error',
@@ -134,7 +163,6 @@ const ScanBeforeAssembly = () => {
       const isSuccess = res.data?.success
 
       if (isSuccess === false) {
-      
         const errorMessage = res.data?.message || 'Matching failed! Please try again.'
         setFeedback({
           title: 'Matching Failed',
