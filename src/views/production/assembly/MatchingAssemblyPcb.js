@@ -8,23 +8,23 @@ import ValidationPopup from '../../components/ValidationPopup'
 const ScanBeforeAssembly = () => {
   const [formData, setFormData] = useState({
     pcbSnumb: '',
-    sideCoverSnumb: '',
+    backCoverSnumb: '',
   })
 
   const [pcbDisabled, setPcbDisabled] = useState(false)
-  const [sideCoverDisabled, setSideCoverDisabled] = useState(true)
+  const [backCoverDisabled, setBackCoverDisabled] = useState(true)
   const [feedback, setFeedback] = useState(null) // error popup
 
   const pcbInputRef = useRef(null)
-  const sideCoverInputRef = useRef(null)
+  const backCoverInputRef = useRef(null)
 
   useEffect(() => {
     if (!pcbDisabled) {
       pcbInputRef.current?.focus()
-    } else if (!sideCoverDisabled) {
-      sideCoverInputRef.current?.focus()
+    } else if (!backCoverDisabled) {
+      backCoverInputRef.current?.focus()
     }
-  }, [pcbDisabled, sideCoverDisabled])
+  }, [pcbDisabled, backCoverDisabled])
 
   useEffect(() => {
     if (!feedback) {
@@ -39,13 +39,14 @@ const ScanBeforeAssembly = () => {
   }, [feedback])
 
   const resetForm = () => {
-    setFormData({ pcbSnumb: '', sideCoverSnumb: '' })
+    setFormData({ pcbSnumb: '', backCoverSnumb: '' })
     setPcbDisabled(false)
-    setSideCoverDisabled(true)
+    setBackCoverDisabled(true)
     setFeedback(null)
     setTimeout(() => pcbInputRef.current?.focus(), 100)
   }
 
+  //validasi PCBA
   const handlePcbSnumb = async () => {
     const currentSerial = formData.pcbSnumb?.trim()
 
@@ -62,14 +63,35 @@ const ScanBeforeAssembly = () => {
       const validateResponse = await backendQc.get('/validation', {
         params: {
           serial_number: currentSerial,
-          qc_id: 'QC-MA001',
+          qc_id: 'QC-MP001',
         },
       })
       const { status, message, serial_number } = validateResponse.data
-      console.log('status : ', status)
-      console.log('message : ', message)
-      console.log('serial_number : ', serial_number)
+      // console.log('status : ', status)
+      // console.log('message : ', message)
+      // console.log('serial_number : ', serial_number)
 
+      //jika belum burning
+      if (status === 'not-burning') {
+        setFeedback({
+          title: 'PCB Validation Failed',
+          message: validateResponse.data.message || 'Need to burn PCBA!',
+          serialNumber: currentSerial,
+        })
+        return
+      }
+
+      //jika PCBA sudah digunakan
+      if (status === 'already-used') {
+        setFeedback({
+          title: 'PCB Validation Failed',
+          message: validateResponse.data.message || 'This PCB Serial Number is already used!',
+          serialNumber: currentSerial,
+        })
+        return
+      }
+
+      //jika sudah burning namun fail
       if (status === 'FAIL') {
         setFeedback({
           title: 'PCB Validation Failed',
@@ -79,19 +101,11 @@ const ScanBeforeAssembly = () => {
         return
       }
 
-      if (status === 'not-serial-pcba') {
-        setFeedback({
-          title: 'PCB Validation Failed',
-          message: validateResponse.data.message || 'This is Not Serial For PCBA!',
-          serialNumber: currentSerial,
-        })
-        return
-      }
-
+      //jika sudah burning dan pass (lanjut step selanjunya)
       if (status === 'PASS') {
         setFeedback(null)
         setPcbDisabled(true)
-        setSideCoverDisabled(false)
+        setBackCoverDisabled(false)
         toast.success(validateResponse.data.message || 'PCB Serial Number is valid!')
       }
 
@@ -106,7 +120,7 @@ const ScanBeforeAssembly = () => {
 
       // setFeedback(null)
       // setPcbDisabled(true)
-      // setSideCoverDisabled(false)
+      // setBackCoverDisabled(false)
       // toast.success(validateResponse.data.message || 'PCB Serial Number is valid!')
     } catch (error) {
       setFeedback({
@@ -117,18 +131,18 @@ const ScanBeforeAssembly = () => {
     }
   }
 
-  const handleSideCover = async () => {
-    if (!formData.pcbSnumb || !formData.sideCoverSnumb) {
+  //matching BackCover
+  const handleBackCover = async () => {
+    if (!formData.pcbSnumb || !formData.backCoverSnumb) {
       setFeedback({
         title: 'Serial Number cannot be empty',
         message: 'Make sure PCB and Assembly serial have been scanned.',
-        serialNumber: formData.sideCoverSnumb,
+        serialNumber: formData.backCoverSnumb,
       })
-      return
     }
 
-    const currentSerial = formData.sideCoverSnumb?.trim()
-    if (!currentSerial) {
+    const assemblySerial = formData.backCoverSnumb?.trim()
+    if (!assemblySerial) {
       setFeedback({
         title: 'Assembly Serial cannot be empty',
         message: 'Enter or scan the Assembly serial number.',
@@ -137,52 +151,92 @@ const ScanBeforeAssembly = () => {
     }
 
     try {
-      const assemblyResponse = await backendTracking.get('/validate', {
+      const assemblyResponse = await backendQc.get('/validation', {
         params: {
-          serial_number: currentSerial,
-          tracking_type: 'assembly',
+          serial_number: assemblySerial,
+          qc_id: 'QC-MBC001',
         },
       })
 
-      if (!assemblyResponse.data.data.isValid) {
+      const { status, message, serial_number } = assemblyResponse.data
+      // console.log('status : ', status)
+      // console.log('message : ', message)
+      // console.log('serial_number : ', serial_number)
+
+      //jika belum dilakukan sub assy
+      if (status === 'sub-assy-not-yet') {
         setFeedback({
-          title: 'Assembly Validation Failed',
-          message: assemblyResponse.data.message || 'Assembly Serial Number is invalid!',
-          serialNumber: currentSerial,
+          title: 'PCB Validation Failed',
+          message: message || 'Must pass the Sub-Assembly process!',
+          serialNumber: assemblySerial,
         })
         return
       }
 
-      const payload = {
-        parent_serial_number: currentSerial,
-        component_serial_number: formData.pcbSnumb,
-        quantity: 1,
+      //jika sudah dilakukan sub assy namun FAIL
+      if (status === 'sub-assy-fail') {
+        setFeedback({
+          title: 'PCB Validation Failed',
+          message: message || 'Sub-Assembly process failed. Process cannot continue',
+          serialNumber: assemblySerial,
+        })
+        return
       }
 
-      const res = await backendTracking.post('/assembly-components/by-serial', payload)
-      const isSuccess = res.data?.success
-
-      if (isSuccess === false) {
-        const errorMessage = res.data?.message || 'Matching failed! Please try again.'
+      //jika sudah dilakukan sub assy namun FAIL
+      if (status === 'already-matching') {
         setFeedback({
-          title: 'Matching Failed',
-          message: errorMessage,
-          serialNumber: currentSerial,
+          title: 'PCB Validation Failed',
+          message: message || 'Back Cover Serial has already passed the Matching stage',
+          serialNumber: assemblySerial,
         })
-        toast.error(errorMessage)
+        return
+      }
+
+      //jika sudah dilakukan Aseembly Test namun belum matching
+      if (status === 'assembly-test-exist') {
+        setFeedback({
+          title: 'PCB Validation Failed',
+          message:
+            message ||
+            'Back Cover Serial has not been matched, but it has already gone through the Assembly Test process',
+          serialNumber: assemblySerial,
+        })
+        return
+      }
+
+      //jika sudah Assembly Test (PASS) dan Lanjut Process Matching
+      if (status === 'sub-assy-pass') {
+        //lanjut ke submit
+
+        const payload = {
+          parent_serial_number: assemblySerial,
+          component_serial_number: formData.pcbSnumb,
+          quantity: 1,
+        }
+        const res = await backendTracking.post('/assembly-components/by-serial', payload)
+        const isSuccess = res.data?.success
+        if (isSuccess === false) {
+          const errorMessage = res.data?.message || 'Matching failed! Please try again.'
+          setFeedback({
+            title: 'Matching Failed',
+            message: errorMessage,
+            serialNumber: assemblySerial,
+          })
+          toast.error(errorMessage)
+          resetForm()
+          return
+        }
+        setFeedback(null)
+        toast.success(res.data?.message || 'Matching Successful! Data saved successfully!')
         resetForm()
-        return
       }
-
-      setFeedback(null)
-      toast.success(res.data?.message || 'Matching Successful! Data saved successfully!')
-      resetForm()
     } catch (error) {
       console.log('error nih')
       setFeedback({
         title: 'Assembly Error',
         message: error.response?.data?.message || 'Failed to validate or submit data!',
-        serialNumber: currentSerial,
+        serialNumber: assemblySerial,
       })
     }
   }
@@ -234,7 +288,7 @@ const ScanBeforeAssembly = () => {
           </CCard>
         </CCol>
 
-        {/* Side Cover Serial Number */}
+        {/* Back Cover Serial Number */}
         <CCol xs={6}>
           <CCard className="mb-4">
             <CCardHeader>
@@ -246,7 +300,7 @@ const ScanBeforeAssembly = () => {
                   <CCol sm={12}>
                     <ImageContainer
                       src="/images/assembly/assembly_serial_no_pcb.jpeg"
-                      alt="Side Cover Preview"
+                      alt="Back Cover Preview"
                       height="300px"
                     />
                   </CCol>
@@ -257,16 +311,16 @@ const ScanBeforeAssembly = () => {
                   <CCol sm={12} className="d-flex justify-content-center mt-2">
                     <CFormInput
                       type="text"
-                      id="sideCoverSnumb"
-                      name="sideCoverSnumb"
-                      value={formData.sideCoverSnumb}
+                      id="backCoverSnumb"
+                      name="backCoverSnumb"
+                      value={formData.backCoverSnumb}
                       onChange={handleChange}
                       onKeyDown={(e) =>
-                        e.key === 'Enter' && (e.preventDefault(), handleSideCover())
+                        e.key === 'Enter' && (e.preventDefault(), handleBackCover())
                       }
-                      ref={sideCoverInputRef}
+                      ref={backCoverInputRef}
                       required
-                      disabled={sideCoverDisabled}
+                      disabled={backCoverDisabled}
                     />
                   </CCol>
                 </CRow>
