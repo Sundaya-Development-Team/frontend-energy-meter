@@ -89,7 +89,7 @@ const ProductDetail = () => {
   }
 
   // Pagination logic
-  const components = product?.components || []
+  const components = useMemo(() => product?.components || [], [product])
   const totalItems = components.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
 
@@ -184,9 +184,7 @@ const ProductDetail = () => {
                     title="Click to enlarge"
                   />
                 ) : (
-                  <div className="product-image-placeholder">
-                    No Image Available
-                  </div>
+                  <div className="product-image-placeholder">No Image Available</div>
                 )}
                 <div className="text-muted small product-image-hint">
                   {product.image_url ? 'Click image to enlarge' : ''}
@@ -279,24 +277,38 @@ const ProductDetail = () => {
                   <CTableHeaderCell>Name</CTableHeaderCell>
                   <CTableHeaderCell>Type</CTableHeaderCell>
                   <CTableHeaderCell>Supplier</CTableHeaderCell>
-                  <CTableHeaderCell className="text-center table-col-action">Action</CTableHeaderCell>
+                  <CTableHeaderCell className="text-center table-col-action">
+                    Action
+                  </CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
                 {paginatedComponents.map((component, index) => (
-                  <CTableRow key={index}>
+                  <CTableRow
+                    key={component.id || component.sap_code || component.product?.sap_code || index}
+                  >
                     <CTableDataCell className="text-center">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </CTableDataCell>
-                    <CTableDataCell>{component.product?.sap_code || component.sap_code || '-'}</CTableDataCell>
-                    <CTableDataCell>{component.product?.name || component.name || '-'}</CTableDataCell>
-                    <CTableDataCell>{component.product?.type?.name || component.type?.name || '-'}</CTableDataCell>
-                    <CTableDataCell>{component.product?.supplier?.name || component.supplier?.name || '-'}</CTableDataCell>
+                    <CTableDataCell>
+                      {component.product?.sap_code || component.sap_code || '-'}
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      {component.product?.name || component.name || '-'}
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      {component.product?.type?.name || component.type?.name || '-'}
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      {component.product?.supplier?.name || component.supplier?.name || '-'}
+                    </CTableDataCell>
                     <CTableDataCell className="text-center">
                       <CButton
                         size="sm"
                         color="primary"
-                        onClick={() => handleComponentDetail(component.product?.sap_code || component.sap_code)}
+                        onClick={() =>
+                          handleComponentDetail(component.product?.sap_code || component.sap_code)
+                        }
                       >
                         Detail
                       </CButton>
@@ -337,7 +349,7 @@ const ProductDetail = () => {
                       >
                         {page}
                       </CPaginationItem>
-                    )
+                    ),
                   )}
 
                   <CPaginationItem
