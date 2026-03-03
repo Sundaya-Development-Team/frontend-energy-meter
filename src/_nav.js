@@ -174,6 +174,20 @@ const _nav = [
     permissions: ['ADMIN', 'QC_RECEIVING'],
   },
 
+  // Quality Assurance
+  {
+    component: CNavTitle,
+    name: 'Quality Assurance',
+    permissions: ['ADMIN', 'QUALTY_ASSURANCE'],
+  },
+  {
+    component: CNavItem,
+    name: 'Tempere Test',
+    to: '/receiving/purchaseOrder',
+    icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'QUALTY_ASSURANCE'],
+  },
+
   // Production
   {
     component: CNavTitle,
