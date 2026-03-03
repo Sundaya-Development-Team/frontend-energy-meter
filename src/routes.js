@@ -23,7 +23,9 @@ const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingF
 //QCProd
 const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql'))
 const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql'))
-const ProdQcSoftwareBurningNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSoftwareBurningNoAql'))
+const ProdQcSoftwareBurningNoAql = React.lazy(
+  () => import('./views/production/formqc/ProdQcSoftwareBurningNoAql'),
+)
 const ProdQcRepair = React.lazy(() => import('./views/production/formqc/RepairQc'))
 
 //QCPerformance
@@ -115,6 +117,8 @@ const routes = [
           'LASER_PRINT',
           'QC_COVER',
           'GENERATE_BOX',
+          'SOFTWARE_BURNING',
+          'QUALTY_ASSURANCE',
         ]}
       >
         <DefaultLayout>
@@ -124,8 +128,8 @@ const routes = [
     ),
   },
   //Receiving
-  { 
-    path: '/receiving', 
+  {
+    path: '/receiving',
     name: 'Receiving',
     element: (
       <PrivateRoutes requiredPermission={['ADMIN', 'PO_RECEIVING']}>
@@ -213,8 +217,8 @@ const routes = [
     ),
   },
   //Tracking
-  { 
-    path: '/tracking', 
+  {
+    path: '/tracking',
     name: 'Tracking',
     element: (
       <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
@@ -228,21 +232,28 @@ const routes = [
     path: '/tracking/list',
     name: 'Tracking Product List',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN',
-      'PO_RECEIVING',
-      'QC_RECEIVING',
-      'QC_SUB_ASSEMBLY',
-      'QC_ASSEMBLY',
-      'ON_TEST',
-      'HIPOT_TEST',
-      'PIC_HIPOT',
-      'TEST_BENCH1',
-      'ULTRA_SONIC',
-      'QC_REF_METER',
-      'TEST_BENCH2',
-      'AGING_TEST',
-      'LASER_PRINT',
-      'QC_COVER']}>
+      <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'PO_RECEIVING',
+          'QC_RECEIVING',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'ON_TEST',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'GENERATE_BOX',
+          'SOFTWARE_BURNING',
+          'QUALTY_ASSURANCE',
+        ]}
+      >
         <DefaultLayout>
           <TrackingList />
         </DefaultLayout>
@@ -253,21 +264,28 @@ const routes = [
     path: '/tracking/detail/:trackingId',
     name: 'Tracking Detail',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN',
-      'PO_RECEIVING',
-      'QC_RECEIVING',
-      'QC_SUB_ASSEMBLY',
-      'QC_ASSEMBLY',
-      'ON_TEST',
-      'HIPOT_TEST',
-      'PIC_HIPOT',
-      'TEST_BENCH1',
-      'ULTRA_SONIC',
-      'QC_REF_METER',
-      'TEST_BENCH2',
-      'AGING_TEST',
-      'LASER_PRINT',
-      'QC_COVER']}>
+      <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'PO_RECEIVING',
+          'QC_RECEIVING',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'ON_TEST',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'GENERATE_BOX',
+          'SOFTWARE_BURNING',
+          'QUALTY_ASSURANCE',
+        ]}
+      >
         <DefaultLayout>
           <TrackingDetail />
         </DefaultLayout>
@@ -286,8 +304,8 @@ const routes = [
     ),
   },
   //Production
-  { 
-    path: '/production', 
+  {
+    path: '/production',
     name: 'Production',
     element: (
       <PrivateRoutes
@@ -325,8 +343,8 @@ const routes = [
   },
 
   //Producrion - Assembly
-  { 
-    path: '/production/assembly', 
+  {
+    path: '/production/assembly',
     name: 'Assembly',
     element: (
       <PrivateRoutes
@@ -422,37 +440,37 @@ const routes = [
       </PrivateRoutes>
     ),
   },
- //QC SoftwareBurning
- { path: '/production/softwareburning', name: 'QC Serial No AQL' },
- {
-  path: '/production/softwareburning/:qcIdParams/:qcNameParams/:qcPlaceParams',
-  name: '',
-  element: (
-    <PrivateRoutes
-      requiredPermission={[
-        'ADMIN',
-        'ON_TEST',
-        'QC_SUB_ASSEMBLY',
-        'QC_ASSEMBLY',
-        'HIPOT_TEST',
-        'PIC_HIPOT',
-        'TEST_BENCH1',
-        'ULTRA_SONIC',
-        'QC_REF_METER',
-        'TEST_BENCH2',
-        'AGING_TEST',
-        'LASER_PRINT',
-        'QC_COVER',
-        'QC_RECEIVING',
-        'SOFTWARE_BURNING',
-      ]}
-    >
-      <DefaultLayout>
-        <ProdQcSoftwareBurningNoAql />
-      </DefaultLayout>
-    </PrivateRoutes>
-  ),
-},
+  //QC SoftwareBurning
+  { path: '/production/softwareburning', name: 'QC Serial No AQL' },
+  {
+    path: '/production/softwareburning/:qcIdParams/:qcNameParams/:qcPlaceParams',
+    name: '',
+    element: (
+      <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'ON_TEST',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'QC_RECEIVING',
+          'SOFTWARE_BURNING',
+        ]}
+      >
+        <DefaultLayout>
+          <ProdQcSoftwareBurningNoAql />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
   //QC Production No Aql Serial
   { path: '/production/serialnoaql', name: 'QC Serial No AQL' },
   {
@@ -515,7 +533,7 @@ const routes = [
     path: '/production/finishing/printlaser/:qcIdParams/:postNameParams/:qcPlaceParams',
     name: 'Print Laser',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN','LASER_PRINT','LASER_PRINT1','LASER_PRINT2']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'LASER_PRINT', 'LASER_PRINT1', 'LASER_PRINT2']}>
         <DefaultLayout>
           <PrintLaser />
         </DefaultLayout>
@@ -544,8 +562,11 @@ const routes = [
       </PrivateRoutes>
     ),
   },
-  { path: '/performance', name: 'Performance' , element: (
-    <PrivateRoutes
+  {
+    path: '/performance',
+    name: 'Performance',
+    element: (
+      <PrivateRoutes
         requiredPermission={[
           'ADMIN',
           'ON_TEST',
@@ -563,20 +584,28 @@ const routes = [
           'QC_RECEIVING',
         ]}
       >
-      <DefaultLayout>
-        <Dashboard />
-      </DefaultLayout>
-    </PrivateRoutes>
-  ) },
-  { path: '/performance/:qcIdParams/:qcNameParams/:qcPlaceParams', name: 'Qc Performance', element: (
-    <PrivateRoutes requiredPermission={['ADMIN']}>
-      <DefaultLayout>
-        <QCPerformanceAql />
-      </DefaultLayout>
-    </PrivateRoutes>
-  ) },
-  { path: '/performance/sampling', name: 'Sampling', element: (
-    <PrivateRoutes
+        <DefaultLayout>
+          <Dashboard />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/performance/:qcIdParams/:qcNameParams/:qcPlaceParams',
+    name: 'Qc Performance',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN']}>
+        <DefaultLayout>
+          <QCPerformanceAql />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/performance/sampling',
+    name: 'Sampling',
+    element: (
+      <PrivateRoutes
         requiredPermission={[
           'ADMIN',
           'ON_TEST',
@@ -594,19 +623,24 @@ const routes = [
           'QC_RECEIVING',
         ]}
       >
-      <DefaultLayout>
-        <Dashboard />
-      </DefaultLayout>
-    </PrivateRoutes>
-  ) },
-  { path: '/performance/sampling/:qcIdParams/:qcNameParams/:qcPlaceParams', name: 'Sampling Unit', element: (
-    <PrivateRoutes requiredPermission={['ADMIN']}>
-      <DefaultLayout>
-        <PerformaceSampling />
-      </DefaultLayout>
-    </PrivateRoutes>
-  ) },
-  
+        <DefaultLayout>
+          <Dashboard />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/performance/sampling/:qcIdParams/:qcNameParams/:qcPlaceParams',
+    name: 'Sampling Unit',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN']}>
+        <DefaultLayout>
+          <PerformaceSampling />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
   { path: '/repair', name: 'Repair' },
   {
     path: '/repair/:qcIdParams/:qcNameParams/:qcPlaceParams',
@@ -637,21 +671,25 @@ const routes = [
     path: '/masterdata/product/detail/:sapCode',
     name: 'Product Detail',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN',
-      'PO_RECEIVING',
-      'QC_RECEIVING',
-      'QC_SUB_ASSEMBLY',
-      'QC_ASSEMBLY',
-      'ON_TEST',
-      'HIPOT_TEST',
-      'PIC_HIPOT',
-      'TEST_BENCH1',
-      'ULTRA_SONIC',
-      'QC_REF_METER',
-      'TEST_BENCH2',
-      'AGING_TEST',
-      'LASER_PRINT',
-      'QC_COVER']}>
+      <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'PO_RECEIVING',
+          'QC_RECEIVING',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'ON_TEST',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+        ]}
+      >
         <DefaultLayout>
           <ProductDetail />
         </DefaultLayout>
@@ -680,7 +718,7 @@ const routes = [
     path: '/warehouse/outgoing/assemblyorder',
     name: 'Acc. Assembly order',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <AssemblyOrderConfirmation />
         </DefaultLayout>
@@ -694,7 +732,7 @@ const routes = [
     path: '/warehouse/stock/warehouseStock',
     name: 'Stock Opname',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <WarehouseStock />
         </DefaultLayout>
@@ -705,7 +743,7 @@ const routes = [
     path: '/warehouse/warehouseMaster',
     name: 'Warehouse Data Master',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <WarehouseMaster />
         </DefaultLayout>
@@ -716,7 +754,7 @@ const routes = [
     path: '/warehouse/receivingwhrequest',
     name: 'Receiving to WH Request List',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <ReceivingWhRequest />
         </DefaultLayout>
@@ -727,7 +765,7 @@ const routes = [
     path: '/warehouse/assemblywhrequest',
     name: 'Assembly to WH Request',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <AssemblyWhRequest />
         </DefaultLayout>
@@ -738,7 +776,7 @@ const routes = [
     path: '/warehouse/serialstockconfirm',
     name: 'Assembly Order Confirmation',
     element: (
-      <PrivateRoutes requiredPermission={['ADMIN','GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
+      <PrivateRoutes requiredPermission={['ADMIN', 'GUDANG_ELEKTRONIK', 'GUDANG_NON_ELEKTRONIK']}>
         <DefaultLayout>
           <SerialStockConfirm />
         </DefaultLayout>
