@@ -241,7 +241,7 @@ const ProdQcSoftwareBurningNoAql = () => {
           qc_id: qcCodeSerial, //cek kembali ini nanti
         },
       })
-      const remainingSample = response.data.data.quantity_summary.remaining_quantity
+      const remainingSample = response.data.data.inspection_status.remaining_items
 
       if (remainingSample <= 0) {
         const errorMsg = 'SAMPLE SUDAH CUKUP !!'
@@ -498,23 +498,25 @@ const ProdQcSoftwareBurningNoAql = () => {
                   <CCardHeader>
                     <strong>Counter</strong>
                   </CCardHeader>
-                  <CCardBody className={`${!successValidation ? 'd-flex flex-column justify-content-center flex-grow-1' : ''}`}>
+                  <CCardBody
+                    className={`${!successValidation ? 'd-flex flex-column justify-content-center flex-grow-1' : ''}`}
+                  >
                     <CRow className="mb-3">
                       <CounterCard6
                         title="Required Quantity"
-                        value={trackingProduct?.quantity_summary?.total_quantity ?? `-`}
+                        value={trackingProduct?.inspection_status?.total_items ?? `-`}
                       />
                       <CounterCard6
                         title="Remaining Quantity"
-                        value={trackingProduct?.quantity_summary?.remaining_quantity ?? `-`}
+                        value={trackingProduct?.inspection_status?.remaining_items ?? `-`}
                       />
                       <CounterCard6
                         title="Pass Quantity"
-                        value={trackingProduct?.quantity_summary?.pass_quantity ?? `-`}
+                        value={trackingProduct?.inspection_status?.pass_quantity ?? `-`}
                       />
                       <CounterCard6
                         title="Fail Quantity"
-                        value={trackingProduct?.quantity_summary?.fail_quantity ?? `-`}
+                        value={trackingProduct?.inspection_status?.fail_quantity ?? `-`}
                       />
                     </CRow>
                   </CCardBody>
