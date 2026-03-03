@@ -74,6 +74,8 @@ const _nav = [
       'LASER_PRINT',
       'QC_COVER',
       'GENERATE_BOX',
+      'SOFTWARE_BURNING',
+      'QUALTY_ASSURANCE',
     ],
   },
 
@@ -140,6 +142,8 @@ const _nav = [
       'AGING_TEST',
       'LASER_PRINT',
       'QC_COVER',
+      'SOFTWARE_BURNING',
+      'QUALTY_ASSURANCE',
     ],
   },
   {
@@ -164,6 +168,8 @@ const _nav = [
       'AGING_TEST',
       'LASER_PRINT',
       'QC_COVER',
+      'SOFTWARE_BURNING',
+      'QUALTY_ASSURANCE',
     ],
   },
   {
@@ -172,6 +178,20 @@ const _nav = [
     to: '/tracking/finalproduct',
     icon: <CIcon icon={cilHistory} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'QC_RECEIVING'],
+  },
+
+  // Quality Assurance
+  {
+    component: CNavTitle,
+    name: 'Quality Assurance',
+    permissions: ['ADMIN', 'QUALTY_ASSURANCE'],
+  },
+  {
+    component: CNavItem,
+    name: 'Tempere Test',
+    to: '/receiving/purchaseOrder',
+    icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'QUALTY_ASSURANCE'],
   },
 
   // Production
