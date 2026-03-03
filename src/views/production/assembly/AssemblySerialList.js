@@ -12,6 +12,7 @@ const AssemblySerialList = () => {
   const [limit, setLimit] = useState(10)
   const [totalRows, setTotalRows] = useState(0)
   const [searchKeyword, setSearchKeyword] = useState('')
+  const [isPrinting, setIsPrinting] = useState(false)
   const navigate = useNavigate()
 
   // Ambil user dari localStorage
@@ -57,21 +58,23 @@ const AssemblySerialList = () => {
 
   //Print Serial
   const PrintSerial = async () => {
-    console.log("Print")
+    console.log('Print')
     const payload = {
       limit: 10,
       printedBy: user?.name || 'Unknown User',
-      printNotes: "Print"
+      printNotes: 'Print',
     }
 
+    setIsPrinting(true)
     try {
       await backendGenerate.post('/pln-codes/send-to-printer', payload)
       toast.success('Print status updated successfully!')
-
       fetchRecords()
     } catch (error) {
       console.error('Error update print status:', error)
       toast.error(error.response?.data?.message || 'Failed to update print status')
+    } finally {
+      setIsPrinting(false)
     }
   }
   // Download CSV + update ke API
@@ -176,9 +179,9 @@ const AssemblySerialList = () => {
               color="success"
               className="text-white"
               onClick={PrintSerial}
-              disabled={records.length === 0}
+              disabled={records.length === 0 || isPrinting}
             >
-              Print Serial
+              {isPrinting ? 'Printing...' : 'Print Serial'}
             </CButton>
           </CCol>
 
