@@ -74,6 +74,8 @@ const _nav = [
       'LASER_PRINT',
       'QC_COVER',
       'GENERATE_BOX',
+      'SOFTWARE_BURNING',
+      'QUALTY_ASSURANCE',
     ],
   },
 
@@ -140,6 +142,8 @@ const _nav = [
       'AGING_TEST',
       'LASER_PRINT',
       'QC_COVER',
+      'SOFTWARE_BURNING',
+      'QUALTY_ASSURANCE',
     ],
   },
   {
@@ -164,6 +168,8 @@ const _nav = [
       'AGING_TEST',
       'LASER_PRINT',
       'QC_COVER',
+      'SOFTWARE_BURNING',
+      'QUALTY_ASSURANCE',
     ],
   },
   {
