@@ -4,7 +4,7 @@ const QUALITY_SERVICE = import.meta.env.VITE_QUALITY_SERVICE
 const PARTNER = import.meta.env.VITE_PARTNER
 const BASE_SERVER = import.meta.env.VITE_SERVER
 const VITE_SERVER_DATA = import.meta.env.VITE_SERVER_DATA
-
+const VITE_RELAY = import.meta.env.VITE_RELAY
 //Master Data
 export const backendProduct = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/master-data/products`,
@@ -45,7 +45,6 @@ export const backendQc = axios.create({
 export const backendQualityService = axios.create({
   baseURL: QUALITY_SERVICE,
 })
-
 
 //Warehouse
 // export const backendWh = axios.create({
@@ -90,6 +89,10 @@ export const cdnBackend = axios.create({
   baseURL: `${VITE_SERVER_DATA}/api/v2/cdn`,
 })
 
+//relay
+export const backendRelay = axios.create({
+  baseURL: `${VITE_RELAY}`,
+})
 
 // export const backendPartner = axios.create({
 //   baseURL: `${BASE_SERVER}/v1/partner`,
