@@ -14,7 +14,7 @@ import {
   CFormSwitch,
 } from '@coreui/react'
 
-import { backendQc, backendTracking } from '../../api/axios'
+import { backendQc, backendTracking, backendRelay } from '../../api/axios'
 import { CounterCard6 } from '../components/CounterCard'
 import ErrorCard from '../components/ErrorCard'
 import SuccessCard from '../components/SuccessCard'
