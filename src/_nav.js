@@ -188,10 +188,25 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Tempere Test',
-    to: '/receiving/purchaseOrder',
+    name: 'QA Status',
+    to: '/quality-assurance/status',
     icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
     permissions: ['ADMIN', 'QUALTY_ASSURANCE'],
+  },
+  {
+    component: CNavGroup,
+    name: 'QA Stage',
+    to: '/quality-assurance/qa-stage',
+    icon: <CIcon icon={cilAlbum} customClassName="nav-icon" />,
+    permissions: ['ADMIN', 'SOFTWARE_BURNING'],
+    items: [
+      {
+        component: CNavItem,
+        name: 'Stage 1',
+        to: '/quality-assurance/qa-stage1',
+        permissions: ['ADMIN', 'SOFTWARE_BURNING'],
+      },
+    ],
   },
 
   // Production

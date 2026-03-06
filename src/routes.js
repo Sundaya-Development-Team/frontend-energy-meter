@@ -20,6 +20,10 @@ const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
 const TrackingDetail = React.lazy(() => import('./views/tracking/TrackingDetail'))
 const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingFinalProduct'))
 
+//Quality Assurance
+const QualityAssuranceStatus = React.lazy(() => import('./views/qa/QaStatus'))
+const QualityAssuranceStage1 = React.lazy(() => import('./views/qa/QaStage1'))
+
 //QCProd
 const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql'))
 const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql'))
@@ -303,6 +307,31 @@ const routes = [
       </PrivateRoutes>
     ),
   },
+  //Quality Assurance
+  { path: '/quality-assurance', name: 'Quality Assurance' },
+  {
+    path: '/quality-assurance/status',
+    name: 'Quality Assurance Status',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN', 'QUALITY_ASSURANCE']}>
+        <DefaultLayout>
+          <QualityAssuranceStatus />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/quality-assurance/qa-stage1',
+    name: 'Stage 1',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN', 'QUALITY_ASSURANCE']}>
+        <DefaultLayout>
+          <QualityAssuranceStage1 />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+
   //Production
   {
     path: '/production',
