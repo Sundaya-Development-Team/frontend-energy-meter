@@ -16,6 +16,7 @@ import {
 
 import { backendQc, backendTracking, backendRelay } from '../../api/axios'
 import { CounterCard6 } from '../components/CounterCard'
+import { toast } from 'react-toastify'
 import ErrorCard from '../components/ErrorCard'
 import SuccessCard from '../components/SuccessCard'
 import '../../scss/style.scss'
@@ -42,6 +43,8 @@ const QaStage1 = () => {
   const [successValidation, setSuccessValidation] = useState(null) // untuk success card
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [qcName, setQcName] = useState([])
+  const [relayData, setRelayData] = useState(null)
+  const [qcCodeSerial, setNextQcIdValue] = useState(null)
 
   useEffect(() => {
     resetStates()
@@ -83,6 +86,7 @@ const QaStage1 = () => {
     setErrorSerialNumber(null)
     setSuccessValidation(null)
     setIsFormLocked(false)
+    setRelayData(null)
   }
 
   const handleInput = (e) => {
@@ -116,8 +120,8 @@ const QaStage1 = () => {
           serial_number: serialNumber,
         },
       })
-      const nextQcId = response.data.next_qc_id
-      console.log('nextQcId : ', nextQcId)
+      const nextQcIdValue = response.data.next_qc_id
+      setNextQcIdValue(nextQcIdValue)
 
       if (response.data.status === true) {
         // toast.success(response.data.message ?? 'Serial number valid')
@@ -148,7 +152,7 @@ const QaStage1 = () => {
         setAnswers(initialAnswers)
 
         // // Ambil product
-        fetchProduct(serialNumber)
+        fetchProduct(serialNumber, nextQcIdValue)
       } else {
         const errorMsg = response.data.message ?? 'Serial number already scan'
         setErrorMessage(errorMsg)
@@ -166,7 +170,7 @@ const QaStage1 = () => {
     }
   }
 
-  const fetchProduct = async (serialNumber) => {
+  const fetchProduct = async (serialNumber, nextQcIdValue) => {
     try {
       const response = await backendTracking.get(`/serial/${serialNumber}`)
 
@@ -186,6 +190,7 @@ const QaStage1 = () => {
         const assemblyId = response.data.data.assembly_id
 
         // fetchTrackingProduct(assemblyId)
+        fetchRelayData(nextQcIdValue)
       } else {
         const errorMsg = response.data.message || 'Failed get product data'
         setErrorMessage(errorMsg)
@@ -200,6 +205,22 @@ const QaStage1 = () => {
       // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
       setErrorSerialNumber(serialNumber)
       // toast.error(errorMsg)
+    }
+  }
+
+  const fetchRelayData = async (nextQcIdValue) => {
+    try {
+      const payload1 = {
+        page: nextQcIdValue,
+      }
+
+      const response = await backendRelay.post('/page', payload1)
+      console.log('Relay Response : ', response.data.status)
+      setRelayData(response.data)
+    } catch (error) {
+      console.log(error)
+      const errorMsg = error.response?.data?.message || 'ERROR RELAY'
+      setErrorMessage(errorMsg)
     }
   }
 
@@ -225,6 +246,7 @@ const QaStage1 = () => {
       // toast.error(errorMsg)
       return
     }
+    console.log('qcCodeSerial : ', qcCodeSerial)
     if (!qcCodeSerial) {
       const errorMsg = 'QC ID wajib diisi!'
       setErrorMessage(errorMsg)
@@ -273,27 +295,6 @@ const QaStage1 = () => {
       toast.success(messageShow)
       setErrorMessage(null)
 
-      // Fetch counter terbaru setelah submit berhasil
-      const assemblyId = productData.assembly_id
-      if (assemblyId) {
-        try {
-          const counterResponse = await backendTracking.get(
-            '/sample-inspections/quantity-summary',
-            {
-              params: {
-                assembly_id: assemblyId,
-                qc_id: qcCodeSerial,
-              },
-            },
-          )
-          // Update counter dengan data terbaru
-          setTrackingProduct(counterResponse.data.data)
-        } catch (counterError) {
-          console.error('Error fetching updated counter:', counterError)
-          // Tidak perlu error handling, karena submit sudah berhasil
-        }
-      }
-
       // Bersihkan semua state hanya jika submit berhasil
       resetStates()
 
@@ -305,7 +306,7 @@ const QaStage1 = () => {
       }, 0)
     } catch (error) {
       console.error('QC submit error:', error)
-      const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QC'
+      const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QA'
       setErrorMessage(errorMsg)
       // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
       const currentSerialNumber = productData?.serial_number || formData.serialNumber
@@ -413,32 +414,24 @@ const QaStage1 = () => {
               />
             ) : (
               <div className="h-100 d-flex flex-column">
-                {/* Counter Card */}
+                {/* Relay Card */}
                 <CCard className={`d-flex flex-column ${successValidation ? 'mb-4' : 'h-100'}`}>
                   <CCardHeader>
-                    <strong>Counter</strong>
+                    <strong>Relay</strong>
                   </CCardHeader>
                   <CCardBody
                     className={`${!successValidation ? 'd-flex flex-column justify-content-center flex-grow-1' : ''}`}
                   >
-                    <CRow className="mb-3">
-                      <CounterCard6
-                        title="Required Quantity"
-                        value={trackingProduct?.quantity_summary?.total_quantity ?? `-`}
-                      />
-                      <CounterCard6
-                        title="Remaining Quantity"
-                        value={trackingProduct?.quantity_summary?.remaining_quantity ?? `-`}
-                      />
-                      <CounterCard6
-                        title="Pass Quantity"
-                        value={trackingProduct?.quantity_summary?.pass_quantity ?? `-`}
-                      />
-                      <CounterCard6
-                        title="Fail Quantity"
-                        value={trackingProduct?.quantity_summary?.fail_quantity ?? `-`}
-                      />
-                    </CRow>
+                    {relayData ? (
+                      <CRow className="mb-3">
+                        <CounterCard6 title="Halaman" value={relayData.halaman ?? `-`} />
+                        <CounterCard6 title="Alamat" value={relayData.alamat ?? `-`} />
+                        <CounterCard6 title="Tipe Test" value={relayData.tipe_test ?? `-`} />
+                        <CounterCard6 title="Status" value={relayData.status ?? `-`} />
+                      </CRow>
+                    ) : (
+                      <p className="text-muted text-center mb-0">Relay data not yet available...</p>
+                    )}
                   </CCardBody>
                 </CCard>
 
