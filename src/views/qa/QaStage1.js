@@ -45,6 +45,8 @@ const QaStage1 = () => {
   const [qcName, setQcName] = useState([])
   const [relayData, setRelayData] = useState(null)
   const [qcCodeSerial, setNextQcIdValue] = useState(null)
+  const [qcIdNow, setQcIdNow] = useState(null)
+  const [buttonStop, setButtonStop] = useState(true)
 
   useEffect(() => {
     resetStates()
@@ -190,6 +192,7 @@ const QaStage1 = () => {
         const assemblyId = response.data.data.assembly_id
 
         // fetchTrackingProduct(assemblyId)
+        setQcIdNow(nextQcIdValue)
         fetchRelayData(nextQcIdValue)
       } else {
         const errorMsg = response.data.message || 'Failed get product data'
@@ -305,7 +308,7 @@ const QaStage1 = () => {
         fetchValidationSnumb(productData.serial_number)
       } else {
         console.log('Tidak lanjut ke stage selanjutnya karena QC-TT006 adalah stage terakhir')
-        stopRelay()
+        homeRelay()
       }
 
       // Set focus ke Production Serial Number setelah reset dan render selesai
@@ -328,15 +331,40 @@ const QaStage1 = () => {
     }
   }
 
-  const stopRelay = async () => {
+  const homeRelay = async () => {
     try {
-      const payload1 = {
+      const payload = {
         page: 'HOME',
       }
 
-      const response = await backendRelay.post('/page', payload1)
+      const response = await backendRelay.post('/page', payload)
       console.log('Relay Response : ', response.data.status)
       setRelayData(response.data)
+    } catch (error) {
+      console.log(error)
+      const errorMsg = error.response?.data?.message || 'ERROR RELAY'
+      setErrorMessage(errorMsg)
+    }
+  }
+
+  const stopRelay = async () => {
+    try {
+      const payload = {
+        page: buttonStop ? 'STOP' : qcIdNow,
+      }
+
+      const response = await backendRelay.post('/page', payload)
+
+      console.log('Relay Response : ', response.data.status)
+      setRelayData(response.data)
+
+      if (buttonStop) {
+        console.log('Masuk kondisi buttonStop true, akan di set ke false dan kirim command RESUME')
+        setButtonStop(false)
+      } else {
+        setButtonStop(true)
+        console.log('Masuk kondisi buttonStop false, akan di set ke true dan kirim command STOP')
+      }
     } catch (error) {
       console.log(error)
       const errorMsg = error.response?.data?.message || 'ERROR RELAY'
@@ -418,7 +446,7 @@ const QaStage1 = () => {
                     })
                   )}
                   {/* Tombol Submit hanya muncul jika ada questions dan tidak ada error */}
-                  {questionData.length > 0 && !errorMessage && (
+                  {questionData.length > 0 && !errorMessage && buttonStop && (
                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                       <CButton color="primary" type="submit">
                         Submit
@@ -457,6 +485,19 @@ const QaStage1 = () => {
                       </CRow>
                     ) : (
                       <p className="text-muted text-center mb-0">Relay data not yet available...</p>
+                    )}
+
+                    {relayData && (
+                      <CRow className="mb-3">
+                        <CButton
+                          color={buttonStop ? 'danger' : 'success'}
+                          type="button"
+                          onClick={stopRelay}
+                          className="mx-auto text-white"
+                        >
+                          {buttonStop ? 'Emergency Stop' : 'Resume Process'}
+                        </CButton>
+                      </CRow>
                     )}
                   </CCardBody>
                 </CCard>
