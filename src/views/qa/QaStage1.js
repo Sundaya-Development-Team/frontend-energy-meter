@@ -270,7 +270,7 @@ const QaStage1 = () => {
       inspector_name: user.name,
       qc_name: qcName, // sementara hardcode
       qc_id: qcCodeSerial,
-      qc_place: qcPlaceParams || 'Workshop A',
+      qc_place: qcPlaceParams || 'QA Station',
       tracking_id: productData.id,
       batch: productData.batch,
       notes: formData.notes,
@@ -298,12 +298,22 @@ const QaStage1 = () => {
       // Bersihkan semua state hanya jika submit berhasil
       resetStates()
 
+      console.log('QC yang di submit : ', qcCodeSerial)
+
+      if (qcCodeSerial !== 'QC-TT006') {
+        console.log('Lanjut ke stage selanjutnya')
+        fetchValidationSnumb(productData.serial_number)
+      } else {
+        console.log('Tidak lanjut ke stage selanjutnya karena QC-TT006 adalah stage terakhir')
+        stopRelay()
+      }
+
       // Set focus ke Production Serial Number setelah reset dan render selesai
-      setTimeout(() => {
-        if (serialNumberInputRef.current) {
-          serialNumberInputRef.current.focus()
-        }
-      }, 0)
+      // setTimeout(() => {
+      //   if (serialNumberInputRef.current) {
+      //     serialNumberInputRef.current.focus()
+      //   }
+      // }, 0)
     } catch (error) {
       console.error('QC submit error:', error)
       const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QA'
@@ -315,6 +325,22 @@ const QaStage1 = () => {
       }
       // toast.error(errorMsg)
       return // Jangan reset states jika ada error
+    }
+  }
+
+  const stopRelay = async () => {
+    try {
+      const payload1 = {
+        page: 'HOME',
+      }
+
+      const response = await backendRelay.post('/page', payload1)
+      console.log('Relay Response : ', response.data.status)
+      setRelayData(response.data)
+    } catch (error) {
+      console.log(error)
+      const errorMsg = error.response?.data?.message || 'ERROR RELAY'
+      setErrorMessage(errorMsg)
     }
   }
 
