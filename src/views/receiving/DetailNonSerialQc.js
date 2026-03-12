@@ -249,7 +249,7 @@ const DetailNonSerialQc = () => {
       setFormData({ notes: '' })
 
       // Fetch ulang summary agar data remaining sample selalu up to date
-      fetchTrackingSumary(detail.receiving_item_id, detail.product.qc_product)
+      fetchTrackingSumary(detail.receiving_item_id, detail?.product?.qc_product)
     } catch (error) {
       toast.error(error.response?.data?.message || error.message || 'Failed to submit QC')
     }
@@ -287,7 +287,7 @@ const DetailNonSerialQc = () => {
           <CCol md={6}>
             <CCard className="mb-4 h-100">
               <CCardHeader className="d-flex justify-content-between align-items-center">
-                <strong>Receiving QC : {detail.product.name || 'Non Serial'} Detail</strong>
+                <strong>Receiving QC : {detail?.product?.name || 'Non Serial'} Detail</strong>
                 <CButton color="secondary" size="sm" onClick={() => navigate(-1)}>
                   Back
                 </CButton>
@@ -301,7 +301,7 @@ const DetailNonSerialQc = () => {
                     </CCol>
                     <CCol md={6}>
                       <div className="fw-semibold">QC Product</div>
-                      <div>{detail.product.qc_product || '-'}</div>
+                      <div>{detail?.product?.qc_product || '-'}</div>
                     </CCol>
                   </CRow>
 
