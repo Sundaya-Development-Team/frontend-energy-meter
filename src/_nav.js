@@ -206,6 +206,12 @@ const _nav = [
         to: '/quality-assurance/qa-stage1',
         permissions: ['ADMIN', 'SOFTWARE_BURNING'],
       },
+      {
+        component: CNavItem,
+        name: 'Before Stage 2',
+        to: '/quality-assurance/qa-before-stage2',
+        permissions: ['ADMIN', 'SOFTWARE_BURNING'],
+      },
     ],
   },
 

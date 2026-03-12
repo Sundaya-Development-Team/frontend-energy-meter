@@ -45,6 +45,8 @@ const QaStage1 = () => {
   const [qcName, setQcName] = useState([])
   const [relayData, setRelayData] = useState(null)
   const [qcCodeSerial, setNextQcIdValue] = useState(null)
+  const [qcIdNow, setQcIdNow] = useState(null)
+  const [buttonStop, setButtonStop] = useState(true)
 
   useEffect(() => {
     resetStates()
@@ -190,6 +192,7 @@ const QaStage1 = () => {
         const assemblyId = response.data.data.assembly_id
 
         // fetchTrackingProduct(assemblyId)
+        setQcIdNow(nextQcIdValue)
         fetchRelayData(nextQcIdValue)
       } else {
         const errorMsg = response.data.message || 'Failed get product data'
@@ -270,7 +273,7 @@ const QaStage1 = () => {
       inspector_name: user.name,
       qc_name: qcName, // sementara hardcode
       qc_id: qcCodeSerial,
-      qc_place: qcPlaceParams || 'Workshop A',
+      qc_place: qcPlaceParams || 'QA Station',
       tracking_id: productData.id,
       batch: productData.batch,
       notes: formData.notes,
@@ -298,12 +301,22 @@ const QaStage1 = () => {
       // Bersihkan semua state hanya jika submit berhasil
       resetStates()
 
+      console.log('QC yang di submit : ', qcCodeSerial)
+
+      if (qcCodeSerial !== 'QC-TT006') {
+        console.log('Lanjut ke stage selanjutnya')
+        fetchValidationSnumb(productData.serial_number)
+      } else {
+        console.log('Tidak lanjut ke stage selanjutnya karena QC-TT006 adalah stage terakhir')
+        homeRelay()
+      }
+
       // Set focus ke Production Serial Number setelah reset dan render selesai
-      setTimeout(() => {
-        if (serialNumberInputRef.current) {
-          serialNumberInputRef.current.focus()
-        }
-      }, 0)
+      // setTimeout(() => {
+      //   if (serialNumberInputRef.current) {
+      //     serialNumberInputRef.current.focus()
+      //   }
+      // }, 0)
     } catch (error) {
       console.error('QC submit error:', error)
       const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QA'
@@ -315,6 +328,47 @@ const QaStage1 = () => {
       }
       // toast.error(errorMsg)
       return // Jangan reset states jika ada error
+    }
+  }
+
+  const homeRelay = async () => {
+    try {
+      const payload = {
+        page: 'HOME',
+      }
+
+      const response = await backendRelay.post('/page', payload)
+      console.log('Relay Response : ', response.data.status)
+      setRelayData(response.data)
+    } catch (error) {
+      console.log(error)
+      const errorMsg = error.response?.data?.message || 'ERROR RELAY'
+      setErrorMessage(errorMsg)
+    }
+  }
+
+  const stopRelay = async () => {
+    try {
+      const payload = {
+        page: buttonStop ? 'STOP' : qcIdNow,
+      }
+
+      const response = await backendRelay.post('/page', payload)
+
+      console.log('Relay Response : ', response.data.status)
+      setRelayData(response.data)
+
+      if (buttonStop) {
+        console.log('Masuk kondisi buttonStop true, akan di set ke false dan kirim command RESUME')
+        setButtonStop(false)
+      } else {
+        setButtonStop(true)
+        console.log('Masuk kondisi buttonStop false, akan di set ke true dan kirim command STOP')
+      }
+    } catch (error) {
+      console.log(error)
+      const errorMsg = error.response?.data?.message || 'ERROR RELAY'
+      setErrorMessage(errorMsg)
     }
   }
 
@@ -392,7 +446,7 @@ const QaStage1 = () => {
                     })
                   )}
                   {/* Tombol Submit hanya muncul jika ada questions dan tidak ada error */}
-                  {questionData.length > 0 && !errorMessage && (
+                  {questionData.length > 0 && !errorMessage && buttonStop && (
                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                       <CButton color="primary" type="submit">
                         Submit
@@ -431,6 +485,19 @@ const QaStage1 = () => {
                       </CRow>
                     ) : (
                       <p className="text-muted text-center mb-0">Relay data not yet available...</p>
+                    )}
+
+                    {relayData && (
+                      <CRow className="mb-3">
+                        <CButton
+                          color={buttonStop ? 'danger' : 'success'}
+                          type="button"
+                          onClick={stopRelay}
+                          className="mx-auto text-white"
+                        >
+                          {buttonStop ? 'Emergency Stop' : 'Resume Process'}
+                        </CButton>
+                      </CRow>
                     )}
                   </CCardBody>
                 </CCard>
