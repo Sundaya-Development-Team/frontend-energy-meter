@@ -69,8 +69,8 @@ const QaBeforeStage2 = () => {
     setInspectionDetails([])
     setCurrentPage(1)
     setIsInputLocked(false)
-    serialInputRef.current?.focus()
-    toast.info('Data tabel telah di-reset.')
+    toast.info('The Serial Number data has been reset..')
+    setTimeout(() => serialInputRef.current?.focus(), 0)
   }
 
   const handleSerial = async () => {
@@ -85,11 +85,10 @@ const QaBeforeStage2 = () => {
       })
       const data = response.data
 
-      // status: true / "sudah-start" = sudah start; false / "belum-start" = belum start
-      const isSudahStart =
-        data.status === true || data.status === 'sudah-start'
+      const isStop = data.status === 'stop'
+      const isLanjut = data.status === 'lanjut'
 
-      if (isSudahStart) {
+      if (isStop) {
         const group = data.serial_number_group || []
         setInspectionDetails(
           group.map((item) => ({ serial_number: item.serial_number })),
@@ -97,6 +96,15 @@ const QaBeforeStage2 = () => {
         setCurrentPage(1)
         setIsInputLocked(true)
         toast.info(data?.message || 'Serial sudah START Tamper.')
+      } else if (isLanjut) {
+        const exists = inspectionDetails.some((d) => d.serial_number === serial)
+        if (exists) {
+          toast.warning('Serial number sudah ada di tabel.')
+          setSerialNumber('')
+          return
+        }
+        setInspectionDetails((prev) => [...prev, { serial_number: serial }])
+        toast.success(data?.message || 'Serial masuk tabel.')
       } else {
         const exists = inspectionDetails.some((d) => d.serial_number === serial)
         if (exists) {
@@ -143,12 +151,13 @@ const QaBeforeStage2 = () => {
             </FormRow>
             <div className="d-flex justify-content-end mt-3">
               {isProcessStarted ? (
-                <CButton color="secondary" onClick={handleStopProcess}>
+                <CButton color="secondary" className="text-white" onClick={handleStopProcess}>
                   Stop Process
                 </CButton>
               ) : (
                 <CButton
                   color="primary"
+                  className="text-white"
                   onClick={handleStartProcess}
                   disabled={inspectionDetails.length === 0}
                 >
@@ -165,7 +174,7 @@ const QaBeforeStage2 = () => {
         <CCard className="mb-4 h-100">
           <CCardHeader className="d-flex justify-content-between align-items-center">
             <strong>Inspection Details || Total: {inspectionDetails.length}</strong>
-            <CButton color="warning" size="sm" onClick={handleReset} disabled={inspectionDetails.length === 0}>
+            <CButton color="warning" size="sm" className="text-white" onClick={handleReset} disabled={inspectionDetails.length === 0}>
               Reset
             </CButton>
           </CCardHeader>
