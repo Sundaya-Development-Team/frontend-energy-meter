@@ -65,12 +65,30 @@ const QaBeforeStage2 = () => {
     setIsInputLocked(false)
   }
 
-  const handleReset = () => {
+  const clearSerialNumber = () => {
     setInspectionDetails([])
     setCurrentPage(1)
     setIsInputLocked(false)
     toast.info('The Serial Number data has been reset..')
     setTimeout(() => serialInputRef.current?.focus(), 0)
+  }
+
+  const handleResetProcess = async () => {
+    const serials = inspectionDetails.map((d) => d.serial_number).filter(Boolean)
+    if (serials.length === 0) {
+      toast.warning('Tidak ada serial untuk reset process.')
+      return
+    }
+    try {
+      await backendQc.post('/tamper/tts007/reset', { serial_numbers: serials })
+      toast.success('Reset process berhasil.')
+      setInspectionDetails([])
+      setCurrentPage(1)
+      setIsInputLocked(false)
+      setTimeout(() => serialInputRef.current?.focus(), 0)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Gagal reset process.')
+    }
   }
 
   const handleSerial = async () => {
@@ -117,7 +135,9 @@ const QaBeforeStage2 = () => {
       }
       setSerialNumber('')
     } catch (err) {
+      setSerialNumber('')
       toast.error(err.response?.data?.message || 'Gagal validasi serial.')
+      setTimeout(() => serialInputRef.current?.focus(), 0)
     }
   }
 
@@ -134,7 +154,7 @@ const QaBeforeStage2 = () => {
           <CCardHeader>
             <strong>QC Aging Test Sample</strong>
           </CCardHeader>
-          <CCardBody>
+          <CCardBody className="d-flex flex-column h-100">
             <FormRow label="Product Serial Number">
               <CFormInput
                 ref={serialInputRef}
@@ -149,12 +169,27 @@ const QaBeforeStage2 = () => {
                 }}
               />
             </FormRow>
-            <div className="d-flex justify-content-end mt-3">
-              {isProcessStarted ? (
-                <CButton color="secondary" className="text-white" onClick={handleStopProcess}>
-                  Stop Process
-                </CButton>
-              ) : (
+            <div className="mt-auto d-flex justify-content-end pt-3 gap-2">
+              {isInputLocked && (
+                <>
+                  <CButton
+                    color="secondary"
+                    className="text-white"
+                    onClick={handleResetProcess}
+                    disabled={inspectionDetails.length === 0}
+                  >
+                    Reset Process
+                  </CButton>
+                  <CButton
+                    color="danger"
+                    className="text-white"
+                    onClick={handleStopProcess}
+                  >
+                    Stop Process
+                  </CButton>
+                </>
+              )}
+              {!isInputLocked && (
                 <CButton
                   color="primary"
                   className="text-white"
@@ -174,9 +209,17 @@ const QaBeforeStage2 = () => {
         <CCard className="mb-4 h-100">
           <CCardHeader className="d-flex justify-content-between align-items-center">
             <strong>Inspection Details || Total: {inspectionDetails.length}</strong>
-            <CButton color="warning" size="sm" className="text-white" onClick={handleReset} disabled={inspectionDetails.length === 0}>
-              Reset
-            </CButton>
+            <div className="d-flex gap-2">
+              <CButton
+                color="warning"
+                size="sm"
+                className="text-white"
+                onClick={clearSerialNumber}
+                disabled={inspectionDetails.length === 0}
+              >
+                Clear Serial Number
+              </CButton>
+            </div>
           </CCardHeader>
           <CCardBody className="d-flex flex-column">
             <div className="flex-grow-1 overflow-auto">
