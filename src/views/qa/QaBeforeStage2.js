@@ -84,6 +84,7 @@ const QaBeforeStage2 = () => {
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
+  const maxSerials = 9
 
   useEffect(() => {
     serialInputRef.current?.focus()
@@ -220,12 +221,26 @@ const QaBeforeStage2 = () => {
       return
     }
     try {
-      await backendQc.post('/tamper/tts007/reset', { serial_numbers: serials })
-      toast.success('Reset process berhasil.')
-      setInspectionDetails([])
+      const response = await backendQc.post('/tamper/tts007/reset', {
+        serial_numbers: serials,
+      })
+      const body = response.data
+      const returnedSerials = Array.isArray(body?.serial_numbers) ? body.serial_numbers : []
+      const limitedSerials = returnedSerials.slice(0, maxSerials)
+      if (returnedSerials.length > maxSerials) {
+        toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
+      }
+      setInspectionDetails(limitedSerials.map((sn) => ({ serial_number: sn })))
       setCurrentPage(1)
       setIsInputLocked(false)
       setIsStopState(false)
+      setIsProcessStarted(false)
+      setProcessStartIso(null)
+      setProcessEndEstimateIso(null)
+      setCountdownMs(null)
+      setStartedSerialNumbers([])
+      autoStopInvokedRef.current = false
+      toast.success(body?.message || 'Reset process berhasil.')
       setTimeout(() => serialInputRef.current?.focus(), 0)
     } catch (err) {
       toast.error(err.response?.data?.message || 'Gagal reset process.')
@@ -250,8 +265,12 @@ const QaBeforeStage2 = () => {
 
       if (isStop) {
         const group = data.serial_number_group || []
+        const limitedGroup = group.slice(0, maxSerials)
+        if (group.length > maxSerials) {
+          toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
+        }
         setInspectionDetails(
-          group.map((item) => ({ serial_number: item.serial_number })),
+          limitedGroup.map((item) => ({ serial_number: item.serial_number })),
         )
         setStartedSerialNumbers([])
         setCurrentPage(1)
@@ -265,8 +284,12 @@ const QaBeforeStage2 = () => {
         toast.info(data?.message || 'Serial sudah START Tamper.')
       } else if (isLanjut) {
         const group = data.serial_number_group || []
+        const limitedGroup = group.slice(0, maxSerials)
+        if (group.length > maxSerials) {
+          toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
+        }
         setInspectionDetails(
-          group.map((item) => ({ serial_number: item.serial_number })),
+          limitedGroup.map((item) => ({ serial_number: item.serial_number })),
         )
         const ts = pickTimestampFromPayload(data)
         if (ts) {
@@ -275,7 +298,7 @@ const QaBeforeStage2 = () => {
           setIsProcessStarted(true)
           autoStopInvokedRef.current = false
         }
-        const serialsFromGroup = group
+        const serialsFromGroup = limitedGroup
           .map((item) => item.serial_number)
           .filter(Boolean)
         setStartedSerialNumbers(serialsFromGroup)
@@ -285,8 +308,12 @@ const QaBeforeStage2 = () => {
         toast.success(data?.message || 'Serial masuk tabel.')
       }else if (isReset) {
         const group = data.serial_number_group || []
+        const limitedGroup = group.slice(0, maxSerials)
+        if (group.length > maxSerials) {
+          toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
+        }
         setInspectionDetails(
-          group.map((item) => ({ serial_number: item.serial_number })),
+          limitedGroup.map((item) => ({ serial_number: item.serial_number })),
         )
         const ts = pickTimestampFromPayload(data)
         if (ts) {
@@ -295,7 +322,7 @@ const QaBeforeStage2 = () => {
           setIsProcessStarted(true)
           autoStopInvokedRef.current = false
         }
-        const serialsFromGroup = group
+        const serialsFromGroup = limitedGroup
           .map((item) => item.serial_number)
           .filter(Boolean)
         setStartedSerialNumbers(serialsFromGroup)
@@ -304,6 +331,11 @@ const QaBeforeStage2 = () => {
         // setIsStopState(false)
         toast.success(data?.message || 'Serial masuk tabel.')
       } else {
+        if (inspectionDetails.length >= maxSerials) {
+          toast.warning(`Maksimal ${maxSerials} serial dalam tabel.`)
+          setSerialNumber('')
+          return
+        }
         const exists = inspectionDetails.some((d) => d.serial_number === serial)
         if (exists) {
           toast.warning('Serial number sudah ada di tabel.')
@@ -370,7 +402,7 @@ const QaBeforeStage2 = () => {
               </>
             )}
             <div className="mt-auto d-flex justify-content-end pt-3 gap-2 flex-wrap">
-              {isInputLocked && (
+              {(isInputLocked || isProcessStarted) && (
                 <>
                   <CButton
                     color="secondary"
@@ -389,16 +421,6 @@ const QaBeforeStage2 = () => {
                     Stop Process
                   </CButton>
                 </>
-              )}
-              {!isInputLocked && isProcessStarted && (
-                <CButton
-                  color="danger"
-                  className="text-white"
-                  onClick={() => handleStopProcess()}
-                  disabled={isStopLoading}
-                >
-                  {isStopLoading ? 'Menghentikan…' : 'Stop Process'}
-                </CButton>
               )}
               {!isInputLocked && !isProcessStarted && !isStopState && (
                 <CButton
@@ -426,7 +448,7 @@ const QaBeforeStage2 = () => {
                 size="sm"
                 className="text-white"
                 onClick={clearSerialNumber}
-                disabled={inspectionDetails.length === 0}
+                disabled={inspectionDetails.length === 0 || isProcessStarted}
               >
                 Clear Serial Number
               </CButton>
