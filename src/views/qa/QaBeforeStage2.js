@@ -76,6 +76,7 @@ const QaBeforeStage2 = () => {
   const [isProcessStarted, setIsProcessStarted] = useState(false)
   const [isInputLocked, setIsInputLocked] = useState(false)
   const [isStopState, setIsStopState] = useState(false)
+  const [isResetState, setIsResetState] = useState(false)
   const [processStartIso, setProcessStartIso] = useState(null)
   const [processEndEstimateIso, setProcessEndEstimateIso] = useState(null)
   const [startedSerialNumbers, setStartedSerialNumbers] = useState([])
@@ -124,6 +125,7 @@ const QaBeforeStage2 = () => {
       toast.success(body?.message || 'Proses berhasil dimulai.')
       setIsProcessStarted(true)
       setIsStopState(false)
+      setIsResetState(false)
       autoStopInvokedRef.current = false
     } catch (err) {
       toast.error(err.response?.data?.message || 'Gagal start proses.')
@@ -152,6 +154,7 @@ const QaBeforeStage2 = () => {
       setIsProcessStarted(false)
       setIsInputLocked(false)
       setIsStopState(false)
+      setIsResetState(false)
       setProcessStartIso(null)
       setProcessEndEstimateIso(null)
       setStartedSerialNumbers([])
@@ -204,6 +207,7 @@ const QaBeforeStage2 = () => {
     setCurrentPage(1)
     setIsInputLocked(false)
     setIsStopState(false)
+    setIsResetState(false)
     setIsProcessStarted(false)
     setProcessStartIso(null)
     setProcessEndEstimateIso(null)
@@ -234,6 +238,7 @@ const QaBeforeStage2 = () => {
       setCurrentPage(1)
       setIsInputLocked(false)
       setIsStopState(false)
+      setIsResetState(true)
       setIsProcessStarted(false)
       setProcessStartIso(null)
       setProcessEndEstimateIso(null)
@@ -277,6 +282,7 @@ const QaBeforeStage2 = () => {
         setIsInputLocked(false)
         setIsProcessStarted(false)
         setIsStopState(true)
+        setIsResetState(false)
         setProcessStartIso(null)
         setProcessEndEstimateIso(null)
         setCountdownMs(null)
@@ -305,6 +311,7 @@ const QaBeforeStage2 = () => {
         setCurrentPage(1)
         setIsInputLocked(true)
         setIsStopState(false)
+        setIsResetState(false)
         toast.success(data?.message || 'Serial masuk tabel.')
       }else if (isReset) {
         const group = data.serial_number_group || []
@@ -328,7 +335,8 @@ const QaBeforeStage2 = () => {
         setStartedSerialNumbers(serialsFromGroup)
         setCurrentPage(1)
         setIsInputLocked(false)
-        // setIsStopState(false)
+        setIsStopState(false)
+        setIsResetState(true)
         toast.success(data?.message || 'Serial masuk tabel.')
       } else {
         if (inspectionDetails.length >= maxSerials) {
@@ -344,6 +352,7 @@ const QaBeforeStage2 = () => {
         }
         setInspectionDetails((prev) => [...prev, { serial_number: serial }])
         setIsStopState(false)
+        setIsResetState(false)
         toast.success(data?.message || 'Serial masuk tabel.')
       }
       setSerialNumber('')
@@ -441,7 +450,10 @@ const QaBeforeStage2 = () => {
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader className="d-flex justify-content-between align-items-center">
-            <strong>Inspection Details || Total: {inspectionDetails.length}</strong>
+            <strong>
+              Inspection Details || Total: {inspectionDetails.length}
+              {isResetState ? ' || RESET' : ''}
+            </strong>
             <div className="d-flex gap-2">
               <CButton
                 color="warning"
