@@ -44,6 +44,7 @@ const QaStage1 = () => {
   const [formData, setFormData] = useState({ serialNumber: '' })
   const [qcName, setQcName] = useState([])
   const [relayData, setRelayData] = useState(null)
+  const [isRelayPageReady, setIsRelayPageReady] = useState(false)
   const [qcCodeSerial, setNextQcIdValue] = useState(null)
   const [qcIdNow, setQcIdNow] = useState(null)
   const [buttonStop, setButtonStop] = useState(true)
@@ -89,6 +90,7 @@ const QaStage1 = () => {
     setSuccessValidation(null)
     setIsFormLocked(false)
     setRelayData(null)
+    setIsRelayPageReady(false)
   }
 
   const handleInput = (e) => {
@@ -220,10 +222,12 @@ const QaStage1 = () => {
       const response = await backendRelay.post('/page', payload1)
       console.log('Relay Response : ', response.data.status)
       setRelayData(response.data)
+      setIsRelayPageReady(true)
     } catch (error) {
       console.log(error)
       const errorMsg = error.response?.data?.message || 'ERROR RELAY'
       setErrorMessage(errorMsg)
+      setIsRelayPageReady(false)
     }
   }
 
@@ -446,9 +450,9 @@ const QaStage1 = () => {
                     })
                   )}
                   {/* Tombol Submit hanya muncul jika ada questions dan tidak ada error */}
-                  {questionData.length > 0 && !errorMessage && buttonStop && (
+                  {questionData.length > 0 && !errorMessage && buttonStop && isRelayPageReady && (
                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                      <CButton color="primary" type="submit">
+                      <CButton color="primary" type="submit" disabled={!isRelayPageReady}>
                         Submit
                       </CButton>
                     </div>
