@@ -323,7 +323,7 @@ const routes = [
   },
   {
     path: '/quality-assurance/qa-stage1',
-    name: 'Stage 1',
+    name: 'HV/LV & Tamper',
     element: (
       <PrivateRoutes requiredPermission={['ADMIN', 'QUALITY_ASSURANCE']}>
         <DefaultLayout>
@@ -334,7 +334,7 @@ const routes = [
   },
   {
     path: '/quality-assurance/qa-before-stage2',
-    name: 'Before Stage 2',
+    name: '6h Tamper 7',
     element: (
       <PrivateRoutes requiredPermission={['ADMIN', 'QUALITY_ASSURANCE']}>
         <DefaultLayout>
