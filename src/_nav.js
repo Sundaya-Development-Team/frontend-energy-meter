@@ -202,13 +202,13 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Stage 1',
+        name: 'HV/LV & Tamper',
         to: '/quality-assurance/qa-stage1',
         permissions: ['ADMIN', 'SOFTWARE_BURNING'],
       },
       {
         component: CNavItem,
-        name: 'Before Stage 2',
+        name: '6h Tamper 7',
         to: '/quality-assurance/qa-before-stage2',
         permissions: ['ADMIN', 'SOFTWARE_BURNING'],
       },

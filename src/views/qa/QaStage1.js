@@ -127,7 +127,7 @@ const QaStage1 = () => {
       const nextQcIdValue = response.data.next_qc_id
       setNextQcIdValue(nextQcIdValue)
 
-      if (response.data.status === true) {
+      if (response.data.status === true || response.data.status === 'lanjut') {
         // toast.success(response.data.message ?? 'Serial number valid')
         setErrorMessage(null)
         setErrorSerialNumber(null)
