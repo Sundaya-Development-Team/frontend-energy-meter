@@ -374,7 +374,7 @@ const QaBeforeStage2 = () => {
       <CCol md={6}>
         <CCard className="mb-4 h-100">
           <CCardHeader>
-            <strong>Temper 7 Time : Record Process</strong>
+            <strong>Tamper 7 Time : Record Process</strong>
           </CCardHeader>
           <CCardBody className="d-flex flex-column h-100">
             <FormRow label="Product Serial Number">
