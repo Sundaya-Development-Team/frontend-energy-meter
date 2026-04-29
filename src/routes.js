@@ -19,6 +19,7 @@ const DetailNonSerialQc = React.lazy(() => import('./views/receiving/DetailNonSe
 const TrackingList = React.lazy(() => import('./views/tracking/TrackingList'))
 const TrackingDetail = React.lazy(() => import('./views/tracking/TrackingDetail'))
 const TrackingFinalProduct = React.lazy(() => import('./views/tracking/TrackingFinalProduct'))
+const TrackingByOrder = React.lazy(() => import('./views/tracking/TrackingByOrder'))
 
 //Quality Assurance
 const QualityAssuranceStatus = React.lazy(() => import('./views/qa/QaStatus'))
@@ -304,6 +305,38 @@ const routes = [
       <PrivateRoutes requiredPermission={['ADMIN', 'QC_RECEIVING']}>
         <DefaultLayout>
           <TrackingFinalProduct />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/tracking/byorder',
+    name: 'Tracking By Order',
+    element: (
+      <PrivateRoutes
+        requiredPermission={[
+          'ADMIN',
+          'PO_RECEIVING',
+          'QC_RECEIVING',
+          'QC_SUB_ASSEMBLY',
+          'QC_ASSEMBLY',
+          'ON_TEST',
+          'HIPOT_TEST',
+          'PIC_HIPOT',
+          'TEST_BENCH1',
+          'ULTRA_SONIC',
+          'QC_REF_METER',
+          'TEST_BENCH2',
+          'AGING_TEST',
+          'LASER_PRINT',
+          'QC_COVER',
+          'GENERATE_BOX',
+          'SOFTWARE_BURNING',
+          'QUALTY_ASSURANCE',
+        ]}
+      >
+        <DefaultLayout>
+          <TrackingByOrder />
         </DefaultLayout>
       </PrivateRoutes>
     ),
