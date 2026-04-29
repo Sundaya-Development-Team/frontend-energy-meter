@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   CCard,
   CCardBody,
@@ -14,6 +15,7 @@ import { backendTracking } from '../../api/axios'
 import { CounterCard6 } from '../components/CounterCard'
 
 const DashboardPLN = () => {
+  const navigate = useNavigate()
   const [orders, setOrders] = useState([])
   const [expanded, setExpanded] = useState({})
   const [loading, setLoading] = useState(true)
@@ -55,6 +57,12 @@ const DashboardPLN = () => {
       ...prev,
       [assemblyId]: !prev[assemblyId],
     }))
+  }
+
+  const handleNavigateAssembly = (assemblyId) => {
+    navigate(`/quality-assurance/qa-before-stage2?assembly_id=${assemblyId}`, {
+      state: { assembly_id: assemblyId },
+    })
   }
 
   // helper badge status
@@ -137,19 +145,29 @@ const DashboardPLN = () => {
 
                 return (
                   <div key={asm.assembly_id} className="mb-2 mt-3">
-                    <CButton
-                      color="light"
-                      className="d-flex justify-content-between align-items-center w-100"
-                      onClick={() => toggleExpand(asm.assembly_id)}
-                    >
-                      <span>Batch {idx + 1}</span>
+                    <div className="d-flex align-items-stretch gap-2">
+                      <CButton
+                        color="light"
+                        className="d-flex justify-content-between align-items-center w-100"
+                        onClick={() => toggleExpand(asm.assembly_id)}
+                      >
+                        <span>Batch {idx + 1}</span>
 
-                      {isCompleted ? (
-                        <span className="badge bg-success text-white">Completed</span>
-                      ) : (
-                        <span className="badge bg-info">Quantity : {asm.current_quantity}</span>
-                      )}
-                    </CButton>
+                        {isCompleted ? (
+                          <span className="badge bg-success text-white">Completed</span>
+                        ) : (
+                          <span className="badge bg-info">Quantity : {asm.current_quantity}</span>
+                        )}
+                      </CButton>
+
+                      <CButton
+                        color="light"
+                        className="px-3 text-nowrap fw-semibold border"
+                        onClick={() => handleNavigateAssembly(asm.assembly_id)}
+                      >
+                        Serial List
+                      </CButton>
+                    </div>
 
                     <CCollapse visible={expanded[asm.assembly_id]}>
                       <CListGroup>
