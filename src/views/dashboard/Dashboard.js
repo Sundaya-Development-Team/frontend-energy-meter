@@ -59,9 +59,9 @@ const DashboardPLN = () => {
     }))
   }
 
-  const handleNavigateAssembly = (assemblyId) => {
-    navigate(`/quality-assurance/qa-before-stage2?assembly_id=${assemblyId}`, {
-      state: { assembly_id: assemblyId },
+  const handleNavigateAssembly = (assemblyId, plnOrderNumber) => {
+    navigate(`/tracking/byorder?assembly_id=${assemblyId}&pln_order_number=${plnOrderNumber}`, {
+      state: { assembly_id: assemblyId, pln_order_number: plnOrderNumber },
     })
   }
 
@@ -163,7 +163,7 @@ const DashboardPLN = () => {
                       <CButton
                         color="light"
                         className="px-3 text-nowrap fw-semibold border"
-                        onClick={() => handleNavigateAssembly(asm.assembly_id)}
+                        onClick={() => handleNavigateAssembly(asm.assembly_id, order.pln_order_details.order_number)}
                       >
                         Serial List
                       </CButton>

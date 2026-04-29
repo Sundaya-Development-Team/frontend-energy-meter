@@ -11,7 +11,7 @@ import {
   CButton,
 } from '@coreui/react'
 import DataTable from 'react-data-table-component'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { backendTracking } from '../../api/axios'
 
@@ -25,6 +25,12 @@ const TrackingList = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(20)
   const navigate = useNavigate()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const rawAssemblyId = queryParams.get('assembly_id') || location.state?.assembly_id || ''
+  const rawPlnOrderId = queryParams.get('pln_order_number') || location.state?.pln_order_number || ''
+  const assemblyIdParam = rawAssemblyId !== '' ? Number(rawAssemblyId) : null
+  const plnOrderIdParam = rawPlnOrderId !== '' ? rawPlnOrderId : null
 
   const handleDetail = (row) => {
     navigate(`/tracking/detail/${row.tracking_id}`)
@@ -52,7 +58,7 @@ const TrackingList = () => {
   )
 
   // === FETCH DATA ===
-  const fetchData = async (page = 1, limit = 20, serialNumber = '') => {
+  const fetchData = async (page = 1, limit = 20, serialNumber = '', assemblyId = null) => {
     setLoading(true)
     try {
       const payload = {
@@ -60,6 +66,10 @@ const TrackingList = () => {
         limit,
         is_serial: true,
         tracking_type: 'assembly',
+      }
+
+      if (Number.isInteger(assemblyId) && assemblyId > 0) {
+        payload.assembly_order_id = assemblyId
       }
 
       // Jika ada serial number, tambahkan ke payload
@@ -85,8 +95,8 @@ const TrackingList = () => {
 
   // Fetch data when page, rowsPerPage, or searchKeyword changes
   useEffect(() => {
-    fetchData(currentPage, rowsPerPage, searchKeyword)
-  }, [currentPage, rowsPerPage, searchKeyword])
+    fetchData(currentPage, rowsPerPage, searchKeyword, assemblyIdParam)
+  }, [currentPage, rowsPerPage, searchKeyword, assemblyIdParam])
 
   // Handle search submit
   const handleSearch = () => {
@@ -352,7 +362,11 @@ const TrackingList = () => {
   return (
     <CCard>
       <CCardHeader>
-        <strong>Tracking QC Product Process</strong>
+        <strong>
+          Tracking QC Product Process
+          {/* {assemblyIdParam ? ` | Assembly ID: ${assemblyIdParam}` : ''} */}
+          {plnOrderIdParam ? ` | PLN Order ID: ${plnOrderIdParam}` : ''}
+        </strong>
       </CCardHeader>
       <CCardBody>
         {/* Search + Download */}
