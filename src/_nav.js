@@ -180,6 +180,28 @@ const _nav = [
     permissions: ['ADMIN', 'QC_RECEIVING'],
   },
 
+  // Admin QC
+  {
+    component: CNavTitle,
+    name: 'Admin QC',
+    permissions: ['ADMIN'],
+  },
+  {
+    component: CNavGroup,
+    name: 'QC Placement Admin',
+    to: '/quality-assurance/qa-stage',
+    icon: <CIcon icon={cilAlbum} customClassName="nav-icon" />,
+    permissions: ['ADMIN'],
+    items: [
+      {
+        component: CNavItem,
+        name: 'Set Qc',
+        to: '/quality-assurance/qc-admin',
+        permissions: ['ADMIN', 'QUALTY_ASSURANCE'],
+      },
+    ],
+  },
+
   // Quality Assurance
   {
     component: CNavTitle,
@@ -214,6 +236,7 @@ const _nav = [
       },
     ],
   },
+  
 
   // Production
   {

@@ -26,6 +26,9 @@ const QualityAssuranceStatus = React.lazy(() => import('./views/qa/QaStatus'))
 const QualityAssuranceStage1 = React.lazy(() => import('./views/qa/QaStage1'))
 const QualityAssuranceBeforeStage2 = React.lazy(() => import('./views/qa/QaBeforeStage2'))
 
+//Qc Admin
+const QcAdmin = React.lazy(() => import('./views/qa/QcAdmin'))
+
 //QCProd
 const ProdQcSerialAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialAql'))
 const ProdQcSerialNoAql = React.lazy(() => import('./views/production/formqc/ProdQcSerialNoAql'))
@@ -341,6 +344,7 @@ const routes = [
       </PrivateRoutes>
     ),
   },
+  
   //Quality Assurance
   { path: '/quality-assurance', name: 'Quality Assurance' },
   {
@@ -372,6 +376,17 @@ const routes = [
       <PrivateRoutes requiredPermission={['ADMIN', 'QUALITY_ASSURANCE']}>
         <DefaultLayout>
           <QualityAssuranceBeforeStage2 />
+        </DefaultLayout>
+      </PrivateRoutes>
+    ),
+  },
+  {
+    path: '/quality-assurance/qc-admin',
+    name: 'QC Placement Admin',
+    element: (
+      <PrivateRoutes requiredPermission={['ADMIN', 'QUALITY_ASSURANCE']}>
+        <DefaultLayout>
+          <QcAdmin />
         </DefaultLayout>
       </PrivateRoutes>
     ),
