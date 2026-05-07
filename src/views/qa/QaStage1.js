@@ -73,7 +73,7 @@ const QaStage1 = () => {
   console.log('username : ', user.name)
 
   if (!user || !user.id || !user.name) {
-    const errorMsg = 'User tidak ditemukan di localStorage!'
+    const errorMsg = 'User not found in localStorage!'
     setErrorMessage(errorMsg)
     // toast.error(errorMsg)
     return
@@ -98,7 +98,7 @@ const QaStage1 = () => {
   }
 
   const handleSerial = () => {
-    console.log('Serial Number di-scan:', formData.serialNumber)
+    console.log('Serial Number scanned:', formData.serialNumber)
 
     // Simpan serial number sebelum reset
     const currentSerialNumber = formData.serialNumber
@@ -236,26 +236,26 @@ const QaStage1 = () => {
 
     // Validasi field wajib
     if (!productData?.serial_number) {
-      const errorMsg = 'Serial number wajib diisi!'
+      const errorMsg = 'Serial number is required!'
       setErrorMessage(errorMsg)
       // toast.error(errorMsg)
       return
     }
     if (!user || !user.id || !user.name) {
-      const errorMsg = 'User tidak ditemukan di localStorage!'
+      const errorMsg = 'User not found in localStorage!'
       setErrorMessage(errorMsg)
       // toast.error(errorMsg)
       return
     }
     if (!qcName) {
-      const errorMsg = 'QC Name wajib diisi!'
+      const errorMsg = 'QC Name is required!'
       setErrorMessage(errorMsg)
       // toast.error(errorMsg)
       return
     }
     console.log('qcCodeSerial : ', qcCodeSerial)
     if (!qcCodeSerial) {
-      const errorMsg = 'QC ID wajib diisi!'
+      const errorMsg = 'QC ID is required!'
       setErrorMessage(errorMsg)
       // toast.error(errorMsg)
       return
@@ -265,7 +265,7 @@ const QaStage1 = () => {
     //   return
     // }
     if (Object.keys(answers).length === 0) {
-      const errorMsg = 'Jawaban pertanyaan QC wajib diisi!'
+      const errorMsg = 'QC question answers are required!'
       setErrorMessage(errorMsg)
       // toast.error(errorMsg)
       return
@@ -305,13 +305,13 @@ const QaStage1 = () => {
       // Bersihkan semua state hanya jika submit berhasil
       resetStates()
 
-      console.log('QC yang di submit : ', qcCodeSerial)
+      console.log('Submitted QC : ', qcCodeSerial)
 
       if (qcCodeSerial !== 'QC-TT006') {
-        console.log('Lanjut ke stage selanjutnya')
+        console.log('Continue to next stage')
         fetchValidationSnumb(productData.serial_number)
       } else {
-        console.log('Tidak lanjut ke stage selanjutnya karena QC-TT006 adalah stage terakhir')
+        console.log('Do not continue to next stage because QC-TT006 is the final stage')
         homeRelay()
       }
 
@@ -323,7 +323,7 @@ const QaStage1 = () => {
       // }, 0)
     } catch (error) {
       console.error('QC submit error:', error)
-      const errorMsg = error.response?.data?.message || error.message || 'Gagal submit QA'
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to submit QA'
       setErrorMessage(errorMsg)
       // Simpan serial number untuk ditampilkan di error card (input field tetap kosong)
       const currentSerialNumber = productData?.serial_number || formData.serialNumber
@@ -363,11 +363,11 @@ const QaStage1 = () => {
       setRelayData(response.data)
 
       if (buttonStop) {
-        console.log('Masuk kondisi buttonStop true, akan di set ke false dan kirim command RESUME')
+        console.log('Entered buttonStop=true condition, set to false and send RESUME command')
         setButtonStop(false)
       } else {
         setButtonStop(true)
-        console.log('Masuk kondisi buttonStop false, akan di set ke true dan kirim command STOP')
+        console.log('Entered buttonStop=false condition, set to true and send STOP command')
       }
     } catch (error) {
       console.log(error)
@@ -482,9 +482,9 @@ const QaStage1 = () => {
                   >
                     {relayData ? (
                       <CRow className="mb-3">
-                        <CounterCard6 title="Halaman" value={relayData.halaman ?? `-`} />
-                        <CounterCard6 title="Alamat" value={relayData.alamat ?? `-`} />
-                        <CounterCard6 title="Tipe Test" value={relayData.tipe_test ?? `-`} />
+                        <CounterCard6 title="Page" value={relayData.halaman ?? `-`} />
+                        <CounterCard6 title="Address" value={relayData.alamat ?? `-`} />
+                        <CounterCard6 title="Test Type" value={relayData.tipe_test ?? `-`} />
                         <CounterCard6 title="Status" value={relayData.status ?? `-`} />
                       </CRow>
                     ) : (
