@@ -51,6 +51,7 @@ const QaStage1 = () => {
 
   useEffect(() => {
     resetStates()
+    fetchRelayData("HOME")
     serialNumberInputRef.current.focus()
     console.clear()
   }, [])
