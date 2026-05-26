@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import {
+  CBadge,
   CButton,
   CCard,
   CCardBody,
@@ -41,217 +42,77 @@ const formatDateTimeId = (iso) => {
   })
 }
 
-const addHoursIso = (iso, hours) => {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return null
-  d.setTime(d.getTime() + hours * 60 * 60 * 1000)
-  return d.toISOString()
-}
-
-const pickTimestampFromPayload = (payload) => {
-  return (
-    payload?.data?.timestamp ||
-    payload?.timestamp ||
-    payload?.start_time ||
-    payload?.started_at ||
-    null
-  )
-}
-
-const formatCountdown = (ms) => {
-  if (ms == null || Number.isNaN(ms)) return '-'
-  const totalSec = Math.max(0, Math.floor(ms / 1000))
-  const h = Math.floor(totalSec / 3600)
-  const m = Math.floor((totalSec % 3600) / 60)
-  const s = totalSec % 60
-  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-}
-
 const QcAdmin = () => {
   const serialInputRef = useRef(null)
-  const handleStopProcessRef = useRef(null)
-  const isStopLoadingRef = useRef(false)
-  const autoStopInvokedRef = useRef(false)
   const [serialNumber, setSerialNumber] = useState('')
   const [qcPlacement, setQcPlacement] = useState('')
   const [notes, setNotes] = useState('')
   const [inspectionDetails, setInspectionDetails] = useState([])
-  const [isProcessStarted, setIsProcessStarted] = useState(false)
-  const [isInputLocked, setIsInputLocked] = useState(false)
-  const [isStopState, setIsStopState] = useState(false)
-  const [isResetState, setIsResetState] = useState(false)
-  const [processStartIso, setProcessStartIso] = useState(null)
-  const [processEndEstimateIso, setProcessEndEstimateIso] = useState(null)
-  const [startedSerialNumbers, setStartedSerialNumbers] = useState([])
-  const [isStopLoading, setIsStopLoading] = useState(false)
-  const [countdownMs, setCountdownMs] = useState(null)
+  const [placementOptions, setPlacementOptions] = useState([])
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
-  const maxSerials = 9
 
   useEffect(() => {
     serialInputRef.current?.focus()
+    const fetchPlacementList = async () => {
+      try {
+        const { data } = await backendQc.get('/qc-placement/list')
+        const items = data?.data || data || []
+        if (Array.isArray(items)) {
+          setPlacementOptions(items)
+        }
+      } catch (err) {
+        console.error('Failed to fetch placement list:', err)
+      }
+    }
+    fetchPlacementList()
   }, [])
-
-  useEffect(() => {
-    isStopLoadingRef.current = isStopLoading
-  }, [isStopLoading])
-
-  const handleStartProcess = async () => {
-    const serials = inspectionDetails.map((d) => d.serial_number).filter(Boolean)
-    if (serials.length === 0) {
-      toast.warning('Belum ada serial yang di-scan. Scan minimal 1 serial.')
-      return
-    }
-    try {
-      const { data: body } = await backendQc.post('/tamper/tts007/start', {
-        serial_number: serials,
-      })
-      const ok = body?.status === true || body?.data?.success === true
-      if (!ok) {
-        toast.error(body?.message || 'Start proses ditolak oleh server.')
-        return
-      }
-      const ts = body?.data?.timestamp
-      if (ts) {
-        setProcessStartIso(ts)
-        setProcessEndEstimateIso(addHoursIso(ts, 6))
-      } else {
-        setProcessStartIso(null)
-        setProcessEndEstimateIso(null)
-      }
-      const returnedSerials = Array.isArray(body?.serial_number)
-        ? body.serial_number
-        : serials
-      setStartedSerialNumbers(returnedSerials)
-      toast.success(body?.message || 'Proses berhasil dimulai.')
-      setIsProcessStarted(true)
-      setIsStopState(false)
-      setIsResetState(false)
-      autoStopInvokedRef.current = false
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal start proses.')
-    }
-  }
-
-  const resolveSerialsForStop = () => {
-    if (startedSerialNumbers.length > 0) return startedSerialNumbers
-    return inspectionDetails.map((d) => d.serial_number).filter(Boolean)
-  }
-
-  const handleStopProcess = async ({ triggeredByTimer = false } = {}) => {
-    const serials = resolveSerialsForStop()
-    if (serials.length === 0) {
-      toast.warning('Tidak ada serial untuk stop process.')
-      return
-    }
-    setIsStopLoading(true)
-    try {
-      await backendQc.post('/tamper/tts007/stop', { serial_number: serials })
-      toast.success(
-        triggeredByTimer
-          ? 'Waktu proses habis. Proses dihentikan otomatis.'
-          : 'Stop process berhasil.',
-      )
-      setIsProcessStarted(false)
-      setIsInputLocked(false)
-      setIsStopState(false)
-      setIsResetState(false)
-      setProcessStartIso(null)
-      setProcessEndEstimateIso(null)
-      setStartedSerialNumbers([])
-      setInspectionDetails([])
-      setCurrentPage(1)
-      setCountdownMs(null)
-      autoStopInvokedRef.current = false
-      setTimeout(() => serialInputRef.current?.focus(), 0)
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal stop process.')
-    } finally {
-      setIsStopLoading(false)
-    }
-  }
-
-  handleStopProcessRef.current = handleStopProcess
-
-  useEffect(() => {
-    if (!isProcessStarted || !processEndEstimateIso) {
-      setCountdownMs(null)
-      return undefined
-    }
-    const endMs = new Date(processEndEstimateIso).getTime()
-    if (Number.isNaN(endMs)) {
-      setCountdownMs(null)
-      return undefined
-    }
-
-    const tick = () => {
-      const remaining = Math.max(0, endMs - Date.now())
-      setCountdownMs(remaining)
-      if (
-        remaining <= 0 &&
-        !autoStopInvokedRef.current &&
-        !isStopLoadingRef.current &&
-        handleStopProcessRef.current
-      ) {
-        autoStopInvokedRef.current = true
-        void handleStopProcessRef.current({ triggeredByTimer: true })
-      }
-    }
-
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [isProcessStarted, processEndEstimateIso])
 
   const clearSerialNumber = () => {
     setInspectionDetails([])
     setCurrentPage(1)
-    setIsInputLocked(false)
-    setIsStopState(false)
-    setIsResetState(false)
-    setIsProcessStarted(false)
-    setProcessStartIso(null)
-    setProcessEndEstimateIso(null)
-    setStartedSerialNumbers([])
-    setCountdownMs(null)
-    autoStopInvokedRef.current = false
     toast.info('The Serial Number data has been reset..')
     setTimeout(() => serialInputRef.current?.focus(), 0)
   }
 
-  const handleResetProcess = async () => {
+  const handleSubmitProcess = async () => {
     const serials = inspectionDetails.map((d) => d.serial_number).filter(Boolean)
     if (serials.length === 0) {
-      toast.warning('Tidak ada serial untuk reset process.')
+      toast.warning('Belum ada serial yang di-scan.')
+      return
+    }
+    if (!qcPlacement) {
+      toast.warning('Pilih QC Placement terlebih dahulu.')
       return
     }
     try {
-      const response = await backendQc.post('/tamper/tts007/reset', {
+      const { data: body } = await backendQc.post('/qc-placement/remove1', {
         serial_numbers: serials,
+        qc_id: qcPlacement,
+        note: notes || '',
       })
-      const body = response.data
-      const returnedSerials = Array.isArray(body?.serial_numbers) ? body.serial_numbers : []
-      const limitedSerials = returnedSerials.slice(0, maxSerials)
-      if (returnedSerials.length > maxSerials) {
-        toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
-      }
-      setInspectionDetails(limitedSerials.map((sn) => ({ serial_number: sn })))
+      toast.success(body?.message || 'Submit process berhasil.')
+      setInspectionDetails([])
       setCurrentPage(1)
-      setIsInputLocked(false)
-      setIsStopState(false)
-      setIsResetState(true)
-      setIsProcessStarted(false)
-      setProcessStartIso(null)
-      setProcessEndEstimateIso(null)
-      setCountdownMs(null)
-      setStartedSerialNumbers([])
-      autoStopInvokedRef.current = false
-      toast.success(body?.message || 'Reset process berhasil.')
+      setQcPlacement('')
+      setNotes('')
+      setSerialNumber('')
       setTimeout(() => serialInputRef.current?.focus(), 0)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal reset process.')
+      toast.error(err.response?.data?.message || 'Gagal submit process.')
+    }
+  }
+
+  const getPlacementSerial = async (serial) => {
+    try {
+      const response = await backendQc.get('/qc-placement/preview', {
+        params: { serial_numbers: serial },
+      })
+      return response.data
+    } catch (err) {
+      console.error('getPlacementSerial error:', err)
+      return null
     }
   }
 
@@ -259,109 +120,30 @@ const QcAdmin = () => {
     const serial = serialNumber.trim()
     if (!serial) return
 
-    if (isInputLocked || isProcessStarted) return
-
     try {
-      const response = await backendQc.get('/validation/tts007', {
-        params: { serial_number: serial },
-      })
-      const data = response.data
+      const placementData = await getPlacementSerial(serial)
+      const placementItems = placementData?.data || []
 
-      const isStop = data.status === 'stop'
-      const isLanjut = data.status === 'progress'
-      const isReset = data.status === 'reset'
-
-      if (isStop) {
-        const group = data.serial_number_group || []
-        const limitedGroup = group.slice(0, maxSerials)
-        if (group.length > maxSerials) {
-          toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
-        }
-        setInspectionDetails(
-          limitedGroup.map((item) => ({ serial_number: item.serial_number })),
-        )
-        setStartedSerialNumbers([])
-        setCurrentPage(1)
-        setIsInputLocked(false)
-        setIsProcessStarted(false)
-        setIsStopState(true)
-        setIsResetState(false)
-        setProcessStartIso(null)
-        setProcessEndEstimateIso(null)
-        setCountdownMs(null)
-        autoStopInvokedRef.current = false
-        toast.info(data?.message || 'Serial sudah START Tamper.')
-      } else if (isLanjut) {
-        const group = data.serial_number_group || []
-        const limitedGroup = group.slice(0, maxSerials)
-        if (group.length > maxSerials) {
-          toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
-        }
-        setInspectionDetails(
-          limitedGroup.map((item) => ({ serial_number: item.serial_number })),
-        )
-        const ts = pickTimestampFromPayload(data)
-        if (ts) {
-          setProcessStartIso(ts)
-          setProcessEndEstimateIso(addHoursIso(ts, 6))
-          setIsProcessStarted(true)
-          autoStopInvokedRef.current = false
-        }
-        const serialsFromGroup = limitedGroup
-          .map((item) => item.serial_number)
-          .filter(Boolean)
-        setStartedSerialNumbers(serialsFromGroup)
-        setCurrentPage(1)
-        setIsInputLocked(true)
-        setIsStopState(false)
-        setIsResetState(false)
-        toast.success(data?.message || 'Serial masuk tabel.')
-      }else if (isReset) {
-        const group = data.serial_number_group || []
-        const limitedGroup = group.slice(0, maxSerials)
-        if (group.length > maxSerials) {
-          toast.warning(`Maksimal ${maxSerials} serial. Data ditampilkan ${maxSerials} serial pertama.`)
-        }
-        setInspectionDetails(
-          limitedGroup.map((item) => ({ serial_number: item.serial_number })),
-        )
-        const ts = pickTimestampFromPayload(data)
-        if (ts) {
-          setProcessStartIso(ts)
-          setProcessEndEstimateIso(addHoursIso(ts, 6))
-          setIsProcessStarted(true)
-          autoStopInvokedRef.current = false
-        }
-        const serialsFromGroup = limitedGroup
-          .map((item) => item.serial_number)
-          .filter(Boolean)
-        setStartedSerialNumbers(serialsFromGroup)
-        setCurrentPage(1)
-        setIsInputLocked(false)
-        setIsStopState(false)
-        setIsResetState(true)
-        toast.success(data?.message || 'Serial masuk tabel.')
+      if (Array.isArray(placementItems) && placementItems.length > 0) {
+        setInspectionDetails((prev) => {
+          const existingSerials = new Set(prev.map((d) => d.serial_number))
+          const newItems = placementItems
+            .filter((item) => !existingSerials.has(item.serial_number))
+            .map((item) => ({
+              serial_number: item.serial_number,
+              last_qc: item.last_qc || null,
+            }))
+          return [...prev, ...newItems]
+        })
+        toast.success('Data placement berhasil dimuat.')
       } else {
-        if (inspectionDetails.length >= maxSerials) {
-          toast.warning(`Maksimal ${maxSerials} serial dalam tabel.`)
-          setSerialNumber('')
-          return
-        }
-        const exists = inspectionDetails.some((d) => d.serial_number === serial)
-        if (exists) {
-          toast.warning('Serial number sudah ada di tabel.')
-          setSerialNumber('')
-          return
-        }
-        setInspectionDetails((prev) => [...prev, { serial_number: serial }])
-        setIsStopState(false)
-        setIsResetState(false)
-        toast.success(data?.message || 'Serial masuk tabel.')
+        toast.warning('Data placement tidak ditemukan untuk serial ini.')
       }
+
       setSerialNumber('')
     } catch (err) {
       setSerialNumber('')
-      toast.error(err.response?.data?.message || 'Gagal validasi serial.')
+      toast.error(err.response?.data?.message || 'Gagal mengambil data placement.')
       setTimeout(() => serialInputRef.current?.focus(), 0)
     }
   }
@@ -385,7 +167,6 @@ const QcAdmin = () => {
               <CFormInput
                 ref={serialInputRef}
                 value={serialNumber}
-                disabled={isInputLocked || isProcessStarted}
                 onChange={(e) => setSerialNumber(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -399,13 +180,14 @@ const QcAdmin = () => {
             <FormRow label="QC Placement">
               <CFormSelect
                 value={qcPlacement}
-                disabled={isInputLocked || isProcessStarted}
                 onChange={(e) => setQcPlacement(e.target.value)}
               >
                 <option value="">Pilih placement</option>
-                <option value="sub_assembly">Sub Assembly</option>
-                <option value="assembly">Assembly</option>
-                <option value="on_test">On Test</option>
+                {placementOptions.map((opt) => (
+                  <option key={opt.qc_id} value={opt.qc_id}>
+                    {opt.qc_name}
+                  </option>
+                ))}
               </CFormSelect>
             </FormRow>
             <FormRow label="Notes">
@@ -413,61 +195,19 @@ const QcAdmin = () => {
                 type="text"
                 value={notes}
                 placeholder="Masukkan catatan"
-                disabled={isInputLocked || isProcessStarted}
                 onChange={(e) => setNotes(e.target.value)}
               />
             </FormRow>
 
-            {/* Time Process Start and End */}
-            {isProcessStarted && processStartIso && (
-              <>
-                <FormRow label="Start time">
-                  <span className="small text-muted">{formatDateTimeId(processStartIso)} (WIB)</span>
-                </FormRow>
-                <FormRow label="Estimate complete">
-                  <span className="small text-muted">
-                    {formatDateTimeId(processEndEstimateIso)} (WIB, start + 6 hours)
-                  </span>
-                </FormRow>
-                {processEndEstimateIso && (
-                  <FormRow label="Countdown to stop">
-                    <span className="text-primary fw-semibold">{formatCountdown(countdownMs)}</span>
-                    <span className="ms-1 small text-muted">(hours:minutes:seconds)</span>
-                  </FormRow>
-                )}
-              </>
-            )}
-            <div className="mt-auto d-flex justify-content-end pt-3 gap-2 flex-wrap">
-              {(isInputLocked || isProcessStarted) && (
-                <>
-                  <CButton
-                    color="secondary"
-                    className="text-white"
-                    onClick={handleResetProcess}
-                    disabled={inspectionDetails.length === 0}
-                  >
-                    Reset Process
-                  </CButton>
-                  <CButton
-                    color="danger"
-                    className="text-white"
-                    onClick={() => handleStopProcess()}
-                    disabled={isStopLoading}
-                  >
-                    Stop Process
-                  </CButton>
-                </>
-              )}
-              {!isInputLocked && !isProcessStarted && !isStopState && (
-                <CButton
-                  color="primary"
-                  className="text-white"
-                  onClick={handleStartProcess}
-                  disabled={inspectionDetails.length === 0}
-                >
-                  Start Process
-                </CButton>
-              )}
+            <div className="mt-auto d-flex justify-content-end pt-3">
+              <CButton
+                color="success"
+                className="text-white"
+                onClick={handleSubmitProcess}
+                disabled={inspectionDetails.length === 0 || !qcPlacement}
+              >
+                Submit Process
+              </CButton>
             </div>
           </CCardBody>
         </CCard>
@@ -486,7 +226,7 @@ const QcAdmin = () => {
                 size="sm"
                 className="text-white"
                 onClick={clearSerialNumber}
-                disabled={inspectionDetails.length === 0 || isProcessStarted}
+                disabled={inspectionDetails.length === 0}
               >
                 Clear Serial Number
               </CButton>
@@ -499,6 +239,8 @@ const QcAdmin = () => {
                   <CTableRow>
                     <CTableHeaderCell>No</CTableHeaderCell>
                     <CTableHeaderCell>Serial Number</CTableHeaderCell>
+                    <CTableHeaderCell>Last QC</CTableHeaderCell>
+                    <CTableHeaderCell>Result</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -508,6 +250,29 @@ const QcAdmin = () => {
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </CTableDataCell>
                       <CTableDataCell>{item.serial_number}</CTableDataCell>
+                      <CTableDataCell>
+                        {item.last_qc ? (
+                          <div>
+                            <div className="fw-semibold">{item.last_qc.qc_name || '-'}</div>
+                            <small className="text-muted">
+                              {formatDateTimeId(item.last_qc.inspection_date)}
+                            </small>
+                          </div>
+                        ) : (
+                          '-'
+                        )}
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        {item.last_qc?.result ? (
+                          <CBadge
+                            color={item.last_qc.result === 'PASS' ? 'success' : 'danger'}
+                          >
+                            {item.last_qc.result}
+                          </CBadge>
+                        ) : (
+                          '-'
+                        )}
+                      </CTableDataCell>
                     </CTableRow>
                   ))}
                 </CTableBody>
