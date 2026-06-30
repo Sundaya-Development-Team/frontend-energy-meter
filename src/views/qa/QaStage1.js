@@ -215,6 +215,7 @@ const QaStage1 = () => {
   }
 
   const fetchRelayData = async (nextQcIdValue) => {
+    console.log('nextQcIdValue : ', nextQcIdValue)
     try {
       const payload1 = {
         page: nextQcIdValue,
@@ -345,6 +346,22 @@ const QaStage1 = () => {
       const response = await backendRelay.post('/page', payload)
       console.log('Relay Response : ', response.data.status)
       setRelayData(response.data)
+    } catch (error) {
+      console.log(error)
+      const errorMsg = error.response?.data?.message || 'ERROR RELAY'
+      setErrorMessage(errorMsg)
+    }
+  }
+
+  const turnOnTemper2 = async () => {
+    try {
+      const payload2 = {
+        active: true,
+      }
+
+      const response = await backendRelay.post('/tamper2/relay', payload2)
+
+      console.log('Relay Response : ', response.data.status)
     } catch (error) {
       console.log(error)
       const errorMsg = error.response?.data?.message || 'ERROR RELAY'
@@ -490,6 +507,19 @@ const QaStage1 = () => {
                       </CRow>
                     ) : (
                       <p className="text-muted text-center mb-0">Relay data not yet available...</p>
+                    )}
+
+                    {relayData && relayData.halaman === 'QC-TT002' && (
+                      <CRow className="mb-3">
+                        <CButton
+                          color="warning"
+                          type="button"
+                          onClick={turnOnTemper2}
+                          className="mx-auto text-white"
+                        >
+                          Turn On Temper 2
+                        </CButton>
+                      </CRow>
                     )}
 
                     {relayData && (
